@@ -8,8 +8,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const CATEGORIES = [
   { label: 'Acne Care', to: '/shop?category=Acne+Care', image: '/products/mighty-patch/1.jpg' },
   { label: 'Toners', to: '/shop?category=Toners', image: '/products/some-by-mi/1.jpg' },
-  { label: 'Spot Patches', to: '/shop?q=patch', image: '/products/mighty-patch/2.jpg' },
-  { label: 'Korean Skincare', to: '/shop?q=some', image: '/products/some-by-mi/2.jpg' },
+  { label: 'Masks', to: '/shop?category=Masks', image: '/products/sadoer-collagen/1.png' },
+  { label: 'Anti-Aging', to: '/shop?q=collagen', image: '/products/sadoer-collagen/2.png' },
 ]
 
 export default function Home() {
@@ -70,9 +70,9 @@ export default function Home() {
             Authentic skincare, delivered across Islamabad and Rawalpindi
           </h2>
           <p className="mt-4 text-ink-soft leading-relaxed">
-            We started Aura Beauty Care so you can shop genuine Hero Cosmetics Mighty Patch and SOME
-            BY MI without guessing what is real. Every order is confirmed on WhatsApp. Cash on
-            delivery is available, and we deliver across Islamabad and Rawalpindi.
+            We started Aura Beauty Care so you can shop genuine SADOER collagen masks, Hero Cosmetics
+            Mighty Patch, and SOME BY MI without guessing what is real. Every order is confirmed on
+            WhatsApp. Cash on delivery is available, and we deliver across Islamabad and Rawalpindi.
           </p>
           <Link to="/about" className="btn-lavender inline-block w-auto px-8 mt-6">
             Our story

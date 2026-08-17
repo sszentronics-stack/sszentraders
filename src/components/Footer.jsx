@@ -9,8 +9,8 @@ export default function Footer() {
         <div className="md:col-span-1">
           <Logo variant="light" />
           <p className="mt-4 text-sm text-white/80 leading-relaxed">
-            Aura Beauty Care brings authentic Korean and US skincare to Pakistan. Shop our hero
-            Mighty Patch and SOME BY MI 30 Days Miracle Toner — genuine products, WhatsApp ordering,
+            Aura Beauty Care brings authentic skincare to Pakistan. Shop SADOER Collagen Mask, Hero
+            Mighty Patch, and SOME BY MI 30 Days Miracle Toner — genuine products, WhatsApp ordering,
             cash on delivery. We deliver across Islamabad and Rawalpindi.
           </p>
         </div>
@@ -20,6 +20,9 @@ export default function Footer() {
           <ul className="space-y-2 text-sm text-white/85">
             <li>
               <Link to="/shop">All products</Link>
+            </li>
+            <li>
+              <Link to="/products/sadoer-collagen-anti-aging-facial-mask">SADOER Collagen Mask</Link>
             </li>
             <li>
               <Link to="/products/hero-mighty-patch-invisible-plus">Hero Mighty Patch</Link>

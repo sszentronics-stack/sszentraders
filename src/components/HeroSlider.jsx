@@ -5,6 +5,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const SLIDES = [
   {
     id: 1,
+    banner: '/banners/sadoer-collagen-banner.png',
+    alt: 'SADOER Collagen Anti-Aging Facial Mask — was Rs.1,299 now Rs.899',
+    to: '/products/sadoer-collagen-anti-aging-facial-mask',
+    theme: 'light',
+    objectPosition: 'center',
+  },
+  {
+    id: 2,
     banner: '/banners/some-by-mi-banner.png',
     alt: 'SOME BY MI 30 Days Miracle Toner — was Rs.11,999 now Rs.7,900',
     to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner',
@@ -12,7 +20,7 @@ const SLIDES = [
     objectPosition: 'center right',
   },
   {
-    id: 2,
+    id: 3,
     banner: '/banners/mighty-patch-banner.png',
     alt: 'Hero Mighty Patch Invisible+ — was Rs.5,500 now Rs.4,400',
     to: '/products/hero-mighty-patch-invisible-plus',

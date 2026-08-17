@@ -31,7 +31,7 @@ export default function Shop() {
         {category ? ` in ${category}` : ''}
       </p>
       {filtered.length === 0 ? (
-        <p>No products match your search. Try Mighty Patch or SOME BY MI.</p>
+        <p>No products match your search. Try SADOER, Mighty Patch, or SOME BY MI.</p>
       ) : (
         <div className="grid grid-cols-2 max-w-[900px] gap-x-6 gap-y-10">
           {filtered.map((product) => (

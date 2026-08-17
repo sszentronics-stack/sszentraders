@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext'
 
 const NAV = [
   { to: '/shop', label: 'Shop' },
+  { to: '/products/sadoer-collagen-anti-aging-facial-mask', label: 'SADOER Mask' },
   { to: '/products/hero-mighty-patch-invisible-plus', label: 'Mighty Patch' },
   { to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner', label: 'SOME BY MI' },
   { to: '/about', label: 'About' },

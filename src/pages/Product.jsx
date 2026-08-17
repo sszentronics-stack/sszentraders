@@ -76,6 +76,7 @@ export default function Product() {
             >
               {product.badge === 'bestseller' && <span className="badge badge-best">Bestseller</span>}
               {product.badge === 'sale' && <span className="badge badge-sale">Sale</span>}
+              {product.badge === 'new' && <span className="badge badge-new">New</span>}
               <img
                 src={product.images[active]}
                 alt={product.name}

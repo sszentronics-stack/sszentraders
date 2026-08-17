@@ -6,6 +6,61 @@ export const PRODUCT_DISCLAIMER = `While we work to ensure that product informat
 
 export const products = [
   {
+    id: 'sadoer-collagen-anti-aging-mask',
+    slug: 'sadoer-collagen-anti-aging-facial-mask',
+    brand: 'SADOER',
+    name: 'SADOER Collagen Anti-Aging Facial Mask',
+    shortName: 'Collagen Anti-Aging Mask',
+    tagline: 'Replenish collagen, restore youthful skin',
+    subtitle: '25g collagen firming sheet mask',
+    price: 899,
+    compareAt: 1299,
+    badge: 'new',
+    featured: true,
+    inStock: true,
+    category: 'Masks',
+    type: 'Facial Mask',
+    sku: 'ABC-SADOER-SD80885',
+    rating: 4.8,
+    reviewCount: 42,
+    images: [
+      '/products/sadoer-collagen/1.png',
+      '/products/sadoer-collagen/2.png',
+      '/products/sadoer-collagen/3.png',
+    ],
+    highlights: [
+      '10× collagen content with active protein technology',
+      'Thin, silky membrane that clings to the face',
+      'Hydrolyzed collagen, hyaluronic acid & niacinamide',
+    ],
+    description: `Replenish collagen and restore youthful skin. SADOER Collagen Anti-Aging Facial Mask uses a thin, soft membrane cloth that sits close to the face, soaked in collagen essence with antioxidant and anti-aging effects. It delivers moisture, helps reduce collagen loss, and supports collagen synthesis for plump, elastic, firmer-looking skin.
+
+Part of the SADOER Collagen Firming Series. Each 25g sachet is packed with hydrolyzed collagen and deer bone collagen, plus sodium hyaluronate, niacinamide, Centella Asiatica extract, and allantoin for moisture, brightness, and soothing repair.`,
+    benefits: [
+      'Helps replenish lost collagen and support plump, elastic skin',
+      'Deeply moisturizes and helps brighten for a smoother complexion',
+      'Soothes and supports nourishment and repair',
+      'Thin, absorbable sheet that clings closely to facial skin',
+      'Suitable for all skin types',
+    ],
+    howToUse: [
+      'Cleanse the face and pat dry.',
+      'Unfold the mask and smooth it over the face, avoiding the eyes and lips.',
+      'Leave on for 15–20 minutes.',
+      'Remove the sheet and gently pat remaining essence into the skin. Use 2–3 times a week.',
+    ],
+    ingredients:
+      'Hydrolyzed Collagen, Deer Bone Collagen, Sodium Hyaluronate, Niacinamide, Centella Asiatica Extract, Allantoin, Glucomannan, Chondrus Crispus, and other ingredients as listed on the official product label. Always read the packaging before use.',
+    details: [
+      ['Brand', 'SADOER'],
+      ['Product', 'Collagen Anti-Aging Facial Mask'],
+      ['Net content', '25g'],
+      ['Skin type', 'All skin types'],
+      ['Model', 'SD80885 / SD38166'],
+      ['Benefits', 'Anti-aging, firming, moisturizing, collagen replenishment'],
+    ],
+  },
+  {
     id: 'mighty-patch-invisible',
     slug: 'hero-mighty-patch-invisible-plus',
     brand: 'Hero Cosmetics',

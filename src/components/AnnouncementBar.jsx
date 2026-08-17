@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 const MESSAGES = [
   'Delivery across Islamabad and Rawalpindi',
   '100% authentic products  ·  Cash on delivery available',
-  'Order on WhatsApp  ·  Hero Mighty Patch is our #1 bestseller',
+  'New: SADOER Collagen Anti-Aging Facial Mask',
 ]
 
 export default function AnnouncementBar() {

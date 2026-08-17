@@ -5,9 +5,8 @@ export default function About() {
       <h1 className="text-4xl font-medium mb-6">Aura Beauty Care</h1>
       <p className="text-lg leading-relaxed mb-4">
         Aura Beauty Care is an online skincare shop in Pakistan focused on a short, trusted list of
-        products that actually work. Our number one product is Hero Mighty Patch Invisible+ — the
-        daytime hydrocolloid patch loved worldwide — alongside SOME BY MI’s AHA BHA PHA 30 Days
-        Miracle Toner.
+        products that actually work. Shop Hero Mighty Patch Invisible+, SOME BY MI’s AHA BHA PHA 30
+        Days Miracle Toner, and SADOER Collagen Anti-Aging Facial Mask.
       </p>
       <p className="leading-relaxed text-ink-soft mb-4">
         We built this store so you can order authentic Korean and US skincare without the noise of a

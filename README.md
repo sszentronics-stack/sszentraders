@@ -1,6 +1,6 @@
 # Aura Beauty Care
 
-React storefront for **Aura Beauty Care** — authentic Hero Mighty Patch and SOME BY MI skincare in Pakistan. Layout, **Jost** font, and colors follow [GlowCare Shop](https://glowcareshop.com/) (black header, forest-green footer, lavender buttons, gold shop-now CTA).
+React storefront for **Aura Beauty Care** — authentic SADOER, Hero Mighty Patch, and SOME BY MI skincare in Pakistan. Layout, **Jost** font, and colors follow [GlowCare Shop](https://glowcareshop.com/) (black header, forest-green footer, lavender buttons, gold shop-now CTA).
 
 ## Run locally
 
