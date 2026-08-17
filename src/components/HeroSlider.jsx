@@ -6,7 +6,7 @@ const SLIDES = [
   {
     id: 1,
     banner: '/banners/sadoer-collagen-banner.png',
-    alt: 'SADOER Collagen Anti-Aging Facial Mask — was Rs.1,299 now Rs.899',
+    alt: 'SADOER Collagen Anti-Aging Facial Mask — was Rs.199 now Rs.129',
     to: '/products/sadoer-collagen-anti-aging-facial-mask',
     theme: 'light',
     objectPosition: 'center',
