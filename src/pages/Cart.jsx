@@ -1,9 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { buildWhatsAppOrder, formatPKR } from '../data/products'
+import { buildWhatsAppOrder, formatPKR, WHATSAPP_LINK } from '../data/products'
+import { isSupabaseConfigured } from '../lib/supabase/client'
 
 export default function Cart() {
+  const configured = isSupabaseConfigured()
+  const navigate = useNavigate()
   const { items, total, updateQty, removeItem, clearCart, removedNotice, dismissRemovedNotice } = useCart()
   const [form, setForm] = useState({ name: '', phone: '', city: '', address: '' })
 
@@ -64,56 +67,78 @@ export default function Cart() {
           </button>
         </div>
 
-        <aside className="bg-meta p-6 h-fit">
-          <h2 className="text-lg font-medium mb-4">Checkout on WhatsApp</h2>
-          <div className="flex justify-between mb-4">
-            <span>Subtotal</span>
-            <span className="font-medium">{formatPKR(total)}</span>
-          </div>
-          <div className="space-y-3 mb-4">
-            <input
-              name="name"
-              value={form.name}
-              onChange={onChange}
-              placeholder="Full name"
-              className="w-full border border-line px-3 py-2.5 bg-white"
-            />
-            <input
-              name="phone"
-              value={form.phone}
-              onChange={onChange}
-              placeholder="Phone number"
-              className="w-full border border-line px-3 py-2.5 bg-white"
-            />
-            <input
-              name="city"
-              value={form.city}
-              onChange={onChange}
-              placeholder="City"
-              className="w-full border border-line px-3 py-2.5 bg-white"
-            />
-            <textarea
-              name="address"
-              value={form.address}
-              onChange={onChange}
-              placeholder="Delivery address"
-              rows={3}
-              className="w-full border border-line px-3 py-2.5 bg-white"
-            />
-          </div>
-          <a
-            className="btn-lavender block text-center"
-            href={buildWhatsAppOrder(items, form)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Place order on WhatsApp
-          </a>
-          <p className="text-xs text-ink-soft mt-3">
-            We will confirm stock, shipping, and payment (COD, JazzCash, EasyPaisa, or bank transfer)
-            on WhatsApp.
-          </p>
-        </aside>
+        {configured ? (
+          <aside className="bg-meta p-6 h-fit">
+            <h2 className="text-lg font-medium mb-4">Order summary</h2>
+            <div className="flex justify-between mb-4">
+              <span>Subtotal</span>
+              <span className="font-medium">{formatPKR(total)}</span>
+            </div>
+            <p className="text-xs text-ink-soft mb-4">Shipping and payment are chosen at checkout.</p>
+            <button type="button" className="btn-lavender block text-center" onClick={() => navigate('/checkout')}>
+              Proceed to checkout
+            </button>
+            <a
+              className="btn-outline block text-center mt-3"
+              href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi Aura Beauty Care! I have a question before placing my order.')}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ask a question on WhatsApp
+            </a>
+          </aside>
+        ) : (
+          <aside className="bg-meta p-6 h-fit">
+            <h2 className="text-lg font-medium mb-4">Checkout on WhatsApp</h2>
+            <div className="flex justify-between mb-4">
+              <span>Subtotal</span>
+              <span className="font-medium">{formatPKR(total)}</span>
+            </div>
+            <div className="space-y-3 mb-4">
+              <input
+                name="name"
+                value={form.name}
+                onChange={onChange}
+                placeholder="Full name"
+                className="w-full border border-line px-3 py-2.5 bg-white"
+              />
+              <input
+                name="phone"
+                value={form.phone}
+                onChange={onChange}
+                placeholder="Phone number"
+                className="w-full border border-line px-3 py-2.5 bg-white"
+              />
+              <input
+                name="city"
+                value={form.city}
+                onChange={onChange}
+                placeholder="City"
+                className="w-full border border-line px-3 py-2.5 bg-white"
+              />
+              <textarea
+                name="address"
+                value={form.address}
+                onChange={onChange}
+                placeholder="Delivery address"
+                rows={3}
+                className="w-full border border-line px-3 py-2.5 bg-white"
+              />
+            </div>
+            <a
+              className="btn-lavender block text-center"
+              href={buildWhatsAppOrder(items, form)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Place order on WhatsApp
+            </a>
+            <p className="text-xs text-ink-soft mt-3">
+              We will confirm stock, shipping, and payment (COD, JazzCash, EasyPaisa, or bank transfer)
+              on WhatsApp.
+            </p>
+          </aside>
+        )}
       </div>
     </div>
   )

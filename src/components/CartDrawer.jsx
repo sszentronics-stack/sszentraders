@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { buildWhatsAppOrder, formatPKR } from '../data/products'
+import { isSupabaseConfigured } from '../lib/supabase/client'
 
 export default function CartDrawer() {
+  const configured = isSupabaseConfigured()
   const { items, total, isOpen, setIsOpen, updateQty, removeItem, removedNotice, dismissRemovedNotice } = useCart()
 
   if (!isOpen) return null
@@ -72,18 +74,31 @@ export default function CartDrawer() {
                 <span>Subtotal</span>
                 <span>{formatPKR(total)}</span>
               </div>
-              <p className="text-xs text-ink-soft">Checkout continues on WhatsApp. Cash on delivery available.</p>
-              <a
-                className="btn-lavender block text-center"
-                href={buildWhatsAppOrder(items)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Order on WhatsApp
-              </a>
-              <Link to="/cart" className="btn-outline block text-center" onClick={() => setIsOpen(false)}>
-                View cart &amp; details
-              </Link>
+              {configured ? (
+                <>
+                  <Link to="/checkout" className="btn-lavender block text-center" onClick={() => setIsOpen(false)}>
+                    Proceed to checkout
+                  </Link>
+                  <Link to="/cart" className="btn-outline block text-center" onClick={() => setIsOpen(false)}>
+                    View cart &amp; details
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-ink-soft">Checkout continues on WhatsApp. Cash on delivery available.</p>
+                  <a
+                    className="btn-lavender block text-center"
+                    href={buildWhatsAppOrder(items)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Order on WhatsApp
+                  </a>
+                  <Link to="/cart" className="btn-outline block text-center" onClick={() => setIsOpen(false)}>
+                    View cart &amp; details
+                  </Link>
+                </>
+              )}
             </div>
           </>
         )}

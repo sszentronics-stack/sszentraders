@@ -291,6 +291,64 @@ export const recentlyViewedInputSchema = z.object({
 })
 export type RecentlyViewedInput = z.infer<typeof recentlyViewedInputSchema>
 
+// ---------------------------------------------------------------------------
+// Phase 6 — Checkout & Order Management
+// ---------------------------------------------------------------------------
+
+/**
+ * Shipping address as captured at checkout. Deliberately a separate, leaner
+ * shape from customerAddressSchema (no isDefaultShipping/isDefaultBilling —
+ * meaningless for a one-off order snapshot; no landmark — orders has no
+ * such column, see 0018_order_address_snapshot.sql) rather than reusing
+ * that schema — this is what actually gets snapshotted onto `orders`.
+ */
+export const checkoutShippingAddressSchema = z.object({
+  recipientName: z.string().trim().min(1).max(200),
+  phone: pakistaniPhoneSchema,
+  addressLine1: z.string().trim().min(1).max(300),
+  addressLine2: z.string().trim().max(300).optional(),
+  city: z.string().trim().min(1).max(120),
+  province: z.string().trim().max(120).optional(),
+  postalCode: z.string().trim().max(20).optional(),
+  country: z.string().trim().length(2).default('PK'),
+  /** Which saved customer_addresses row this came from, if any — stored on the order as a convenience back-reference only (the fields above remain the source of truth). */
+  savedAddressId: uuidSchema.optional(),
+})
+export type CheckoutShippingAddressInput = z.infer<typeof checkoutShippingAddressSchema>
+
+/**
+ * The checkout request body. Deliberately carries NO line items — unlike
+ * Phase 1's placeholder createOrderSchema (which accepted a client-supplied
+ * items array), order creation always derives its line items from the
+ * caller's own server-side cart (backend/services/cart/cart.service.ts),
+ * never from anything the client asserts here. See
+ * backend/services/orders/orders.service.ts for why.
+ */
+export const checkoutSchema = z
+  .object({
+    email: emailSchema.optional(),
+    phone: pakistaniPhoneSchema.optional(),
+    shippingAddress: checkoutShippingAddressSchema,
+    deliveryMethod: z.enum(['standard', 'express']).default('standard'),
+    paymentMethod: z.enum(['cod', 'easypaisa']).default('cod'),
+    customerNotes: z.string().trim().max(2000).optional(),
+    source: z.enum(['web', 'whatsapp', 'mobile', 'admin']).default('web'),
+  })
+  .refine((v) => Boolean(v.email || v.phone), { message: 'Provide at least an email or phone number.', path: ['email'] })
+export type CheckoutInput = z.infer<typeof checkoutSchema>
+
+/** Order-number + email match — the guest order lookup path (no sequential/guessable id exposure; see orders.service.ts). */
+export const guestOrderLookupSchema = z.object({
+  orderNumber: z.string().trim().min(5).max(40),
+  email: emailSchema,
+})
+export type GuestOrderLookupInput = z.infer<typeof guestOrderLookupSchema>
+
+export const cancelOrderRequestSchema = z.object({
+  reason: z.string().trim().max(500).optional(),
+})
+export type CancelOrderRequestInput = z.infer<typeof cancelOrderRequestSchema>
+
 /** Validate `input` against `schema`, throwing a ValidationError (see ../errors) with field-level detail on failure. */
 export function parseOrThrow<T>(schema: z.ZodType<T>, input: unknown): T {
   const result = schema.safeParse(input)

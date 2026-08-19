@@ -197,6 +197,17 @@ export async function getCartSummary(db: SupabaseClient, profileId: string): Pro
   return buildSummary(db, await findActiveCart(db, profileId))
 }
 
+/**
+ * Called by backend/services/orders/orders.service.ts once an order has
+ * been created from this cart — flips it out of `active` so
+ * getOrCreateActiveCart() starts a fresh cart next time, while keeping the
+ * row (and its cart_events history) intact rather than deleting it.
+ */
+export async function markCartConverted(db: SupabaseClient, cartId: string): Promise<void> {
+  await db.from('carts').update({ status: 'converted' }).eq('id', cartId)
+  await recordCartEvent(db, cartId, 'converted')
+}
+
 async function fetchVariantSnapshot(db: SupabaseClient, variantId: string) {
   const { data, error } = await db
     .from('product_variants')
