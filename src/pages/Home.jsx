@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import HeroSlider from '../components/HeroSlider'
 import ProductCard from '../components/ProductCard'
-import { products } from '../data/products'
+import { useProducts } from '../hooks/useCatalog'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const CATEGORIES = [
@@ -14,7 +14,8 @@ const CATEGORIES = [
 
 export default function Home() {
   const [tab, setTab] = useState('new')
-  const list = tab === 'best' ? [...products].reverse() : products
+  const { products, loading, error } = useProducts()
+  const list = tab === 'best' ? [...products].sort((a, b) => Number(b.featured) - Number(a.featured)) : products
 
   return (
     <>
@@ -36,11 +37,27 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 max-w-[900px] gap-x-6 gap-y-10">
-          {list.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 max-w-[900px] gap-x-6 gap-y-10" aria-busy="true" aria-label="Loading products">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-square bg-meta" />
+                <div className="mt-3 h-4 bg-meta w-3/4" />
+                <div className="mt-2 h-4 bg-meta w-1/3" />
+              </div>
+            ))}
+          </div>
+        ) : list.length === 0 ? (
+          <p className="text-ink-soft">
+            {error ? 'We could not load products right now. Please try again shortly.' : 'No products to show yet.'}
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 max-w-[900px] gap-x-6 gap-y-10">
+            {list.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="bg-meta py-12 md:py-16">
