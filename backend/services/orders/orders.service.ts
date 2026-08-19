@@ -18,6 +18,12 @@ import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
 import { ensureCustomerForProfile } from '../../lib/auth/linking'
 import { makeCustomerLinkDeps } from '../auth/auth.service'
 import { getCartSummary, markCartConverted } from '../cart/cart.service'
+import {
+  recordCancellationTransaction,
+  recordDeliveryChargeTransaction,
+  recordDiscountTransaction,
+  recordSaleTransaction,
+} from '../accounting/accounting.service'
 import type { CheckoutInput } from '../../lib/validation'
 
 const ORDER_COLUMNS = `
@@ -293,6 +299,24 @@ export async function createOrder(db: SupabaseClient, profileId: string, input: 
     status: 'pending',
   })
 
+  // Phase 7 (Local Operational Accounting Layer): local-first financial
+  // event recording — commit the sale (and, when non-zero, discount and
+  // delivery-charge) events before the order-creation flow completes, so
+  // every order has a durable local financial record queued for eventual
+  // ERP sync (Phase 8) regardless of when/whether that sync succeeds. Both
+  // recordSaleTransaction and recordDiscountTransaction/
+  // recordDeliveryChargeTransaction are idempotent per order id (see
+  // backend/services/accounting/accounting.service.ts), so a retried
+  // createOrder() call (e.g. after this step throws and the Edge
+  // Function's idempotency layer retries) can never double-record them.
+  await recordSaleTransaction(db, { id: order.id, orderNumber: order.order_number, currency: cart.currency, grandTotal: totals.grandTotal })
+  if (totals.discountTotal > 0) {
+    await recordDiscountTransaction(db, { id: order.id, orderNumber: order.order_number, currency: cart.currency, grandTotal: totals.grandTotal, discountTotal: totals.discountTotal })
+  }
+  if (totals.shippingTotal > 0) {
+    await recordDeliveryChargeTransaction(db, { id: order.id, orderNumber: order.order_number, currency: cart.currency, grandTotal: totals.grandTotal, shippingTotal: totals.shippingTotal })
+  }
+
   if (cart.cartId) await markCartConverted(db, cart.cartId)
 
   const items = (
@@ -391,6 +415,17 @@ export async function requestOrderCancellation(
     from_status: order.orderStatus,
     to_status: 'cancelled',
     note: reason ?? null,
+  })
+
+  // Phase 7: record the cancellation as its own local financial event
+  // (idempotent per order id) — see recordSaleTransaction's call site
+  // above for the same "local-first, best-effort sequential write"
+  // rationale.
+  await recordCancellationTransaction(db, {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    currency: order.currency,
+    grandTotal: order.grandTotal,
   })
 
   const updated = await fetchOrderWithItems(db, orderId)
