@@ -27,6 +27,12 @@ import Returns from './pages/account/Returns'
 import ReturnDetail from './pages/account/ReturnDetail'
 import RequestReturn from './pages/account/RequestReturn'
 import ComingSoon from './pages/account/ComingSoon'
+import Loyalty from './pages/account/Loyalty'
+import AdminPromotionsLayout from './pages/admin/promotions/AdminPromotionsLayout'
+import AdminCampaigns from './pages/admin/promotions/Campaigns'
+import AdminPromotions from './pages/admin/promotions/Promotions'
+import AdminCoupons from './pages/admin/promotions/Coupons'
+import AdminAbandonedCarts from './pages/admin/promotions/AbandonedCarts'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -79,14 +85,32 @@ export default function App() {
                   <Route path="returns" element={<Returns />} />
                   <Route path="returns/:id" element={<ReturnDetail />} />
                   <Route path="wishlist" element={<Wishlist />} />
+                  <Route path="loyalty" element={<Loyalty />} />
                   <Route
                     path="preferences"
                     element={<ComingSoon title="Preferences" description="Manage notification and communication preferences here soon." />}
                   />
                 </Route>
-
-                <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
+
+              {/*
+                Phase 13: standalone admin promotions route tree — deliberately
+                OUTSIDE the storefront <Layout /> element above (no header/
+                footer/cart chrome) since Phase 12's shared admin shell may not
+                exist yet in this worktree. AdminPromotionsLayout carries its
+                own admin guard and nav. See the layout's header comment and
+                docs/phase-13-completion-report.md's known limitations for the
+                follow-up integration this implies.
+              */}
+              <Route path="/admin/promotions" element={<AdminPromotionsLayout />}>
+                <Route index element={<Navigate to="campaigns" replace />} />
+                <Route path="campaigns" element={<AdminCampaigns />} />
+                <Route path="promotions" element={<AdminPromotions />} />
+                <Route path="coupons" element={<AdminCoupons />} />
+                <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </WishlistProvider>

@@ -7,6 +7,7 @@ import { deliveryCost } from '../../backend/lib/orders/index'
 import { formatMoney, toMinorUnits } from '../../backend/lib/money/index'
 import * as ordersApi from '../repositories/orders.repository'
 import * as customersApi from '../repositories/customers.repository'
+import * as promotionsApi from '../repositories/promotions.repository'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 
 const STEPS = ['contact', 'address', 'delivery', 'payment', 'review']
@@ -42,6 +43,50 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [idempotencyKey] = useState(() => crypto.randomUUID())
 
+  // Phase 13: coupon + loyalty-points redemption. Everything shown here
+  // (discount amount, eligibility reasons, redeemable point count) is a
+  // literal echo of the server's own computation (promotions/preview Edge
+  // Function route) — never assembled client-side — so what's shown always
+  // matches what createOrder() will actually apply.
+  const [couponCodeInput, setCouponCodeInput] = useState('')
+  const [couponPreview, setCouponPreview] = useState(null)
+  const [couponChecking, setCouponChecking] = useState(false)
+  const [redeemPointsChecked, setRedeemPointsChecked] = useState(false)
+  const [loyaltyPreview, setLoyaltyPreview] = useState(null)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return
+    promotionsApi
+      .previewDiscount()
+      .then(setLoyaltyPreview)
+      .catch(() => undefined)
+  }, [])
+
+  async function checkCoupon() {
+    if (!couponCodeInput.trim()) {
+      setCouponPreview(null)
+      return
+    }
+    setCouponChecking(true)
+    try {
+      const preview = await promotionsApi.previewDiscount(couponCodeInput.trim())
+      setCouponPreview(preview)
+    } catch (err) {
+      setCouponPreview({ eligible: false, reasons: [err?.message ?? 'Could not check this coupon.'], discountAmount: 0, freeShipping: false })
+    } finally {
+      setCouponChecking(false)
+    }
+  }
+
+  // No coupon typed: fall back to whatever automatic promotion (if any) the
+  // no-code preview found, so the customer still sees savings they didn't
+  // have to ask for.
+  const activePromotion = couponPreview ?? loyaltyPreview
+  const appliedDiscount = activePromotion?.eligible ? activePromotion.discountAmount : 0
+  const appliedFreeShipping = activePromotion?.eligible ? activePromotion.freeShipping : false
+  const redeemablePoints = loyaltyPreview?.maxRedeemablePoints ?? 0
+  const loyaltyDiscount = redeemPointsChecked ? redeemablePoints * 100 : 0
+
   useEffect(() => {
     if (!isSupabaseConfigured()) return
     ensureGuestSession().catch((err) => console.error('Failed to establish a checkout session.', err))
@@ -71,8 +116,10 @@ export default function Checkout() {
       .catch((err) => console.error('Failed to load saved addresses.', err))
   }, [isAuthenticated])
 
-  const shippingTotal = deliveryCost(deliveryMethod)
-  const grandTotal = toMinorUnits(total) + shippingTotal
+  const baseShippingTotal = deliveryCost(deliveryMethod)
+  const shippingTotal = appliedFreeShipping ? 0 : baseShippingTotal
+  const discountTotal = appliedDiscount + loyaltyDiscount
+  const grandTotal = Math.max(toMinorUnits(total) - discountTotal, 0) + shippingTotal
 
   if (!isSupabaseConfigured() || (!cartLoading && items.length === 0)) {
     return <Navigate to="/cart" replace />
@@ -141,6 +188,8 @@ export default function Checkout() {
       paymentMethod,
       customerNotes: customerNotes.trim() || undefined,
       source: 'web',
+      couponCode: couponPreview?.eligible ? couponPreview.couponCode ?? couponCodeInput.trim() : undefined,
+      redeemPoints: redeemPointsChecked && redeemablePoints > 0 ? redeemablePoints : undefined,
     }
 
     const parsed = checkoutSchema.safeParse(input)
@@ -324,13 +373,56 @@ export default function Checkout() {
               </div>
             ))}
           </div>
+          <div className="form-field">
+            <label className="form-label" htmlFor="coupon">Coupon code</label>
+            <div className="flex gap-2">
+              <input
+                id="coupon"
+                className="form-input"
+                placeholder="e.g. WELCOME10"
+                value={couponCodeInput}
+                onChange={(e) => {
+                  setCouponCodeInput(e.target.value)
+                  setCouponPreview(null)
+                }}
+              />
+              <button type="button" className="btn-outline w-auto px-4" onClick={checkCoupon} disabled={couponChecking}>
+                {couponChecking ? '...' : 'Apply'}
+              </button>
+            </div>
+            {couponPreview && !couponPreview.eligible && couponPreview.reasons.length > 0 && (
+              <p className="form-error">{couponPreview.reasons[0]}</p>
+            )}
+            {couponPreview?.eligible && (
+              <p className="text-xs mt-1" style={{ color: '#1c7a3c' }}>
+                {couponPreview.freeShipping ? 'Free shipping applied!' : `Rs. ${(couponPreview.discountAmount / 100).toLocaleString()} off applied!`}
+              </p>
+            )}
+          </div>
+
+          {redeemablePoints > 0 && (
+            <label className="flex items-start gap-2 text-sm mb-4 cursor-pointer">
+              <input type="checkbox" className="mt-1" checked={redeemPointsChecked} onChange={(e) => setRedeemPointsChecked(e.target.checked)} />
+              <span>
+                Redeem {redeemablePoints.toLocaleString()} loyalty points for Rs. {redeemablePoints.toLocaleString()} off
+                {loyaltyPreview?.loyaltyBalance ? ` (balance: ${loyaltyPreview.loyaltyBalance.toLocaleString()} pts)` : ''}
+              </span>
+            </label>
+          )}
+
           <div className="flex justify-between text-sm mb-2">
             <span>Subtotal</span>
             <span>{formatMoney(toMinorUnits(total))}</span>
           </div>
+          {discountTotal > 0 && (
+            <div className="flex justify-between text-sm mb-2" style={{ color: '#1c7a3c' }}>
+              <span>Discount</span>
+              <span>-{formatMoney(discountTotal)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm mb-2">
             <span>Delivery</span>
-            <span>{formatMoney(shippingTotal)}</span>
+            <span>{appliedFreeShipping ? <span style={{ color: '#1c7a3c' }}>Free</span> : formatMoney(shippingTotal)}</span>
           </div>
           <div className="flex justify-between font-medium text-base pt-2 border-t border-[#e0d9de]">
             <span>Total</span>

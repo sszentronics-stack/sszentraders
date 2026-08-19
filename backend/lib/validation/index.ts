@@ -333,6 +333,10 @@ export const checkoutSchema = z
     paymentMethod: z.enum(['cod', 'easypaisa']).default('cod'),
     customerNotes: z.string().trim().max(2000).optional(),
     source: z.enum(['web', 'whatsapp', 'mobile', 'admin']).default('web'),
+    /** Phase 13: optional coupon code applied at checkout — validated and priced server-side only, see backend/services/promotions/promotions.service.ts. */
+    couponCode: z.string().trim().min(1).max(60).optional(),
+    /** Phase 13: optional loyalty points to redeem toward this order — server re-checks balance/eligibility, never trusts a client-computed discount value. */
+    redeemPoints: z.number().int().positive().optional(),
   })
   .refine((v) => Boolean(v.email || v.phone), { message: 'Provide at least an email or phone number.', path: ['email'] })
 export type CheckoutInput = z.infer<typeof checkoutSchema>
@@ -465,6 +469,66 @@ export const recordInspectionOutcomeSchema = z
     path: ['refundAmount'],
   })
 export type RecordInspectionOutcomeInput = z.infer<typeof recordInspectionOutcomeSchema>
+
+// ---------------------------------------------------------------------------
+// Phase 13 — Promotions, Loyalty & Customer Intelligence
+// ---------------------------------------------------------------------------
+
+/** Cart/checkout-time discount preview request — server recomputes everything against the caller's own live cart, this only carries the optional coupon code being tried. */
+export const discountPreviewSchema = z.object({
+  couponCode: z.string().trim().min(1).max(60).optional(),
+})
+export type DiscountPreviewInput = z.infer<typeof discountPreviewSchema>
+
+const promotionStatusEnum = z.enum(['draft', 'active', 'paused', 'expired', 'archived'])
+
+export const campaignInputSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  slug: slugSchema,
+  description: z.string().trim().max(2000).optional(),
+  status: promotionStatusEnum.optional(),
+  startsAt: z.string().trim().datetime({ offset: true }).nullable().optional(),
+  endsAt: z.string().trim().datetime({ offset: true }).nullable().optional(),
+})
+export type CampaignInput = z.infer<typeof campaignInputSchema>
+
+export const updateCampaignSchema = campaignInputSchema.partial().omit({ slug: true })
+export type UpdateCampaignInput = z.infer<typeof updateCampaignSchema>
+
+export const promotionInputSchema = z.object({
+  campaignId: uuidSchema.nullable().optional(),
+  name: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).optional(),
+  discountType: z.enum(['percentage', 'fixed_amount', 'free_shipping']),
+  discountValue: z.number().int().nonnegative(),
+  status: promotionStatusEnum.optional(),
+  startsAt: z.string().trim().datetime({ offset: true }).nullable().optional(),
+  endsAt: z.string().trim().datetime({ offset: true }).nullable().optional(),
+  minSpend: moneyMinorUnitsSchema.nullable().optional(),
+  firstOrderOnly: z.boolean().optional(),
+  appliesTo: z.enum(['all', 'category', 'collection', 'product']).optional(),
+  scopeId: uuidSchema.nullable().optional(),
+})
+export type PromotionInput = z.infer<typeof promotionInputSchema>
+
+export const updatePromotionSchema = promotionInputSchema.partial()
+export type UpdatePromotionInput = z.infer<typeof updatePromotionSchema>
+
+export const couponInputSchema = z.object({
+  promotionId: uuidSchema,
+  code: z.string().trim().min(3).max(60),
+  usageLimit: z.number().int().positive().nullable().optional(),
+  usageLimitPerCustomer: z.number().int().positive().nullable().optional(),
+  status: promotionStatusEnum.optional(),
+})
+export type CouponInput = z.infer<typeof couponInputSchema>
+
+export const updateCouponSchema = couponInputSchema.partial().omit({ promotionId: true, code: true })
+export type UpdateCouponInput = z.infer<typeof updateCouponSchema>
+
+/** Checkout-time reorder request — no body needed beyond the order id in the route. */
+export const reorderRequestSchema = z.object({}).optional()
+export type ReorderRequestInput = z.infer<typeof reorderRequestSchema>
 
 /** Validate `input` against `schema`, throwing a ValidationError (see ../errors) with field-level detail on failure. */
 export function parseOrThrow<T>(schema: z.ZodType<T>, input: unknown): T {

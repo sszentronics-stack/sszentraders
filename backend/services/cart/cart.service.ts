@@ -351,3 +351,53 @@ export async function mergeCartItems(db: SupabaseClient, profileId: string, inco
 
   return buildSummary(db, cart)
 }
+
+// ---------------------------------------------------------------------------
+// Phase 13 — reorder: re-add a past order's items to the CURRENT cart,
+// checking today's availability/price rather than blindly replaying the
+// order's old price/quantity snapshot (phase spec: "checking current
+// availability/price, not blindly re-using the old snapshot"). Reuses
+// addCartItem()'s own snapshot/availability/clamping logic per line rather
+// than re-deriving it, so a reordered line behaves exactly like a normal
+// "add to cart" would today.
+// ---------------------------------------------------------------------------
+
+export interface ReorderResult {
+  cart: CartSummary
+  addedCount: number
+  skipped: { productName: string; sku: string; reason: 'unavailable' | 'out_of_stock' }[]
+}
+
+/** Ownership-checked: only re-adds items from an order that belongs to this profile's own customer record. */
+export async function reorderToCart(db: SupabaseClient, profileId: string, orderId: string): Promise<ReorderResult> {
+  const { data: customer } = await db.from('customers').select('id').eq('profile_id', profileId).maybeSingle()
+  if (!customer) throw new NotFoundError('Order')
+
+  const { data: order } = await db.from('orders').select('id, customer_id').eq('id', orderId).maybeSingle()
+  if (!order || order.customer_id !== customer.id) throw new NotFoundError('Order')
+
+  const { data: items, error } = await db
+    .from('order_items')
+    .select('variant_id, sku, product_name, quantity')
+    .eq('order_id', orderId)
+  if (error) throw error
+
+  const skipped: ReorderResult['skipped'] = []
+  let addedCount = 0
+
+  for (const item of (items ?? []) as { variant_id: string | null; sku: string; product_name: string; quantity: number }[]) {
+    if (!item.variant_id) {
+      skipped.push({ productName: item.product_name, sku: item.sku, reason: 'unavailable' })
+      continue
+    }
+    try {
+      await addCartItem(db, profileId, { variantId: item.variant_id, quantity: item.quantity })
+      addedCount += 1
+    } catch (err) {
+      const reason = err instanceof ValidationError ? 'out_of_stock' : 'unavailable'
+      skipped.push({ productName: item.product_name, sku: item.sku, reason })
+    }
+  }
+
+  return { cart: await getCartSummary(db, profileId), addedCount, skipped }
+}

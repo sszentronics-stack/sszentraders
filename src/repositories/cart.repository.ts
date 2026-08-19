@@ -59,6 +59,17 @@ export function clearCart(): Promise<CartSummary> {
   return callEdgeFunction<CartSummary>('cart', { method: 'DELETE' })
 }
 
+export interface ReorderResult {
+  cart: CartSummary
+  addedCount: number
+  skipped: { productName: string; sku: string; reason: 'unavailable' | 'out_of_stock' }[]
+}
+
+/** Phase 13: re-add a past order's items to the current cart, re-checked against today's price/availability (backend/services/cart/cart.service.ts::reorderToCart). */
+export function reorder(orderId: string): Promise<ReorderResult> {
+  return callEdgeFunction<ReorderResult>(`cart/reorder/${orderId}`, { method: 'POST' })
+}
+
 /** Called once right after a guest becomes authenticated — see CartContext's login/register merge flow. */
 export function mergeCart(items: { variantId: string; quantity: number }[]): Promise<CartSummary> {
   return callEdgeFunction<CartSummary>('cart/merge', { method: 'POST', body: { items } })

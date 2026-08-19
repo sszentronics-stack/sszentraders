@@ -209,6 +209,18 @@ export function CartProvider({ children }) {
 
   const dismissRemovedNotice = useCallback(() => setRemovedNotice(null), [])
 
+  /** Phase 13: re-add a past order's items to the current cart (server re-checks price/availability — see backend/services/cart/cart.service.ts::reorderToCart). Returns { addedCount, skipped } so the caller can tell the customer what didn't make it back in. */
+  const reorder = useCallback(
+    async (orderId) => {
+      if (!configured) return { addedCount: 0, skipped: [] }
+      const result = await cartApi.reorder(orderId)
+      applySummary(result.cart)
+      setIsOpen(true)
+      return { addedCount: result.addedCount, skipped: result.skipped }
+    },
+    [configured, applySummary],
+  )
+
   const count = items.reduce((sum, item) => sum + item.qty, 0)
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0)
 
@@ -223,11 +235,12 @@ export function CartProvider({ children }) {
       updateQty,
       removeItem,
       clearCart,
+      reorder,
       loading,
       removedNotice,
       dismissRemovedNotice,
     }),
-    [items, count, total, isOpen, addItem, updateQty, removeItem, clearCart, loading, removedNotice, dismissRemovedNotice],
+    [items, count, total, isOpen, addItem, updateQty, removeItem, clearCart, reorder, loading, removedNotice, dismissRemovedNotice],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

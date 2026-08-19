@@ -19,6 +19,9 @@
  *   POST   /merge                   merge guest lines into the current cart
  *                                    {items:[{variantId,quantity}]} — called
  *                                    once right after login/registration
+ *   POST   /reorder/:orderId        re-add a past order's items to the
+ *                                    current cart, re-checked against live
+ *                                    price/availability (Phase 13)
  *   GET    /wishlist                list saved products
  *   POST   /wishlist                save a product {productId}
  *   DELETE /wishlist/:productId     remove a saved product
@@ -72,6 +75,12 @@ Deno.serve(
     if (segments[0] === 'merge' && req.method === 'POST') {
       const input = parseOrThrow(mergeCartItemsSchema, body)
       return okResponse(await cart.mergeCartItems(admin, caller.id, input.items))
+    }
+
+    if (segments[0] === 'reorder' && req.method === 'POST') {
+      const [, orderId] = segments
+      if (!orderId) throw new NotFoundError('Route')
+      return okResponse(await cart.reorderToCart(admin, caller.id, orderId))
     }
 
     if (segments[0] === 'wishlist') {

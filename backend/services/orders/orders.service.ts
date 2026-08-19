@@ -25,6 +25,14 @@ import {
   recordSaleTransaction,
 } from '../accounting/accounting.service'
 import type { CheckoutInput } from '../../lib/validation'
+import {
+  applyPromotionAtCheckout,
+  recordAppliedPromotion,
+  releasePromotionClaimOnFailure,
+  type ClaimedPromotion,
+} from '../promotions/promotions.service'
+import { getLoyaltyBalance, redeemLoyaltyPoints } from '../promotions/loyalty.service'
+import { computeMaxRedeemablePoints, REDEMPTION_MINOR_UNITS_PER_POINT } from '../../lib/loyalty'
 
 const ORDER_COLUMNS = `
   id, order_number, customer_id, email, phone, currency, subtotal, discount_total, shipping_total, tax_total, grand_total,
@@ -224,8 +232,51 @@ export async function createOrder(db: SupabaseClient, profileId: string, input: 
     })),
   )
 
-  const shippingTotal = deliveryCost(input.deliveryMethod as DeliveryMethod)
-  const totals = calculateOrderTotals({ subtotal: cart.subtotal, shippingTotal })
+  let shippingTotal = deliveryCost(input.deliveryMethod as DeliveryMethod)
+
+  // Phase 13: server-side coupon/automatic-promotion evaluation — NEVER a
+  // client-supplied discount amount. A coupon claims a usage slot
+  // atomically here (see promotions.service.ts's claimCouponUsage); if
+  // anything below fails before the order is durably created, the claim is
+  // released in the catch block so a failed checkout never silently burns
+  // a limited coupon's use.
+  const claimedPromotion: ClaimedPromotion | null = await applyPromotionAtCheckout(db, {
+    customerId,
+    couponCode: input.couponCode,
+    items: cart.items.map((item) => ({ productId: item.productId, lineTotal: item.lineTotal })),
+    shippingTotal,
+  })
+  if (claimedPromotion?.freeShipping) shippingTotal = 0
+
+  // Phase 13: loyalty-points redemption, re-validated against the
+  // customer's real ledger balance (see loyalty.service.ts) — also never a
+  // client-supplied discount amount. Combined with any coupon discount,
+  // never allowed to exceed the merchandise subtotal.
+  let loyaltyDiscountValue = 0
+  if (input.redeemPoints) {
+    const balance = await getLoyaltyBalance(db, customerId)
+    const remainingSubtotal = Math.max(cart.subtotal - (claimedPromotion?.discountAmount ?? 0), 0)
+    const maxRedeemable = computeMaxRedeemablePoints(balance, remainingSubtotal)
+    if (input.redeemPoints > maxRedeemable) {
+      await releasePromotionClaimOnFailure(db, claimedPromotion)
+      throw new ValidationError(
+        maxRedeemable === 0
+          ? 'You have no redeemable loyalty points available for this order.'
+          : `You can redeem at most ${maxRedeemable} points for this order.`,
+      )
+    }
+    loyaltyDiscountValue = input.redeemPoints * REDEMPTION_MINOR_UNITS_PER_POINT
+  }
+
+  const discountTotal = (claimedPromotion?.discountAmount ?? 0) + loyaltyDiscountValue
+
+  let totals
+  try {
+    totals = calculateOrderTotals({ subtotal: cart.subtotal, discountTotal, shippingTotal })
+  } catch (err) {
+    await releasePromotionClaimOnFailure(db, claimedPromotion)
+    throw err
+  }
 
   const orderNumber = await generateUniqueOrderNumber(
     new Date(),
@@ -236,59 +287,86 @@ export async function createOrder(db: SupabaseClient, profileId: string, input: 
     },
   )
 
-  const { data: orderRow, error: orderError } = await db
-    .from('orders')
-    .insert({
-      order_number: orderNumber,
-      customer_id: customerId,
-      email: input.email ?? null,
-      phone: input.phone ?? null,
-      currency: cart.currency,
-      subtotal: totals.subtotal,
-      discount_total: totals.discountTotal,
-      shipping_total: totals.shippingTotal,
-      tax_total: totals.taxTotal,
-      grand_total: totals.grandTotal,
-      payment_method: input.paymentMethod,
-      source: input.source,
-      customer_notes: input.customerNotes ?? null,
-      shipping_recipient_name: input.shippingAddress.recipientName,
-      shipping_phone: input.shippingAddress.phone,
-      shipping_address_line_1: input.shippingAddress.addressLine1,
-      shipping_address_line_2: input.shippingAddress.addressLine2 ?? null,
-      shipping_city: input.shippingAddress.city,
-      shipping_province: input.shippingAddress.province ?? null,
-      shipping_postal_code: input.shippingAddress.postalCode ?? null,
-      shipping_country: input.shippingAddress.country,
-      customer_address_id: input.shippingAddress.savedAddressId ?? null,
-      delivery_method: input.deliveryMethod,
-    })
-    .select(ORDER_COLUMNS)
-    .single()
-  if (orderError) {
-    if ((orderError as { code?: string }).code === '23505') throw new ConflictError('Order number collision — please retry.')
-    throw orderError
-  }
-  const order = orderRow as OrderRow
+  let order: OrderRow
+  try {
+    const { data: orderRow, error: orderError } = await db
+      .from('orders')
+      .insert({
+        order_number: orderNumber,
+        customer_id: customerId,
+        email: input.email ?? null,
+        phone: input.phone ?? null,
+        currency: cart.currency,
+        subtotal: totals.subtotal,
+        discount_total: totals.discountTotal,
+        shipping_total: totals.shippingTotal,
+        tax_total: totals.taxTotal,
+        grand_total: totals.grandTotal,
+        payment_method: input.paymentMethod,
+        source: input.source,
+        customer_notes: input.customerNotes ?? null,
+        shipping_recipient_name: input.shippingAddress.recipientName,
+        shipping_phone: input.shippingAddress.phone,
+        shipping_address_line_1: input.shippingAddress.addressLine1,
+        shipping_address_line_2: input.shippingAddress.addressLine2 ?? null,
+        shipping_city: input.shippingAddress.city,
+        shipping_province: input.shippingAddress.province ?? null,
+        shipping_postal_code: input.shippingAddress.postalCode ?? null,
+        shipping_country: input.shippingAddress.country,
+        customer_address_id: input.shippingAddress.savedAddressId ?? null,
+        delivery_method: input.deliveryMethod,
+      })
+      .select(ORDER_COLUMNS)
+      .single()
+    if (orderError) {
+      if ((orderError as { code?: string }).code === '23505') throw new ConflictError('Order number collision — please retry.')
+      throw orderError
+    }
+    order = orderRow as OrderRow
 
-  const { error: itemsError } = await db.from('order_items').insert(
-    orderItems.map((item) => ({
-      order_id: order.id,
-      product_id: item.productId,
-      variant_id: item.variantId,
-      sku: item.sku,
-      product_name: item.productName,
-      variant_name: item.variantName,
-      quantity: item.quantity,
-      unit_price: item.unitPrice,
-      original_price: item.originalPrice,
-      discount_amount: item.discountAmount,
-      line_total: item.lineTotal,
-    })),
-  )
-  if (itemsError) throw itemsError
+    const { error: itemsError } = await db.from('order_items').insert(
+      orderItems.map((item) => ({
+        order_id: order.id,
+        product_id: item.productId,
+        variant_id: item.variantId,
+        sku: item.sku,
+        product_name: item.productName,
+        variant_name: item.variantName,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+        original_price: item.originalPrice,
+        discount_amount: item.discountAmount,
+        line_total: item.lineTotal,
+      })),
+    )
+    if (itemsError) throw itemsError
+  } catch (err) {
+    // Order/items insert never completed — give back the coupon usage slot
+    // claimed above so a failed checkout never silently burns it (see
+    // promotions.service.ts's claimCouponUsage doc comment).
+    await releasePromotionClaimOnFailure(db, claimedPromotion)
+    throw err
+  }
 
   await db.from('order_status_history').insert({ order_id: order.id, from_status: null, to_status: 'pending' })
+
+  // Phase 13: record the applied promotion/coupon (discounts audit row +
+  // coupon_redemptions) and the checkout-time loyalty-points redemption,
+  // now that the order row exists. Both are idempotent per order id, same
+  // "sequential best-effort write, propagate any error" shape the Phase 7
+  // accounting calls below already use.
+  if (claimedPromotion) {
+    await recordAppliedPromotion(db, { orderId: order.id, customerId, claimed: claimedPromotion })
+  }
+  if (input.redeemPoints && loyaltyDiscountValue > 0) {
+    await redeemLoyaltyPoints(db, {
+      customerId,
+      orderId: order.id,
+      orderNumber: order.order_number,
+      points: input.redeemPoints,
+      subtotalMinorUnits: cart.subtotal,
+    })
+  }
 
   await db.from('payments').insert({
     order_id: order.id,

@@ -71,6 +71,10 @@ export interface CheckoutInput {
   paymentMethod: 'cod' | 'easypaisa'
   customerNotes?: string
   source?: 'web' | 'whatsapp' | 'mobile' | 'admin'
+  /** Phase 13: optional coupon code, validated and priced server-side only. */
+  couponCode?: string
+  /** Phase 13: optional loyalty points to redeem toward this order, re-checked against the real balance server-side. */
+  redeemPoints?: number
 }
 
 /** `idempotencyKey` must be the same value across retries of the same checkout attempt (e.g. a double-click) — see backend/lib/idempotency. Generate a fresh one (crypto.randomUUID()) per NEW checkout attempt. */
