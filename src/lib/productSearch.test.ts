@@ -16,6 +16,7 @@ function makeProduct(overrides: Partial<StorefrontProduct>): StorefrontProduct {
     badge: null,
     featured: false,
     inStock: true,
+    availability: 'unknown',
     category: 'Masks',
     type: 'Facial Mask',
     sku: 'SKU-1',

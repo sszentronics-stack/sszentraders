@@ -154,6 +154,13 @@ export default function Product() {
             {off > 0 && <span className="price-sale ml-2 text-base">{off}% off</span>}
           </p>
 
+          {product.availability === 'out_of_stock' && (
+            <p className="mt-3 text-sm font-medium" style={{ color: '#c31818' }}>Currently out of stock</p>
+          )}
+          {product.availability === 'low_stock' && (
+            <p className="mt-3 text-sm" style={{ color: '#c98a7d' }}>Only a few left in stock</p>
+          )}
+
           <ul className="mt-5 space-y-1.5 text-sm">
             {product.highlights.map((h) => (
               <li key={h}>• {h}</li>
@@ -163,19 +170,24 @@ export default function Product() {
           <div className="mt-6">
             <p className="text-sm mb-2">Quantity</p>
             <div className="qty">
-              <button type="button" onClick={() => setQty((n) => Math.max(1, n - 1))}>
+              <button type="button" onClick={() => setQty((n) => Math.max(1, n - 1))} disabled={product.availability === 'out_of_stock'}>
                 −
               </button>
               <input readOnly value={qty} />
-              <button type="button" onClick={() => setQty((n) => n + 1)}>
+              <button type="button" onClick={() => setQty((n) => n + 1)} disabled={product.availability === 'out_of_stock'}>
                 +
               </button>
             </div>
           </div>
 
           <div className="mt-5 flex gap-3">
-            <button type="button" className="btn-lavender flex-1" onClick={() => addItem(product, qty)}>
-              Add to bag
+            <button
+              type="button"
+              className="btn-lavender flex-1"
+              onClick={() => addItem(product, qty)}
+              disabled={product.availability === 'out_of_stock'}
+            >
+              {product.availability === 'out_of_stock' ? 'Out of stock' : 'Add to bag'}
             </button>
             <button
               type="button"

@@ -14,6 +14,8 @@ export default function ProductCard({ product }) {
   const badgeLabel = product.badge === 'bestseller' ? 'Bestseller' : product.badge === 'new' ? 'New' : 'Sale'
   const { isWishlisted, toggle } = useWishlist()
   const wishlisted = isWishlisted(product.id)
+  const outOfStock = product.availability === 'out_of_stock'
+  const lowStock = product.availability === 'low_stock'
 
   return (
     <article className="product-card relative">
@@ -31,8 +33,12 @@ export default function ProductCard({ product }) {
       </button>
       <Link to={`/products/${product.slug}`} className="block">
         <div className="thumb">
-          {product.badge && <span className={BADGE_CLASS[product.badge] || BADGE_CLASS.sale}>{badgeLabel}</span>}
-          <img src={product.images[0]} alt={product.name} />
+          {outOfStock ? (
+            <span className="badge" style={{ background: '#6b6b6b' }}>Sold out</span>
+          ) : (
+            product.badge && <span className={BADGE_CLASS[product.badge] || BADGE_CLASS.sale}>{badgeLabel}</span>
+          )}
+          <img src={product.images[0]} alt={product.name} style={outOfStock ? { opacity: 0.5 } : undefined} />
         </div>
         <h3 className="mt-3 text-[15px] font-normal leading-snug px-2">{product.name}</h3>
         <p className="mt-2 text-[15px]">
@@ -42,6 +48,7 @@ export default function ProductCard({ product }) {
           <span className={off ? 'price-sale' : 'font-medium'}>{formatPKR(product.price)}</span>
           {off > 0 && <span className="price-sale ml-1.5 text-sm">{off}% off</span>}
         </p>
+        {lowStock && <p className="text-xs mt-1" style={{ color: '#c98a7d' }}>Only a few left</p>}
       </Link>
     </article>
   )

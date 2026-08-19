@@ -28,6 +28,7 @@ function mapSummaryToItems(summary) {
     image: getPublicImageUrl('product-images', item.imagePath) ?? '',
     qty: item.quantity,
     priceChanged: item.priceChanged,
+    quantityAdjusted: item.quantityAdjusted,
   }))
 }
 
@@ -61,13 +62,20 @@ export function CartProvider({ children }) {
 
   const applySummary = useCallback((summary) => {
     setItems(mapSummaryToItems(summary))
-    setRemovedNotice(
-      summary.removedItems?.length
-        ? `${summary.removedItems.length} item${summary.removedItems.length === 1 ? '' : 's'} in your cart ${
-            summary.removedItems.length === 1 ? 'is' : 'are'
-          } no longer available and ${summary.removedItems.length === 1 ? 'was' : 'were'} removed.`
-        : null,
-    )
+    const removedCount = summary.removedItems?.length ?? 0
+    const adjustedCount = summary.items?.filter((item) => item.quantityAdjusted).length ?? 0
+    const notices = []
+    if (removedCount > 0) {
+      notices.push(
+        `${removedCount} item${removedCount === 1 ? '' : 's'} in your cart ${removedCount === 1 ? 'is' : 'are'} no longer available and ${removedCount === 1 ? 'was' : 'were'} removed.`,
+      )
+    }
+    if (adjustedCount > 0) {
+      notices.push(
+        `${adjustedCount} item${adjustedCount === 1 ? '' : 's'} in your cart ${adjustedCount === 1 ? 'was' : 'were'} reduced to match what's currently in stock.`,
+      )
+    }
+    setRemovedNotice(notices.length ? notices.join(' ') : null)
   }, [])
 
   const reload = useCallback(async () => {

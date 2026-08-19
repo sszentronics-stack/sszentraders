@@ -10,6 +10,7 @@
  */
 import { toMajorUnits } from '../../backend/lib/money'
 import { computeDefaultBadge, computeDiscountPercent } from '../../backend/lib/catalog'
+import { computeAvailabilityState, type AvailabilityState } from '../../backend/lib/inventory'
 import { getPublicImageUrl } from '../lib/supabase/storage'
 import type { ProductWithRelations } from '../repositories/products.repository'
 
@@ -28,6 +29,8 @@ export interface StorefrontProduct {
   badge: 'new' | 'sale' | 'bestseller' | null
   featured: boolean
   inStock: boolean
+  /** Phase 9: real synced availability state, or 'unknown'/absent when the variant has no reliable inventory_cache data yet — see backend/lib/inventory. Optional because a few lightweight card shapes (recently-viewed, wishlist) don't carry it. */
+  availability?: AvailabilityState
   category: string
   type: string
   sku: string
@@ -73,6 +76,12 @@ export function adaptProduct(product: ProductWithRelations): StorefrontProduct {
     ...(variant?.title ? ([['Size', variant.title]] as [string, string][]) : []),
   ]
 
+  // Phase 9: an 'unknown' availability (no inventory_cache row yet — the
+  // variant isn't ERP-mapped/synced) is treated as sellable, matching
+  // backend/lib/inventory's checkout-side rule: never block a sale on
+  // missing data alone. Only a real, synced zero blocks "Add to bag".
+  const availability = computeAvailabilityState(variant?.availableQuantity)
+
   return {
     id: product.id,
     variantId: variant?.id,
@@ -86,7 +95,8 @@ export function adaptProduct(product: ProductWithRelations): StorefrontProduct {
     compareAt,
     badge: badge ?? null,
     featured: product.isFeatured,
-    inStock: true, // Phase 3 has no stock-quantity concept in Aura — see docs/phase-3-completion-report.md
+    inStock: availability !== 'out_of_stock',
+    availability,
     category: product.categories[0]?.name ?? '',
     type: product.productType ?? '',
     sku: variant?.sku ?? '',

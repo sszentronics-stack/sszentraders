@@ -11,6 +11,7 @@
  * same request — a client-supplied price is never an input to this module.
  */
 import { calculateLineTotal, sumMinorUnits } from '../money'
+import { assessCheckoutAvailability } from '../inventory'
 
 export const MAX_LINE_QUANTITY = 999
 
@@ -44,6 +45,13 @@ export interface VariantSnapshot {
   price: number // minor units
   status: 'draft' | 'published' | 'archived'
   productStatus: 'draft' | 'published' | 'archived'
+  /**
+   * Synced inventory_cache quantity (Phase 9), or null/undefined when no
+   * reliable cache data exists yet (unmapped/never-synced variant) — see
+   * backend/lib/inventory's assessCheckoutAvailability for why "unknown"
+   * never blocks a sale by itself.
+   */
+  availableQuantity?: number | null
 }
 
 export interface RevalidateLineInput {
@@ -61,18 +69,25 @@ export type RevalidatedLine =
       unitPrice: number
       lineTotal: number
       priceChanged: boolean
+      /** True when `quantity` was clamped down from what was requested/stored because inventory_cache reports less is available. */
+      quantityAdjusted: boolean
     }
   | {
       keep: false
-      reason: 'variant_unavailable' | 'product_unavailable'
+      reason: 'variant_unavailable' | 'product_unavailable' | 'out_of_stock'
     }
 
 /**
- * Re-check one cart line against the live catalog before returning cart
- * totals or allowing checkout. A line whose variant was archived/deleted, or
- * whose product was unpublished/deleted, is dropped (never silently kept at
- * a stale price) so the storefront can surface "this item is no longer
- * available" rather than charging for something that can't be fulfilled.
+ * Re-check one cart line against the live catalog (and, since Phase 9,
+ * ERP-synced availability) before returning cart totals or allowing
+ * checkout. A line whose variant was archived/deleted, whose product was
+ * unpublished/deleted, or whose inventory_cache reports zero available is
+ * dropped — never silently kept at a stale price or an unsellable quantity
+ * — so the storefront can surface "this item is no longer available"
+ * rather than charging for something that can't be fulfilled. A line
+ * requesting more than is available is kept but clamped down, never
+ * rejected outright — "never oversell", not "never let them buy what's
+ * left."
  */
 export function revalidateCartLine(input: RevalidateLineInput): RevalidatedLine {
   const { variant, requestedQuantity, previousUnitPrice } = input
@@ -80,7 +95,11 @@ export function revalidateCartLine(input: RevalidateLineInput): RevalidatedLine 
   if (variant.status !== 'published') return { keep: false, reason: 'variant_unavailable' }
   if (variant.productStatus !== 'published') return { keep: false, reason: 'product_unavailable' }
 
-  const quantity = Math.min(Math.max(1, requestedQuantity), MAX_LINE_QUANTITY)
+  const clampedRequest = Math.min(Math.max(1, requestedQuantity), MAX_LINE_QUANTITY)
+  const availability = assessCheckoutAvailability(clampedRequest, variant.availableQuantity)
+  if (!availability.ok) return { keep: false, reason: 'out_of_stock' }
+
+  const quantity = availability.allowedQuantity
   const unitPrice = variant.price
   const priceChanged = previousUnitPrice != null && previousUnitPrice !== unitPrice
 
@@ -90,6 +109,7 @@ export function revalidateCartLine(input: RevalidateLineInput): RevalidatedLine 
     unitPrice,
     lineTotal: calculateLineTotal({ unitPrice, quantity }),
     priceChanged,
+    quantityAdjusted: quantity !== clampedRequest,
   }
 }
 
