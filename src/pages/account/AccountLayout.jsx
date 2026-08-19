@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useSeo } from '../../hooks/useSeo'
 
 const NAV = [
   { to: '/account', label: 'Profile', end: true },
@@ -14,6 +15,8 @@ const NAV = [
 export default function AccountLayout() {
   const { profile, user, logout } = useAuth()
   const displayName = profile?.firstName || user?.email
+
+  useSeo({ title: 'My Account | Aura Beauty Care', noindex: true })
 
   return (
     <div className="container-aura py-12 md:py-16">

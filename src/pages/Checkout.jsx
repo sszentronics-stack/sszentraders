@@ -9,6 +9,7 @@ import * as ordersApi from '../repositories/orders.repository'
 import * as customersApi from '../repositories/customers.repository'
 import * as promotionsApi from '../repositories/promotions.repository'
 import { isSupabaseConfigured } from '../lib/supabase/client'
+import { useSeo } from '../hooks/useSeo'
 
 const STEPS = ['contact', 'address', 'delivery', 'payment', 'review']
 const STEP_LABELS = { contact: 'Contact', address: 'Address', delivery: 'Delivery', payment: 'Payment', review: 'Review' }
@@ -25,6 +26,7 @@ const EMPTY_ADDRESS = {
 }
 
 export default function Checkout() {
+  useSeo({ title: 'Checkout | Aura Beauty Care', noindex: true })
   const navigate = useNavigate()
   const { isAuthenticated, user, ensureGuestSession } = useAuth()
   const { items, total, loading: cartLoading, clearCart } = useCart()

@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { lazy, Suspense, useLayoutEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
@@ -14,6 +14,7 @@ import OrderConfirmation from './pages/OrderConfirmation'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Policy from './pages/Policy'
+import NotFound from './pages/NotFound'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import ForgotPassword from './pages/auth/ForgotPassword'
@@ -29,31 +30,47 @@ import RequestReturn from './pages/account/RequestReturn'
 import ComingSoon from './pages/account/ComingSoon'
 import Loyalty from './pages/account/Loyalty'
 import RequireAdmin from './components/admin/RequireAdmin'
-import AdminLayout from './components/admin/AdminLayout'
-import AdminDashboard from './pages/admin/Dashboard'
-import AdminProductList from './pages/admin/products/ProductList'
-import AdminProductForm from './pages/admin/products/ProductForm'
-import AdminProductDetail from './pages/admin/products/ProductDetail'
-import AdminCatalogManager from './pages/admin/catalog/CatalogManager'
-import AdminOrderList from './pages/admin/orders/OrderList'
-import AdminOrderDetail from './pages/admin/orders/OrderDetail'
-import AdminCustomerList from './pages/admin/customers/CustomerList'
-import AdminCustomerDetail from './pages/admin/customers/CustomerDetail'
-import AdminPaymentsQueue from './pages/admin/payments/PaymentsQueue'
-import AdminShipmentsQueue from './pages/admin/shipments/ShipmentsQueue'
-import AdminReturnsQueue from './pages/admin/returns/ReturnsQueue'
-import AdminReturnDetail from './pages/admin/returns/ReturnDetail'
-import AdminReviewsQueue from './pages/admin/reviews/ReviewsQueue'
-import AdminErpSyncCenter from './pages/admin/erp/ErpSyncCenter'
-import AdminInventoryCenter from './pages/admin/inventory/InventoryCenter'
-import AdminReports from './pages/admin/reports/Reports'
-import AdminSettings from './pages/admin/settings/Settings'
-import AdminAuditLog from './pages/admin/audit/AuditLog'
-import AdminPromotionsLayout from './pages/admin/promotions/AdminPromotionsLayout'
-import AdminCampaigns from './pages/admin/promotions/Campaigns'
-import AdminPromotions from './pages/admin/promotions/Promotions'
-import AdminCoupons from './pages/admin/promotions/Coupons'
-import AdminAbandonedCarts from './pages/admin/promotions/AbandonedCarts'
+
+/**
+ * Phase 16 — production hardening. The entire /admin/* console (a large,
+ * customer-inaccessible internal tool — dozens of pages across catalog,
+ * orders, customers, payments, shipments, returns, reviews, ERP,
+ * inventory, reports, promotions, settings, audit log) was previously
+ * bundled eagerly into the same chunk every storefront visitor downloads,
+ * pushing the main bundle well past Vite's 500kB warning threshold for
+ * code nobody but a signed-in admin ever runs. Lazy-loading it means a
+ * customer's first paint only pays for the storefront; the admin chunk is
+ * fetched on first navigation to /admin, gated by RequireAdmin either way.
+ */
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
+const AdminProductList = lazy(() => import('./pages/admin/products/ProductList'))
+const AdminProductForm = lazy(() => import('./pages/admin/products/ProductForm'))
+const AdminProductDetail = lazy(() => import('./pages/admin/products/ProductDetail'))
+const AdminCatalogManager = lazy(() => import('./pages/admin/catalog/CatalogManager'))
+const AdminOrderList = lazy(() => import('./pages/admin/orders/OrderList'))
+const AdminOrderDetail = lazy(() => import('./pages/admin/orders/OrderDetail'))
+const AdminCustomerList = lazy(() => import('./pages/admin/customers/CustomerList'))
+const AdminCustomerDetail = lazy(() => import('./pages/admin/customers/CustomerDetail'))
+const AdminPaymentsQueue = lazy(() => import('./pages/admin/payments/PaymentsQueue'))
+const AdminShipmentsQueue = lazy(() => import('./pages/admin/shipments/ShipmentsQueue'))
+const AdminReturnsQueue = lazy(() => import('./pages/admin/returns/ReturnsQueue'))
+const AdminReturnDetail = lazy(() => import('./pages/admin/returns/ReturnDetail'))
+const AdminReviewsQueue = lazy(() => import('./pages/admin/reviews/ReviewsQueue'))
+const AdminErpSyncCenter = lazy(() => import('./pages/admin/erp/ErpSyncCenter'))
+const AdminInventoryCenter = lazy(() => import('./pages/admin/inventory/InventoryCenter'))
+const AdminReports = lazy(() => import('./pages/admin/reports/Reports'))
+const AdminSettings = lazy(() => import('./pages/admin/settings/Settings'))
+const AdminAuditLog = lazy(() => import('./pages/admin/audit/AuditLog'))
+const AdminPromotionsLayout = lazy(() => import('./pages/admin/promotions/AdminPromotionsLayout'))
+const AdminCampaigns = lazy(() => import('./pages/admin/promotions/Campaigns'))
+const AdminPromotions = lazy(() => import('./pages/admin/promotions/Promotions'))
+const AdminCoupons = lazy(() => import('./pages/admin/promotions/Coupons'))
+const AdminAbandonedCarts = lazy(() => import('./pages/admin/promotions/AbandonedCarts'))
+
+function AdminFallback() {
+  return <div className="admin-shell-loading">Loading admin console…</div>
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -112,6 +129,11 @@ export default function App() {
                     element={<ComingSoon title="Preferences" description="Manage notification and communication preferences here soon." />}
                   />
                 </Route>
+
+                {/* Catches unmatched storefront paths inside Layout so
+                    Header/Footer/CartDrawer still render around the 404 —
+                    previously this blind-redirected to "/" (a soft-404). */}
+                <Route path="*" element={<NotFound />} />
               </Route>
 
               {/* /admin/* is a deliberately separate internal-tool shell —
@@ -125,7 +147,9 @@ export default function App() {
                 path="/admin"
                 element={
                   <RequireAdmin>
-                    <AdminLayout />
+                    <Suspense fallback={<AdminFallback />}>
+                      <AdminLayout />
+                    </Suspense>
                   </RequireAdmin>
                 }
               >
@@ -157,8 +181,6 @@ export default function App() {
                 <Route path="audit-log" element={<AdminAuditLog />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />
               </Route>
-
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </WishlistProvider>

@@ -1,6 +1,7 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { AdminToastProvider } from '../../context/admin/AdminToastContext'
+import { useSeo } from '../../hooks/useSeo'
 
 /**
  * Sidebar/shell for /admin/*. Includes "Promotions", folded in during the
@@ -27,6 +28,8 @@ const NAV = [
 
 export default function AdminLayout() {
   const { logout, session } = useAuth()
+
+  useSeo({ title: 'Admin | Aura Beauty Care', noindex: true })
 
   return (
     <AdminToastProvider>

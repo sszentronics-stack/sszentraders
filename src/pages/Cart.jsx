@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { buildWhatsAppOrder, formatPKR, WHATSAPP_LINK } from '../data/products'
 import { isSupabaseConfigured } from '../lib/supabase/client'
+import { useSeo } from '../hooks/useSeo'
 
 export default function Cart() {
+  useSeo({ title: 'Your Cart | Aura Beauty Care', noindex: true })
   const configured = isSupabaseConfigured()
   const navigate = useNavigate()
   const { items, total, updateQty, removeItem, clearCart, removedNotice, dismissRemovedNotice } = useCart()
