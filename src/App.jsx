@@ -9,6 +9,8 @@ import Home from './pages/Home'
 import Shop from './pages/Shop'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
+import OrderConfirmation from './pages/OrderConfirmation'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Policy from './pages/Policy'
@@ -19,6 +21,7 @@ import ResetPassword from './pages/auth/ResetPassword'
 import AccountLayout from './pages/account/AccountLayout'
 import Profile from './pages/account/Profile'
 import Addresses from './pages/account/Addresses'
+import Orders from './pages/account/Orders'
 import Wishlist from './pages/account/Wishlist'
 import ComingSoon from './pages/account/ComingSoon'
 
@@ -43,6 +46,8 @@ export default function App() {
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/products/:slug" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/privacy" element={<Policy />} />
@@ -65,10 +70,8 @@ export default function App() {
                 >
                   <Route index element={<Profile />} />
                   <Route path="addresses" element={<Addresses />} />
-                  <Route
-                    path="orders"
-                    element={<ComingSoon title="Orders" description="Order history and tracking are on the way." />}
-                  />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="orders/:id" element={<OrderConfirmation />} />
                   <Route path="wishlist" element={<Wishlist />} />
                   <Route
                     path="preferences"

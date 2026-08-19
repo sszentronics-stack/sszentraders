@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { buildWhatsAppProduct, formatPKR, salePercent } from '../data/products'
+import { buildWhatsAppProduct, formatPKR, salePercent, WHATSAPP_LINK } from '../data/products'
+import { isSupabaseConfigured } from '../lib/supabase/client'
 import { useProduct } from '../hooks/useCatalog'
 import { useRecentlyViewed, useRecordRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useCart } from '../context/CartContext'
@@ -187,14 +188,25 @@ export default function Product() {
             </button>
           </div>
           <div className="mt-3">
-            <a
-              className="btn-outline block text-center"
-              href={buildWhatsAppProduct(product, qty)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Buy it now on WhatsApp
-            </a>
+            {isSupabaseConfigured() ? (
+              <a
+                className="btn-outline block text-center"
+                href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aura Beauty Care! I have a question about ${product.name}.`)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Ask a question on WhatsApp
+              </a>
+            ) : (
+              <a
+                className="btn-outline block text-center"
+                href={buildWhatsAppProduct(product, qty)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Buy it now on WhatsApp
+              </a>
+            )}
           </div>
 
           <div className="mt-6">

@@ -18,12 +18,13 @@ interface ErrorEnvelope {
  */
 export async function callEdgeFunction<T>(
   name: string,
-  options: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown } = {},
+  options: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown; headers?: Record<string, string> } = {},
 ): Promise<T> {
   const client = getSupabaseBrowserClient()
   const { data, error } = await client.functions.invoke(name, {
     method: options.method ?? 'POST',
     body: options.body as Record<string, unknown> | undefined,
+    headers: options.headers,
   })
 
   if (error) {
