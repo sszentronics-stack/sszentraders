@@ -86,6 +86,7 @@ export default function OrderConfirmation() {
   }
 
   const canCancel = order.orderStatus === 'pending' || order.orderStatus === 'confirmed'
+  const canRequestReturn = order.orderStatus === 'delivered'
   const supportMessage = `Hi Aura Beauty Care! I have a question about my order ${order.orderNumber}.`
 
   return (
@@ -160,6 +161,11 @@ export default function OrderConfirmation() {
           <button type="button" className="btn-outline w-auto px-6" onClick={handleCancel} disabled={cancelling}>
             {cancelling ? 'Cancelling...' : 'Cancel order'}
           </button>
+        )}
+        {canRequestReturn && (
+          <Link to={`/account/orders/${order.id}/return`} className="btn-outline w-auto px-6 inline-block text-center">
+            Request return
+          </Link>
         )}
         <Link to="/shop" className="btn-lavender w-auto px-8 inline-block text-center">Continue shopping</Link>
       </div>

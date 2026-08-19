@@ -4,6 +4,8 @@ import {
   MAX_IMAGE_BYTES,
   buildBrandAssetStoragePath,
   buildProductImageStoragePath,
+  buildReturnEvidenceStoragePath,
+  buildReviewImageStoragePath,
   sanitizeFileName,
   validateImageUpload,
 } from './index'
@@ -64,6 +66,18 @@ describe('storage path builders', () => {
   it('builds a brand asset path', () => {
     expect(buildBrandAssetStoragePath({ brandId: 'brand-1', assetId: 'asset-1', mimeType: 'image/jpeg' })).toBe(
       'brand-1/asset-1.jpg',
+    )
+  })
+
+  it('builds a review image path', () => {
+    expect(buildReviewImageStoragePath({ reviewId: 'rev-1', imageId: 'img-1', mimeType: 'image/webp' })).toBe(
+      'rev-1/img-1.webp',
+    )
+  })
+
+  it('builds a return evidence path', () => {
+    expect(buildReturnEvidenceStoragePath({ orderItemId: 'oi-1', evidenceId: 'ev-1', mimeType: 'image/jpeg' })).toBe(
+      'oi-1/ev-1.jpg',
     )
   })
 })

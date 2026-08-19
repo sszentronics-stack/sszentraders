@@ -9,6 +9,7 @@ import { useWishlist } from '../context/WishlistContext'
 import Disclaimer from '../components/Disclaimer'
 import ProductCard from '../components/ProductCard'
 import TrustBar from '../components/TrustBar'
+import ReviewsSection from '../components/ReviewsSection'
 import { ChevronLeft, ChevronRight, Heart, Share2, Star } from 'lucide-react'
 
 export default function Product() {
@@ -271,6 +272,8 @@ export default function Product() {
           <Disclaimer />
         </Accordion>
       </div>
+
+      <ReviewsSection productId={product.id} />
 
       {related.length > 0 && (
         <section className="mt-16">
