@@ -23,6 +23,9 @@ import Profile from './pages/account/Profile'
 import Addresses from './pages/account/Addresses'
 import Orders from './pages/account/Orders'
 import Wishlist from './pages/account/Wishlist'
+import Returns from './pages/account/Returns'
+import ReturnDetail from './pages/account/ReturnDetail'
+import RequestReturn from './pages/account/RequestReturn'
 import ComingSoon from './pages/account/ComingSoon'
 
 function ScrollToTop() {
@@ -72,6 +75,9 @@ export default function App() {
                   <Route path="addresses" element={<Addresses />} />
                   <Route path="orders" element={<Orders />} />
                   <Route path="orders/:id" element={<OrderConfirmation />} />
+                  <Route path="orders/:id/return" element={<RequestReturn />} />
+                  <Route path="returns" element={<Returns />} />
+                  <Route path="returns/:id" element={<ReturnDetail />} />
                   <Route path="wishlist" element={<Wishlist />} />
                   <Route
                     path="preferences"

@@ -102,3 +102,21 @@ export function buildBrandAssetStoragePath(params: { brandId: string; assetId: s
 export function buildCategoryAssetStoragePath(params: { categoryId: string; assetId: string; mimeType: AllowedImageMimeType }): string {
   return `${params.categoryId}/${params.assetId}.${MIME_TO_EXTENSION[params.mimeType]}`
 }
+
+/** Phase 14 — review-images bucket (public read, see 0021_reviews_and_returns_workflow.sql). */
+export function buildReviewImageStoragePath(params: { reviewId: string; imageId: string; mimeType: AllowedImageMimeType }): string {
+  return `${params.reviewId}/${params.imageId}.${MIME_TO_EXTENSION[params.mimeType]}`
+}
+
+/**
+ * Phase 14 — return-evidence bucket (PRIVATE, read only via a
+ * service-role-issued signed URL — see 0021_reviews_and_returns_workflow.sql).
+ * Keyed by orderItemId rather than the eventual return_item_id: evidence is
+ * uploaded WHILE the customer is still assembling a return request, before
+ * any `returns`/`return_items` row exists yet, so there is no return_item_id
+ * to key on at upload time — the order item being returned already exists
+ * and is what the caller owns/can prove.
+ */
+export function buildReturnEvidenceStoragePath(params: { orderItemId: string; evidenceId: string; mimeType: AllowedImageMimeType }): string {
+  return `${params.orderItemId}/${params.evidenceId}.${MIME_TO_EXTENSION[params.mimeType]}`
+}

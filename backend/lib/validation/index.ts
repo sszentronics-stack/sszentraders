@@ -374,6 +374,98 @@ export const easypaisaRefundSchema = z.object({
 })
 export type EasypaisaRefundInput = z.infer<typeof easypaisaRefundSchema>
 
+// ---------------------------------------------------------------------------
+// Phase 14 — Reviews, Returns & Customer Service
+// ---------------------------------------------------------------------------
+
+export const createReviewSchema = z.object({
+  orderItemId: uuidSchema,
+  rating: z.number().int().min(1).max(5),
+  title: z.string().trim().max(150).optional(),
+  body: z.string().trim().max(4000).optional(),
+})
+export type CreateReviewInput = z.infer<typeof createReviewSchema>
+
+export const moderateReviewSchema = z.object({
+  status: z.enum(['published', 'rejected']),
+  moderationNote: z.string().trim().max(1000).optional(),
+})
+export type ModerateReviewInput = z.infer<typeof moderateReviewSchema>
+
+export const reviewImageUploadRequestSchema = z.object({
+  fileName: z.string().trim().min(1).max(255),
+  mimeType: z.string().trim().min(1).max(100),
+  sizeBytes: z.number().int().positive(),
+})
+export type ReviewImageUploadRequestInput = z.infer<typeof reviewImageUploadRequestSchema>
+
+export const attachReviewImageSchema = z.object({
+  storagePath: z.string().trim().min(1).max(500),
+})
+export type AttachReviewImageInput = z.infer<typeof attachReviewImageSchema>
+
+const returnReasonCodeSchema = z.enum([
+  'damaged_in_transit',
+  'wrong_item_received',
+  'not_as_described',
+  'defective_quality',
+  'changed_mind',
+  'size_fit_issue',
+  'other',
+])
+
+/** A signed upload URL request for return evidence, keyed by the order item being returned — see backend/lib/media's buildReturnEvidenceStoragePath doc for why (no return_item_id exists yet at upload time). */
+export const returnEvidenceUploadRequestSchema = z.object({
+  orderItemId: uuidSchema,
+  fileName: z.string().trim().min(1).max(255),
+  mimeType: z.string().trim().min(1).max(100),
+  sizeBytes: z.number().int().positive(),
+})
+export type ReturnEvidenceUploadRequestInput = z.infer<typeof returnEvidenceUploadRequestSchema>
+
+export const returnRequestLineSchema = z.object({
+  orderItemId: uuidSchema,
+  quantity: z.number().int().positive().max(999),
+  reasonCode: returnReasonCodeSchema,
+  notes: z.string().trim().max(1000).optional(),
+  /** storagePath values already uploaded via POST /returns/evidence/upload-url. */
+  evidenceStoragePaths: z.array(z.string().trim().min(1).max(500)).max(6).default([]),
+})
+export type ReturnRequestLineInput = z.infer<typeof returnRequestLineSchema>
+
+export const createReturnRequestSchema = z.object({
+  orderId: uuidSchema,
+  customerNotes: z.string().trim().max(2000).optional(),
+  items: z.array(returnRequestLineSchema).min(1),
+})
+export type CreateReturnRequestInput = z.infer<typeof createReturnRequestSchema>
+
+/** Admin approve/reject of a `requested`/`under_review` return. */
+export const returnDecisionSchema = z.object({
+  note: z.string().trim().max(1000).optional(),
+})
+export type ReturnDecisionInput = z.infer<typeof returnDecisionSchema>
+
+/** Admin move a return into review (from `requested`). */
+export const returnReviewSchema = z.object({
+  note: z.string().trim().max(1000).optional(),
+})
+export type ReturnReviewInput = z.infer<typeof returnReviewSchema>
+
+/** Admin records what happened once the returned item was physically received/inspected. */
+export const recordInspectionOutcomeSchema = z
+  .object({
+    resolution: z.enum(['refund', 'replacement']),
+    inspectionNotes: z.string().trim().max(2000).optional(),
+    /** Required when resolution is "refund" — the server never guesses an amount; this is the admin's inspected decision, still capped server-side against the order's paid amount. */
+    refundAmount: moneyMinorUnitsSchema.optional(),
+  })
+  .refine((v) => v.resolution !== 'refund' || typeof v.refundAmount === 'number', {
+    message: 'refundAmount is required when resolution is "refund".',
+    path: ['refundAmount'],
+  })
+export type RecordInspectionOutcomeInput = z.infer<typeof recordInspectionOutcomeSchema>
+
 /** Validate `input` against `schema`, throwing a ValidationError (see ../errors) with field-level detail on failure. */
 export function parseOrThrow<T>(schema: z.ZodType<T>, input: unknown): T {
   const result = schema.safeParse(input)
