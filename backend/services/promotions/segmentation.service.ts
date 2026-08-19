@@ -8,9 +8,10 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-const COMPLETED_ORDER_STATUSES = ['delivered', 'returned', 'refunded'] as const
+/** Exported so other read-only reporting (Phase 15's commerce analytics) can reuse the same "what counts as a real order" vocabulary instead of redefining it. */
+export const COMPLETED_ORDER_STATUSES = ['delivered', 'returned', 'refunded'] as const
 /** Any order that isn't cancelled counts toward "has this customer ordered before" for first-order-offer eligibility — a cancelled order was never fulfilled. */
-const COUNTS_TOWARD_ORDER_HISTORY = ['pending', 'confirmed', 'processing', 'packed', 'ready_for_pickup', 'shipped', ...COMPLETED_ORDER_STATUSES]
+export const COUNTS_TOWARD_ORDER_HISTORY = ['pending', 'confirmed', 'processing', 'packed', 'ready_for_pickup', 'shipped', ...COMPLETED_ORDER_STATUSES]
 
 export interface CustomerOrderStats {
   orderCount: number

@@ -1141,6 +1141,78 @@ img {
   color: #7a5b53;
 }
 
+/* Phase 15: distinguishes "commerce analytics" (computed locally from real order/cart/return data) from "ERP financial reports" (LedGix-authoritative, currently unavailable) — required by the phase spec so the two are never visually or textually confused. */
+.admin-source-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+.admin-source-badge-commerce {
+  background: rgba(90, 143, 110, 0.12);
+  color: #2f6b45;
+}
+
+.admin-source-badge-erp {
+  background: rgba(122, 91, 83, 0.14);
+  color: #7a5b53;
+}
+
+.admin-section-intro {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.admin-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-date-filter-presets {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-date-filter-presets button {
+  border: 1px solid #eddad3;
+  background: #fff;
+  color: #7a5b53;
+  font-size: 12.5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-date-filter-presets button.active {
+  background: #c98a7d;
+  border-color: #c98a7d;
+  color: #fff;
+}
+
+.admin-date-filter input[type="date"] {
+  padding: 6px 10px;
+  font-size: 12.5px;
+  border: 1px solid #eddad3;
+  border-radius: 6px;
+}
+
+.admin-metric-note {
+  font-size: 11.5px;
+  color: #9c8983;
+  margin-top: 4px;
+}
+
 .admin-empty,
 .admin-loading {
   padding: 28px 0;

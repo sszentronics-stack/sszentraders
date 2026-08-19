@@ -19,6 +19,7 @@ const NAV = [
   { to: '/admin/reviews', label: 'Reviews' },
   { to: '/admin/erp', label: 'ERP Sync' },
   { to: '/admin/inventory', label: 'Inventory' },
+  { to: '/admin/reports', label: 'Reports' },
   { to: '/admin/promotions', label: 'Promotions' },
   { to: '/admin/settings', label: 'Settings' },
   { to: '/admin/audit-log', label: 'Audit Log' },

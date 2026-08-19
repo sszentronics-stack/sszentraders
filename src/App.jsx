@@ -46,6 +46,7 @@ import AdminReturnDetail from './pages/admin/returns/ReturnDetail'
 import AdminReviewsQueue from './pages/admin/reviews/ReviewsQueue'
 import AdminErpSyncCenter from './pages/admin/erp/ErpSyncCenter'
 import AdminInventoryCenter from './pages/admin/inventory/InventoryCenter'
+import AdminReports from './pages/admin/reports/Reports'
 import AdminSettings from './pages/admin/settings/Settings'
 import AdminAuditLog from './pages/admin/audit/AuditLog'
 import AdminPromotionsLayout from './pages/admin/promotions/AdminPromotionsLayout'
@@ -144,6 +145,7 @@ export default function App() {
                 <Route path="reviews" element={<AdminReviewsQueue />} />
                 <Route path="erp" element={<AdminErpSyncCenter />} />
                 <Route path="inventory" element={<AdminInventoryCenter />} />
+                <Route path="reports" element={<AdminReports />} />
                 <Route path="promotions" element={<AdminPromotionsLayout />}>
                   <Route index element={<Navigate to="campaigns" replace />} />
                   <Route path="campaigns" element={<AdminCampaigns />} />
