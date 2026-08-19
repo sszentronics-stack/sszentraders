@@ -20,6 +20,25 @@ describe('integration provider skeletons', () => {
     await expect(
       provider.initiatePayment({ orderId: 'o1', amount: 1000, currency: 'PKR' }),
     ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+    await expect(provider.verifyPayment({ providerTransactionId: 't1' })).rejects.toBeInstanceOf(
+      IntegrationNotConfiguredError,
+    )
+    await expect(
+      provider.refundPayment({ providerTransactionId: 't1', amount: 500 }),
+    ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+  })
+
+  it('EasypaisaProvider still throws even when "configured" — configuration alone is never mistaken for success', async () => {
+    const provider = new EasypaisaProvider({
+      merchantId: 'm1',
+      storeId: 's1',
+      hashKey: 'h1',
+      apiBaseUrl: 'https://example.test',
+      webhookSecret: 'w1',
+    })
+    await expect(
+      provider.initiatePayment({ orderId: 'o1', amount: 1000, currency: 'PKR' }),
+    ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
   })
 
   it('LeopardsCourierProvider throws IntegrationNotConfiguredError when unconfigured', async () => {

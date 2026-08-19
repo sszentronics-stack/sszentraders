@@ -349,6 +349,21 @@ export const cancelOrderRequestSchema = z.object({
 })
 export type CancelOrderRequestInput = z.infer<typeof cancelOrderRequestSchema>
 
+/** Phase 10 — start/retry an Easypaisa payment attempt against an order the caller owns. */
+export const easypaisaInitiateSchema = z.object({
+  orderId: uuidSchema,
+  returnUrl: z.string().trim().url().optional(),
+})
+export type EasypaisaInitiateInput = z.infer<typeof easypaisaInitiateSchema>
+
+/** Phase 10 — admin-initiated refund against an already-paid Easypaisa payment. */
+export const easypaisaRefundSchema = z.object({
+  paymentId: uuidSchema,
+  amount: moneyMinorUnitsSchema,
+  reason: z.string().trim().max(500).optional(),
+})
+export type EasypaisaRefundInput = z.infer<typeof easypaisaRefundSchema>
+
 /** Validate `input` against `schema`, throwing a ValidationError (see ../errors) with field-level detail on failure. */
 export function parseOrThrow<T>(schema: z.ZodType<T>, input: unknown): T {
   const result = schema.safeParse(input)
