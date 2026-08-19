@@ -61,3 +61,15 @@ export function getLeopardsConfig() {
   if (!apiKey || !apiPassword || !apiBaseUrl) return null
   return { apiKey, apiPassword, apiBaseUrl }
 }
+
+/**
+ * Webhook signing secret for verifying inbound Leopards callbacks (see
+ * backend/services/delivery/leopards/webhook.ts) — kept separate from
+ * getLeopardsConfig() because a webhook secret and API credentials are
+ * conceptually different keys, even though neither exists yet. Returns
+ * undefined (not an object) so callers can cleanly distinguish "no secret
+ * configured" without an extra null-check shape.
+ */
+export function getLeopardsWebhookSecret(): string | undefined {
+  return readOptional('LEOPARDS_WEBHOOK_SECRET')
+}
