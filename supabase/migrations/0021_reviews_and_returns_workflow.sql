@@ -1,14 +1,14 @@
 -- 0021_reviews_and_returns_workflow.sql
 -- Phase 14: Reviews, Returns & Customer Service.
 --
--- Numbering note: 0001-0020 are all taken (with two pre-existing sibling
--- collisions at 0016/0019 from earlier parallel phases, documented in
--- supabase/migrations/README.md). 0021 was verified free at the time this
--- migration was written. If a Phase 9 (ERP-Controlled Inventory) migration
--- also lands as 0021 from a parallel session, both files are additive and
--- touch disjoint tables (this file never touches inventory_cache/products
--- stock columns), so applying them in either order is safe — same
--- resolution Phase 8 documented for the 0019 collision.
+-- Numbering note: 0001-0020 were all taken at the time this migration was
+-- written, and 0021 was verified free in this session's worktree. Phase 9
+-- (ERP-Controlled Inventory), running in parallel, also landed a migration
+-- as 0021_inventory_cache_public_read.sql. Both files are additive and
+-- touch fully disjoint tables (this file never touches inventory_cache or
+-- any products stock column), so applying them in either order is safe —
+-- same resolution Phase 8 documented for the earlier 0019 collision. See
+-- supabase/migrations/README.md for the full note.
 --
 -- Adds:
 --   1. Reviews: product_reviews + product_review_images (new schema —

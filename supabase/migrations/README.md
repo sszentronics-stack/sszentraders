@@ -26,9 +26,14 @@ never edit an already-applied migration; add a new one instead.
 | `0016_address_default_enforcement.sql` | Phase 2: trigger that atomically clears a customer's previous default shipping/billing address when a new one is promoted, so the "one default per customer" partial unique indexes never block a legitimate change. |
 | `0019_leopards_shipments.sql` | Phase 11: `shipment_status` enum gains `pending_booking`/`rto_initiated`/`rto_in_transit`/`rto_delivered`; `shipments` gains `purpose`, `return_id`, `request_payload`, `booking_error`, `booking_attempted_at`, `idempotency_key`, and duplicate-booking-prevention indexes. |
 | `0020_accounting_adjustment_type.sql` | Phase 8 housekeeping: adds `'adjustment'` to `local_financial_transactions`' `transaction_type` check constraint, needed by the Phase 10/11 → Phase 7 accounting consolidation's `recordAdjustmentTransaction()`. |
+| `0021_inventory_cache_public_read.sql` | Phase 9: extends `inventory_cache` RLS with a public-read policy (storefront stock-availability badges), separate from the admin-only write path. |
 | `0021_reviews_and_returns_workflow.sql` | Phase 14: new `product_reviews`/`product_review_images` (verified-purchase reviews); `returns`/`return_items` gain workflow columns (`resolution`, `refund_method`, `reason_code`, LedGix credit-note reference, etc.); new `return_item_evidence`; `review-images` (public) and `return-evidence` (private) storage buckets + RLS. |
 
-**Note:** `0019_accounting_local_financial_events.sql` (Phase 7) and `0019_leopards_shipments.sql` (Phase 11) share the same numeric prefix — both were built as parallel sibling agents off the same `main` commit and merged without renumbering. Both are additive `alter table`/`create index` migrations against disjoint tables/columns, so applying them in either order is safe; this is flagged here rather than silently left for someone to trip over.
+**Note:** Two numeric prefixes are shared by parallel sibling-agent phases merged off the same `main` commit without renumbering:
+- `0019_accounting_local_financial_events.sql` (Phase 7) and `0019_leopards_shipments.sql` (Phase 11).
+- `0021_inventory_cache_public_read.sql` (Phase 9) and `0021_reviews_and_returns_workflow.sql` (Phase 14).
+
+In both cases the files are additive `alter table`/`create table`/`create index`/RLS-policy migrations against fully disjoint tables (Phase 9 only touches `inventory_cache`; Phase 14 only touches `product_reviews`/`product_review_images`/`return_item_evidence`/`returns`/`return_items`), so applying either pair in either order is safe. Flagged here rather than silently left for someone to trip over.
 
 `../seed.sql` holds minimal, clearly-marked, safe-to-rerun DEV-ONLY seed data
 (3 brands, 3 categories, 1 product/variant matching the current live
