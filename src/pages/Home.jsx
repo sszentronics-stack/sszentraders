@@ -3,7 +3,17 @@ import { Link } from 'react-router-dom'
 import HeroSlider from '../components/HeroSlider'
 import ProductCard from '../components/ProductCard'
 import { useProducts } from '../hooks/useCatalog'
+import { useSeo, useJsonLd } from '../hooks/useSeo'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+const ORGANIZATION_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Aura Beauty Care',
+  url: typeof window !== 'undefined' ? window.location.origin : undefined,
+  description: 'Authentic Korean and US skincare in Pakistan — Hero Mighty Patch, SOME BY MI, and more.',
+  sameAs: [],
+}
 
 const CATEGORIES = [
   { label: 'Acne Care', to: '/shop?category=Acne+Care', image: '/products/mighty-patch/1.jpg' },
@@ -16,6 +26,12 @@ export default function Home() {
   const [tab, setTab] = useState('new')
   const { products, loading, error } = useProducts()
   const list = tab === 'best' ? [...products].sort((a, b) => Number(b.featured) - Number(a.featured)) : products
+
+  useSeo({
+    title: 'Aura Beauty Care | Authentic Skincare in Pakistan',
+    description: 'Authentic Korean and US skincare in Pakistan. Shop Hero Mighty Patch and SOME BY MI. Order on WhatsApp, cash on delivery, nationwide shipping.',
+  })
+  useJsonLd(ORGANIZATION_JSON_LD)
 
   return (
     <>

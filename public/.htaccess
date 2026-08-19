@@ -1,0 +1,51 @@
+# Phase 16 — production hardening for Hostinger shared/static hosting
+# (Apache, no VPS/Node server — see docs/PHASE_PLAN.md's "must stay
+# deployable to Hostinger without a VPS" rule). Copied verbatim into
+# dist/ by Vite's `public/` passthrough on every build.
+
+# --- SPA fallback ---------------------------------------------------------
+# This is a client-rendered React Router app with no server-side routes:
+# every path other than a real static asset must serve index.html so
+# React Router can take over. Without this, a hard refresh (or a shared
+# link) on e.g. /shop or /products/some-serum 404s at the Apache level
+# instead of rendering the page.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# --- Security headers ------------------------------------------------------
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "DENY"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# --- Caching -----------------------------------------------------------
+# Vite fingerprints built JS/CSS/image filenames (content hash in the name),
+# so those are safe to cache aggressively; index.html must always
+# revalidate or a redeploy won't be picked up by returning visitors.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "index\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# --- Compression ---------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

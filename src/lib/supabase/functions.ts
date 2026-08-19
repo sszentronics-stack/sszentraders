@@ -7,9 +7,25 @@
  * message.
  */
 import { getSupabaseBrowserClient } from './client'
+import type { SuccessEnvelope } from '../../../backend/lib/response/index'
 
 interface ErrorEnvelope {
   error?: { code?: string; message?: string }
+}
+
+/**
+ * Phase 16 finding: every Edge Function returns backend/lib/response's
+ * standard envelope on success — `{ ok: true, data: T }` (see okResponse in
+ * supabase/functions/_shared/http.ts) — never the bare payload. This was
+ * NOT being unwrapped here: `callEdgeFunction` returned `data as T`, so
+ * every caller across every phase was actually receiving `{ ok, data }`
+ * cast as `T` — every `.field` access on the result would be `undefined`
+ * against a real Edge Function. Never caught in dev because no live
+ * Supabase project exists in this environment to exercise a real
+ * round trip. Fixed here, in the single shared call site.
+ */
+function isSuccessEnvelope<T>(value: unknown): value is SuccessEnvelope<T> {
+  return Boolean(value && typeof value === 'object' && (value as { ok?: unknown }).ok === true && 'data' in (value as object))
 }
 
 /**
@@ -43,5 +59,5 @@ export async function callEdgeFunction<T>(
     throw new Error(unwrappedMessage ?? error.message ?? 'Request failed.')
   }
 
-  return data as T
+  return isSuccessEnvelope<T>(data) ? data.data : (data as T)
 }

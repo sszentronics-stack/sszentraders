@@ -1,6 +1,12 @@
 import { WHATSAPP_DISPLAY, WHATSAPP_LINK } from '../data/products'
+import { useSeo } from '../hooks/useSeo'
 
 export default function Contact() {
+  useSeo({
+    title: 'Contact Us | Aura Beauty Care',
+    description: 'Questions about an order or a product? Message Aura Beauty Care on WhatsApp — the fastest way to reach us.',
+  })
+
   return (
     <div className="container-aura py-12 md:py-16 grid md:grid-cols-2 gap-12">
       <div>

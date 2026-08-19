@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import PasswordField from '../../components/auth/PasswordField'
 import { useAuth } from '../../context/AuthContext'
+import { useSeo } from '../../hooks/useSeo'
 
 export default function Login() {
+  useSeo({ title: 'Sign In | Aura Beauty Care', noindex: true })
   const { login, configured, isAuthenticated, initializing } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()

@@ -3,8 +3,10 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import PasswordField from '../../components/auth/PasswordField'
 import { useAuth } from '../../context/AuthContext'
 import { registerInputSchema } from '../../../backend/lib/validation/index'
+import { useSeo } from '../../hooks/useSeo'
 
 export default function Register() {
+  useSeo({ title: 'Create Account | Aura Beauty Care', noindex: true })
   const { register, configured } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()

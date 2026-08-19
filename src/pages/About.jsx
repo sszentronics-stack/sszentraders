@@ -1,4 +1,11 @@
+import { useSeo } from '../hooks/useSeo'
+
 export default function About() {
+  useSeo({
+    title: 'About Us | Aura Beauty Care',
+    description: 'Aura Beauty Care is an online skincare shop in Pakistan focused on a short, trusted list of authentic Korean and US products.',
+  })
+
   return (
     <div className="container-aura py-12 md:py-16 max-w-3xl">
       <p className="text-sm text-ink-soft mb-3">About us</p>

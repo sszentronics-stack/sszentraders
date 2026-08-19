@@ -4,6 +4,7 @@ import { buildWhatsAppProduct, formatPKR, salePercent, WHATSAPP_LINK } from '../
 import { isSupabaseConfigured } from '../lib/supabase/client'
 import { useProduct } from '../hooks/useCatalog'
 import { useRecentlyViewed, useRecordRecentlyViewed } from '../hooks/useRecentlyViewed'
+import { useSeo, useJsonLd } from '../hooks/useSeo'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import Disclaimer from '../components/Disclaimer'
@@ -29,6 +30,31 @@ export default function Product() {
 
   useRecordRecentlyViewed(product?.id)
   const { items: recentlyViewed } = useRecentlyViewed(product?.id)
+
+  useSeo({
+    title: product ? `${product.name} | Aura Beauty Care` : 'Product | Aura Beauty Care',
+    description: product ? (product.tagline || product.description)?.slice(0, 160) : undefined,
+    image: product?.images?.[0],
+  })
+  useJsonLd(
+    product
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          image: product.images,
+          description: product.tagline || product.description,
+          brand: product.brand ? { '@type': 'Brand', name: product.brand } : undefined,
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'PKR',
+            price: product.price,
+            availability: 'https://schema.org/InStock',
+            url: typeof window !== 'undefined' ? window.location.href : undefined,
+          },
+        }
+      : undefined,
+  )
 
   const sameCategory = product && product.category ? others.filter((p) => p.category === product.category) : []
   const related = sameCategory.length > 0 ? sameCategory : others

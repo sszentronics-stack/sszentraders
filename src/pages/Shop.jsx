@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { SlidersHorizontal, X } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
 import { useProducts } from '../hooks/useCatalog'
+import { useSeo } from '../hooks/useSeo'
 import { deriveFacets, filterProducts, sortProducts } from '../lib/productSearch'
 
 const SORT_LABELS = {
@@ -17,6 +18,11 @@ export default function Shop() {
   const [params, setParams] = useSearchParams()
   const { products, loading, error } = useProducts()
   const [filtersOpen, setFiltersOpen] = useState(false)
+
+  useSeo({
+    title: 'Shop All Skincare | Aura Beauty Care',
+    description: 'Browse authentic Korean and US skincare — acne patches, toners, masks, and anti-aging essentials. Nationwide delivery in Pakistan.',
+  })
 
   const q = params.get('q') || ''
   const category = params.get('category') || ''
