@@ -260,6 +260,37 @@ export const updateCustomerAddressSchema = customerAddressSchema.partial()
 export type UpdateCustomerAddressInput = z.infer<typeof updateCustomerAddressSchema>
 export type CreateCustomerAddressInput = z.infer<typeof customerAddressSchema>
 
+// ---------------------------------------------------------------------------
+// Phase 5 — Persistent Cart, Wishlist & Shopping State
+// ---------------------------------------------------------------------------
+
+export const cartItemInputSchema = z.object({
+  variantId: uuidSchema,
+  quantity: z.number().int().positive().max(999),
+})
+export type CartItemInput = z.infer<typeof cartItemInputSchema>
+
+export const updateCartItemQuantitySchema = z.object({
+  quantity: z.number().int().positive().max(999),
+})
+export type UpdateCartItemQuantityInput = z.infer<typeof updateCartItemQuantitySchema>
+
+/** Body of POST /cart/merge, sent once right after a guest signs in/registers — see backend/services/cart/cart.service.ts. */
+export const mergeCartItemsSchema = z.object({
+  items: z.array(cartItemInputSchema).max(200),
+})
+export type MergeCartItemsInput = z.infer<typeof mergeCartItemsSchema>
+
+export const wishlistItemInputSchema = z.object({
+  productId: uuidSchema,
+})
+export type WishlistItemInput = z.infer<typeof wishlistItemInputSchema>
+
+export const recentlyViewedInputSchema = z.object({
+  productId: uuidSchema,
+})
+export type RecentlyViewedInput = z.infer<typeof recentlyViewedInputSchema>
+
 /** Validate `input` against `schema`, throwing a ValidationError (see ../errors) with field-level detail on failure. */
 export function parseOrThrow<T>(schema: z.ZodType<T>, input: unknown): T {
   const result = schema.safeParse(input)

@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext'
 import { buildWhatsAppOrder, formatPKR } from '../data/products'
 
 export default function Cart() {
-  const { items, total, updateQty, removeItem, clearCart } = useCart()
+  const { items, total, updateQty, removeItem, clearCart, removedNotice, dismissRemovedNotice } = useCart()
   const [form, setForm] = useState({ name: '', phone: '', city: '', address: '' })
 
   const onChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
@@ -23,6 +23,14 @@ export default function Cart() {
   return (
     <div className="container-aura py-10 md:py-14">
       <h1 className="text-3xl font-medium mb-8">Your cart</h1>
+      {removedNotice && (
+        <div className="mb-6 flex items-start justify-between gap-3 bg-blush px-4 py-3 text-sm text-ink">
+          <span>{removedNotice}</span>
+          <button type="button" className="text-xs underline shrink-0" onClick={dismissRemovedNotice}>
+            Dismiss
+          </button>
+        </div>
+      )}
       <div className="grid lg:grid-cols-[1fr_380px] gap-10">
         <div className="space-y-6">
           {items.map((item) => (

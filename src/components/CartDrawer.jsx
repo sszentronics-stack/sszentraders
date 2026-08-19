@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext'
 import { buildWhatsAppOrder, formatPKR } from '../data/products'
 
 export default function CartDrawer() {
-  const { items, total, isOpen, setIsOpen, updateQty, removeItem } = useCart()
+  const { items, total, isOpen, setIsOpen, updateQty, removeItem, removedNotice, dismissRemovedNotice } = useCart()
 
   if (!isOpen) return null
 
@@ -17,6 +17,15 @@ export default function CartDrawer() {
             <X />
           </button>
         </div>
+
+        {removedNotice && (
+          <div className="mx-5 mt-4 flex items-start justify-between gap-3 bg-blush px-3 py-2.5 text-xs text-ink">
+            <span>{removedNotice}</span>
+            <button type="button" aria-label="Dismiss" onClick={dismissRemovedNotice} className="shrink-0">
+              <X size={14} />
+            </button>
+          </div>
+        )}
 
         {items.length === 0 ? (
           <div className="flex-1 grid place-items-center p-8 text-center text-ink-soft">
