@@ -73,7 +73,7 @@ export interface Product {
   seoTitle: string | null
   seoDescription: string | null
   publishedAt: string | null
-  /** Admin-authored copy not covered by a dedicated column — see supabase/migrations/0016_catalog_content_attributes.sql. */
+  /** Admin-authored copy not covered by a dedicated column — see supabase/migrations/0023_catalog_content_attributes.sql. */
   attributes: Record<string, unknown>
   variants: ProductVariant[]
   images: ProductImage[]

@@ -5,7 +5,7 @@
  * backend/lib/reviews' evaluateReviewEligibility() — the frontend never
  * asserts eligibility, it only reflects what this service already decided.
  * Public reads of PUBLISHED reviews go straight through RLS
- * (product_reviews_public_read, 0021_reviews_and_returns_workflow.sql) via
+ * (product_reviews_public_read, 0024_reviews_and_returns_workflow.sql) via
  * src/repositories/reviews.repository.ts's anon-key client — this service
  * only handles the privileged paths: create, self-list, image upload,
  * moderation.

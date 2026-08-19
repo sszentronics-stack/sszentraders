@@ -4,7 +4,7 @@
  * admin-review/approve/reject + courier-handoff + inspection-outcome +
  * refund router, on top of the existing `returns`/`return_items`/
  * `return_events` schema (0009_returns.sql, extended by
- * 0021_reviews_and_returns_workflow.sql).
+ * 0024_reviews_and_returns_workflow.sql).
  *
  *   GET    /                              list the caller's own returns
  *   GET    /:id                           read one return (caller-owned, or admin) — includes items + event timeline

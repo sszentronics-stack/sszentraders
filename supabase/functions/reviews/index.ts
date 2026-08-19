@@ -3,7 +3,7 @@
  * Function (Phase 1 deferred reviews entirely — see
  * backend/services/reviews/README.md). Handles every privileged review
  * write path; PUBLIC reads of published reviews go straight through RLS
- * (product_reviews_public_read, 0021_reviews_and_returns_workflow.sql) via
+ * (product_reviews_public_read, 0024_reviews_and_returns_workflow.sql) via
  * src/repositories/reviews.repository.ts's anon-key client and never touch
  * this function.
  *
