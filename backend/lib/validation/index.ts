@@ -66,24 +66,141 @@ export type CreateOrderInput = z.infer<typeof createOrderSchema>
 
 export const productVariantInputSchema = z.object({
   sku: z.string().trim().min(1).max(80),
+  barcode: z.string().trim().max(80).optional(),
   title: z.string().trim().max(200).optional(),
   price: moneyMinorUnitsSchema,
   compareAtPrice: moneyMinorUnitsSchema.optional(),
   currency: currencySchema,
+  weight: z.number().nonnegative().optional(),
+  weightUnit: z.string().trim().max(10).optional(),
   attributes: z.record(z.string(), z.unknown()).default({}),
+  status: z.enum(['draft', 'published', 'archived']).default('draft'),
 })
+export type ProductVariantInput = z.infer<typeof productVariantInputSchema>
+
+/** Partial variant edit — every field optional except nothing is required, PATCH-style. */
+export const updateVariantSchema = productVariantInputSchema.partial()
+export type UpdateVariantInput = z.infer<typeof updateVariantSchema>
+
+/**
+ * Free-form, admin-authored storefront content that doesn't warrant its own
+ * column (see supabase/migrations/0016_catalog_content_attributes.sql).
+ * Every field is optional so partial admin edits never fail validation for
+ * content they haven't filled in yet.
+ */
+export const productAttributesSchema = z
+  .object({
+    shortName: z.string().trim().max(200).optional(),
+    tagline: z.string().trim().max(200).optional(),
+    subtitle: z.string().trim().max(200).optional(),
+    badge: z.enum(['new', 'sale', 'bestseller']).optional(),
+    highlights: z.array(z.string().trim().min(1).max(300)).max(20).optional(),
+    benefits: z.array(z.string().trim().min(1).max(300)).max(20).optional(),
+    howToUse: z.array(z.string().trim().min(1).max(300)).max(20).optional(),
+    details: z.array(z.tuple([z.string().trim().min(1).max(80), z.string().trim().min(1).max(300)])).max(30).optional(),
+    rating: z.number().min(0).max(5).optional(),
+    reviewCount: z.number().int().nonnegative().optional(),
+  })
+  .partial()
+  .default({})
+export type ProductAttributesInput = z.infer<typeof productAttributesSchema>
 
 export const createProductSchema = z.object({
   brandId: uuidSchema.optional(),
   name: z.string().trim().min(1).max(200),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   shortDescription: z.string().trim().max(500).optional(),
   description: z.string().trim().max(20000).optional(),
+  ingredients: z.string().trim().max(20000).optional(),
+  directions: z.string().trim().max(20000).optional(),
+  productType: z.string().trim().max(120).optional(),
+  seoTitle: z.string().trim().max(200).optional(),
+  seoDescription: z.string().trim().max(300).optional(),
+  isFeatured: z.boolean().default(false),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
-  variants: z.array(productVariantInputSchema).min(1),
+  attributes: productAttributesSchema,
+  variants: z.array(productVariantInputSchema).min(1, 'A product needs at least one variant/SKU.'),
   categoryIds: z.array(uuidSchema).default([]),
+  collectionIds: z.array(uuidSchema).default([]),
 })
 export type CreateProductInput = z.infer<typeof createProductSchema>
+
+/** PATCH-style product edit — everything optional except nothing is forced; variants/images are managed by their own endpoints. */
+export const updateProductSchema = createProductSchema
+  .omit({ variants: true })
+  .partial()
+export type UpdateProductInput = z.infer<typeof updateProductSchema>
+
+export const contentStatusSchema = z.enum(['draft', 'published', 'archived'])
+export const setStatusSchema = z.object({ status: contentStatusSchema })
+export type SetStatusInput = z.infer<typeof setStatusSchema>
+
+export const productImageInputSchema = z.object({
+  variantId: uuidSchema.optional(),
+  storagePath: z.string().trim().min(1).max(500),
+  altText: z.string().trim().max(300).optional(),
+  sortOrder: z.number().int().nonnegative().default(0),
+  isPrimary: z.boolean().default(false),
+})
+export type ProductImageInput = z.infer<typeof productImageInputSchema>
+
+export const reorderImagesSchema = z.object({
+  order: z.array(z.object({ id: uuidSchema, sortOrder: z.number().int().nonnegative() })).min(1),
+})
+export type ReorderImagesInput = z.infer<typeof reorderImagesSchema>
+
+export const imageUploadRequestSchema = z.object({
+  variantId: uuidSchema.optional(),
+  fileName: z.string().trim().min(1).max(255),
+  mimeType: z.string().trim().min(1).max(100),
+  sizeBytes: z.number().int().positive(),
+})
+export type ImageUploadRequestInput = z.infer<typeof imageUploadRequestSchema>
+
+export const catalogEntityInputSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  slug: slugSchema.optional(),
+  description: z.string().trim().max(2000).optional(),
+  status: contentStatusSchema.default('draft'),
+  sortOrder: z.number().int().default(0),
+})
+
+export const brandInputSchema = catalogEntityInputSchema.extend({
+  logoUrl: z.string().trim().url().optional(),
+  websiteUrl: z.string().trim().url().optional(),
+})
+export type BrandInput = z.infer<typeof brandInputSchema>
+export const updateBrandInputSchema = brandInputSchema.partial()
+
+export const categoryInputSchema = catalogEntityInputSchema.extend({
+  parentId: uuidSchema.optional(),
+  imageUrl: z.string().trim().url().optional(),
+})
+export type CategoryInput = z.infer<typeof categoryInputSchema>
+export const updateCategoryInputSchema = categoryInputSchema.partial()
+
+export const collectionInputSchema = catalogEntityInputSchema
+  .extend({
+    imageUrl: z.string().trim().url().optional(),
+    startsAt: z.string().datetime().optional(),
+    endsAt: z.string().datetime().optional(),
+  })
+  .refine((v) => !v.startsAt || !v.endsAt || v.startsAt <= v.endsAt, {
+    message: 'startsAt must be before or equal to endsAt',
+    path: ['endsAt'],
+  })
+export type CollectionInput = z.infer<typeof collectionInputSchema>
+export const updateCollectionInputSchema = catalogEntityInputSchema
+  .extend({
+    imageUrl: z.string().trim().url().optional(),
+    startsAt: z.string().datetime().optional(),
+    endsAt: z.string().datetime().optional(),
+  })
+  .partial()
+  .refine((v) => !v.startsAt || !v.endsAt || v.startsAt <= v.endsAt, {
+    message: 'startsAt must be before or equal to endsAt',
+    path: ['endsAt'],
+  })
 
 export const idempotencyHeaderSchema = z.string().trim().min(8).max(200)
 

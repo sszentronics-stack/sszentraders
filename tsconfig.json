@@ -27,6 +27,7 @@
     "src/**/*.tsx",
     "backend/lib/**/*.ts",
     "backend/lib/**/*.test.ts",
+    "backend/services/**/*.ts",
     "tests/**/*.ts"
   ],
   "exclude": [

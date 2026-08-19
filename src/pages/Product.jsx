@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import {
-  buildWhatsAppProduct,
-  formatPKR,
-  getProductBySlug,
-  products,
-  salePercent,
-} from '../data/products'
+import { buildWhatsAppProduct, formatPKR, salePercent } from '../data/products'
+import { useProduct } from '../hooks/useCatalog'
 import { useCart } from '../context/CartContext'
 import Disclaimer from '../components/Disclaimer'
 import ProductCard from '../components/ProductCard'
@@ -15,7 +10,7 @@ import { ChevronLeft, ChevronRight, Share2, Star } from 'lucide-react'
 
 export default function Product() {
   const { slug } = useParams()
-  const product = getProductBySlug(slug)
+  const { product, others, loading, notFound } = useProduct(slug)
   const { addItem } = useCart()
   const [active, setActive] = useState(0)
   const [qty, setQty] = useState(1)
@@ -27,10 +22,25 @@ export default function Product() {
     setActive(0)
   }, [slug])
 
-  if (!product) return <Navigate to="/shop" replace />
+  if (loading) {
+    return (
+      <div className="container-aura py-8 md:py-12" aria-busy="true" aria-label="Loading product">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-pulse">
+          <div className="aspect-square bg-meta" />
+          <div className="space-y-3">
+            <div className="h-4 bg-meta w-1/3" />
+            <div className="h-8 bg-meta w-3/4" />
+            <div className="h-4 bg-meta w-1/2" />
+            <div className="h-10 bg-meta w-1/3 mt-6" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (notFound) return <Navigate to="/shop" replace />
 
   const off = salePercent(product)
-  const others = products.filter((p) => p.id !== product.id)
   const last = product.images.length - 1
   const showPrev = () => setActive((i) => (i === 0 ? last : i - 1))
   const showNext = () => setActive((i) => (i === last ? 0 : i + 1))

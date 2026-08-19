@@ -32,6 +32,17 @@ export interface Category {
   status: ContentStatus
 }
 
+export interface Collection {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  imageUrl: string | null
+  status: ContentStatus
+  startsAt: string | null
+  endsAt: string | null
+}
+
 export interface ProductVariant {
   id: string
   productId: string
@@ -52,8 +63,16 @@ export interface Product {
   slug: string
   shortDescription: string | null
   description: string | null
+  ingredients: string | null
+  directions: string | null
+  productType: string | null
   status: ContentStatus
   isFeatured: boolean
+  seoTitle: string | null
+  seoDescription: string | null
+  publishedAt: string | null
+  /** Admin-authored copy not covered by a dedicated column — see supabase/migrations/0016_catalog_content_attributes.sql. */
+  attributes: Record<string, unknown>
   variants: ProductVariant[]
   images: ProductImage[]
 }

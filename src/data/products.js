@@ -1,3 +1,16 @@
+/**
+ * Phase 3 note: this file's `products` array is now the OFFLINE FALLBACK
+ * dataset only, used by src/hooks/useCatalog.js when Supabase isn't
+ * configured (no live project in this dev environment) or a request to it
+ * fails/returns nothing published. The live, backend-driven path is
+ * src/repositories/products.repository.ts -> src/data/catalogAdapter.ts.
+ * Every other export here (formatPKR, salePercent, buildWhatsAppOrder,
+ * buildWhatsAppProduct, WHATSAPP_*, PRODUCT_DISCLAIMER) is unchanged and
+ * still the single source of truth for that logic — both the fallback
+ * dataset and Supabase-backed products share the exact same shape
+ * (see StorefrontProduct in catalogAdapter.ts) so every page/component
+ * works identically regardless of where the data came from.
+ */
 export const WHATSAPP_NUMBER = '923079594474'
 export const WHATSAPP_DISPLAY = '+92 307 9594474'
 export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`
