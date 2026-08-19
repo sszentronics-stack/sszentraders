@@ -11,7 +11,24 @@ describe('integration provider skeletons', () => {
       provider.upsertCustomer({ customerId: 'c1' }),
     ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
     await expect(
+      provider.createInvoice({ orderId: 'o1', ledgixCustomerId: 'c1', lineItems: [], currency: 'PKR' }),
+    ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+    await expect(
+      provider.recordReceipt({ ledgixInvoiceId: 'inv-1', amount: 1000, currency: 'PKR', paidAt: new Date().toISOString() }),
+    ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+    await expect(
+      provider.recordCreditNote({ orderId: 'o1', amount: 1000, currency: 'PKR', reason: 'order_cancelled' }),
+    ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+    await expect(
       provider.getInventorySnapshot(['item-1']),
+    ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+  })
+
+  it('LedGixErpProvider still rejects every method even when "configured" — config presence never implies a working integration', async () => {
+    const provider = new LedGixErpProvider({ apiBaseUrl: 'https://example.test', apiKey: 'x', companyId: 'y' })
+    await expect(provider.upsertCustomer({ customerId: 'c1' })).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
+    await expect(
+      provider.recordCreditNote({ orderId: 'o1', amount: 1000, currency: 'PKR', reason: 'return_received' }),
     ).rejects.toBeInstanceOf(IntegrationNotConfiguredError)
   })
 

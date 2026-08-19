@@ -54,6 +54,19 @@ export function getEasypaisaConfig() {
   return { merchantId, storeId, hashKey, apiBaseUrl, webhookSecret }
 }
 
+/**
+ * Webhook signing secret for verifying inbound LedGix callbacks (see
+ * backend/lib/erp/webhook.ts) — kept separate from getLedGixConfig() the
+ * same way getLeopardsWebhookSecret() is kept separate from
+ * getLeopardsConfig(): a webhook secret and API credentials are
+ * conceptually different keys, even though neither exists yet. Returns
+ * undefined (not an object) so callers can cleanly distinguish "no secret
+ * configured" without an extra null-check shape.
+ */
+export function getLedGixWebhookSecret(): string | undefined {
+  return readOptional('LEDGIX_WEBHOOK_SECRET')
+}
+
 export function getLeopardsConfig() {
   const apiKey = readOptional('LEOPARDS_API_KEY')
   const apiPassword = readOptional('LEOPARDS_API_PASSWORD')

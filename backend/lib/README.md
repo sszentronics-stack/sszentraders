@@ -24,6 +24,8 @@ second copy of any of this in `src/` or `supabase/functions/`.
 | `logger/` | Structured JSON logging with secret-key redaction. |
 | `audit/` | `writeAuditLog()` helper for the `audit_logs` table. |
 | `providers/` | `ErpProvider` / `PaymentProvider` / `CourierProvider` interfaces + LedGix/Easypaisa/Leopards skeleton implementations that throw `IntegrationNotConfiguredError`. |
+| `accounting/` | Phase 7: local financial-event vocabulary, idempotency-key builder, ERP-sync-state helpers. |
+| `erp/` | Phase 8: pure LedGix ERP sync domain logic — financial-event → ERP document action mapping, sync-error classification, customer-sync decision, reconciliation comparison, and webhook signature verification (`erp/webhook.ts`). |
 | `types/` | Hand-written domain types matching the Phase 1 schema (see `types/domain.ts` header for why these aren't CLI-generated yet). |
 
 Tests live next to their source file (`*.test.ts`) and run via `npm test` (Vitest).
