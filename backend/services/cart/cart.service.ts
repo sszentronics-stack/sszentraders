@@ -15,6 +15,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { computeCartSubtotal, mergeCartLines, revalidateCartLine, type CartLineInput } from '../../lib/cart'
 import { NotFoundError, ValidationError } from '../../lib/errors'
+import { getAvailabilityForVariants } from '../inventory/inventory.service'
 
 const CART_ITEM_SELECT = `
   id, variant_id, quantity, unit_price_snapshot, added_at,
@@ -73,6 +74,8 @@ export interface CartSummaryItem {
   currency: string
   imagePath: string | null
   priceChanged: boolean
+  /** True when the quantity shown was reduced from what was stored because Phase 9's inventory_cache reports less is actually available. */
+  quantityAdjusted: boolean
 }
 
 export interface CartSummary {
@@ -80,7 +83,7 @@ export interface CartSummary {
   currency: string
   items: CartSummaryItem[]
   subtotal: number
-  removedItems: { itemId: string; reason: 'variant_unavailable' | 'product_unavailable' }[]
+  removedItems: { itemId: string; reason: 'variant_unavailable' | 'product_unavailable' | 'out_of_stock' }[]
 }
 
 function primaryImagePath(images: ImageRow[] | null | undefined): string | null {
@@ -136,6 +139,9 @@ async function buildSummary(db: SupabaseClient, cart: { id: string; currency: st
   const removedItems: CartSummary['removedItems'] = []
   const staleItemIds: string[] = []
 
+  const variantIds = rows.map((r) => r.variant_id)
+  const availability = await getAvailabilityForVariants(db, variantIds)
+
   for (const row of rows) {
     const variant = row.product_variants
     const snapshot = variant
@@ -144,6 +150,7 @@ async function buildSummary(db: SupabaseClient, cart: { id: string; currency: st
           price: variant.price,
           status: variant.status as 'draft' | 'published' | 'archived',
           productStatus: (variant.products?.status ?? 'archived') as 'draft' | 'published' | 'archived',
+          availableQuantity: availability.get(variant.id)?.quantityAvailable ?? null,
         }
       : null
 
@@ -175,6 +182,7 @@ async function buildSummary(db: SupabaseClient, cart: { id: string; currency: st
       currency: variant!.currency,
       imagePath: primaryImagePath(product.product_images),
       priceChanged: result.priceChanged,
+      quantityAdjusted: result.quantityAdjusted,
     })
 
     // Keep the stored snapshot in step with the live price so the NEXT
@@ -218,11 +226,13 @@ async function fetchVariantSnapshot(db: SupabaseClient, variantId: string) {
   if (!data) return null
   const products = data.products as { status: string } | { status: string }[] | null
   const productStatus = Array.isArray(products) ? products[0]?.status : products?.status
+  const availability = await getAvailabilityForVariants(db, [variantId])
   return {
     id: data.id as string,
     price: data.price as number,
     status: data.status as 'draft' | 'published' | 'archived',
     productStatus: (productStatus ?? 'archived') as 'draft' | 'published' | 'archived',
+    availableQuantity: availability.get(variantId)?.quantityAvailable ?? null,
   }
 }
 
@@ -230,6 +240,9 @@ export async function addCartItem(db: SupabaseClient, profileId: string, input: 
   const snapshot = await fetchVariantSnapshot(db, input.variantId)
   if (!snapshot || snapshot.status !== 'published' || snapshot.productStatus !== 'published') {
     throw new NotFoundError('Product variant', 'This product is not currently available.')
+  }
+  if (snapshot.availableQuantity != null && snapshot.availableQuantity <= 0) {
+    throw new ValidationError('This product is currently out of stock.')
   }
 
   const cart = await getOrCreateActiveCart(db, profileId)
@@ -240,7 +253,12 @@ export async function addCartItem(db: SupabaseClient, profileId: string, input: 
     .eq('variant_id', input.variantId)
     .maybeSingle()
 
-  const nextQuantity = Math.min((existing?.quantity ?? 0) + input.quantity, 999)
+  let nextQuantity = Math.min((existing?.quantity ?? 0) + input.quantity, 999)
+  // Never let this line exceed real availability — clamp rather than reject
+  // outright, so "add 5 when only 3 are left" still adds what's sellable
+  // (buildSummary()'s revalidation below would clamp it anyway; doing it
+  // here too avoids a pointless insert-then-clamp round trip).
+  if (snapshot.availableQuantity != null) nextQuantity = Math.min(nextQuantity, snapshot.availableQuantity)
 
   if (existing) {
     await db.from('cart_items').update({ quantity: nextQuantity, unit_price_snapshot: snapshot.price }).eq('id', existing.id)

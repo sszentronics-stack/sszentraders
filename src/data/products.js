@@ -31,6 +31,7 @@ export const products = [
     badge: 'new',
     featured: true,
     inStock: true,
+    availability: 'unknown', // Phase 9: offline fallback dataset has no live inventory_cache to read
     category: 'Masks',
     type: 'Facial Mask',
     sku: 'ABC-SADOER-SD80885',
@@ -86,6 +87,7 @@ Part of the SADOER Collagen Firming Series. Each 25g sachet is packed with hydro
     badge: 'bestseller',
     featured: true,
     inStock: true,
+    availability: 'unknown', // Phase 9: offline fallback dataset has no live inventory_cache to read
     category: 'Acne Care',
     type: 'Spot Patches',
     sku: 'ABC-HERO-MP-INV39',
@@ -142,6 +144,7 @@ Each pack includes 39 hydrocolloid patches in two sizes so you can cover differe
     badge: 'sale',
     featured: true,
     inStock: true,
+    availability: 'unknown', // Phase 9: offline fallback dataset has no live inventory_cache to read
     category: 'Toners',
     type: 'Face Toner',
     sku: 'ABC-SBM-TONER-150',

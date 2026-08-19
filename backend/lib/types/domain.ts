@@ -54,6 +54,8 @@ export interface ProductVariant {
   attributes: Record<string, unknown>
   status: ContentStatus
   ledgixItemId: string | null
+  /** Phase 9 (ERP-Controlled Inventory): synced inventory_cache quantity, or null when no reliable cache data exists yet (unmapped/never-synced variant — see backend/lib/inventory's header on why "unknown" is never treated as out of stock). Populated only by the public storefront repository read path — admin write paths (backend/services/products) don't need it. */
+  availableQuantity?: number | null
 }
 
 export interface Product {

@@ -27,6 +27,8 @@ export interface CartSummaryItem {
   currency: string
   imagePath: string | null
   priceChanged: boolean
+  /** True when Phase 9's inventory sync reduced this line's quantity to what's actually available. */
+  quantityAdjusted: boolean
 }
 
 export interface CartSummary {
@@ -34,7 +36,7 @@ export interface CartSummary {
   currency: string
   items: CartSummaryItem[]
   subtotal: number // minor units
-  removedItems: { itemId: string; reason: 'variant_unavailable' | 'product_unavailable' }[]
+  removedItems: { itemId: string; reason: 'variant_unavailable' | 'product_unavailable' | 'out_of_stock' }[]
 }
 
 export function getCart(): Promise<CartSummary> {

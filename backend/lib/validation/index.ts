@@ -349,6 +349,16 @@ export const cancelOrderRequestSchema = z.object({
 })
 export type CancelOrderRequestInput = z.infer<typeof cancelOrderRequestSchema>
 
+// ---------------------------------------------------------------------------
+// Phase 9 — ERP-Controlled Inventory & Availability Synchronization
+// ---------------------------------------------------------------------------
+
+export const inventoryMappingInputSchema = z.object({
+  variantId: uuidSchema,
+  ledgixItemId: z.string().trim().min(1).max(200),
+})
+export type InventoryMappingInput = z.infer<typeof inventoryMappingInputSchema>
+
 /** Phase 10 — start/retry an Easypaisa payment attempt against an order the caller owns. */
 export const easypaisaInitiateSchema = z.object({
   orderId: uuidSchema,

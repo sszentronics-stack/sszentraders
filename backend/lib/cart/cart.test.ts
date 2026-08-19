@@ -77,6 +77,31 @@ describe('revalidateCartLine', () => {
     expect(low.keep && low.quantity).toBe(1)
     expect(high.keep && high.quantity).toBe(999)
   })
+
+  it('keeps the line at full quantity when availability is unknown (no inventory_cache row)', () => {
+    const result = revalidateCartLine({ requestedQuantity: 3, variant: publishedVariant })
+    expect(result.keep).toBe(true)
+    if (result.keep) {
+      expect(result.quantity).toBe(3)
+      expect(result.quantityAdjusted).toBe(false)
+    }
+  })
+
+  it('drops the line when inventory_cache reports zero available', () => {
+    const result = revalidateCartLine({ requestedQuantity: 1, variant: { ...publishedVariant, availableQuantity: 0 } })
+    expect(result.keep).toBe(false)
+    if (!result.keep) expect(result.reason).toBe('out_of_stock')
+  })
+
+  it('clamps quantity down to what inventory_cache reports as available', () => {
+    const result = revalidateCartLine({ requestedQuantity: 10, variant: { ...publishedVariant, availableQuantity: 4 } })
+    expect(result.keep).toBe(true)
+    if (result.keep) {
+      expect(result.quantity).toBe(4)
+      expect(result.quantityAdjusted).toBe(true)
+      expect(result.lineTotal).toBe(12900 * 4)
+    }
+  })
 })
 
 describe('computeCartSubtotal', () => {

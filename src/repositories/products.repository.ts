@@ -45,6 +45,10 @@ interface ProductRow {
   product_collections: { collections: CollectionRelationRow | null }[] | null
 }
 
+interface InventoryCacheRow {
+  quantity_available: number
+}
+
 interface VariantRow {
   id: string
   product_id: string
@@ -55,6 +59,8 @@ interface VariantRow {
   currency: string
   attributes: Record<string, unknown>
   status: 'draft' | 'published' | 'archived'
+  /** Phase 9: null when the variant has never been synced (0021_inventory_cache_public_read.sql only exposes a row once one exists). */
+  inventory_cache: InventoryCacheRow[] | InventoryCacheRow | null
 }
 
 interface ImageRow {
@@ -115,6 +121,7 @@ export interface ProductWithRelations extends Product {
 }
 
 function mapVariant(row: VariantRow): ProductVariant {
+  const cache = Array.isArray(row.inventory_cache) ? row.inventory_cache[0] : row.inventory_cache
   return {
     id: row.id,
     productId: row.product_id,
@@ -126,6 +133,7 @@ function mapVariant(row: VariantRow): ProductVariant {
     attributes: row.attributes,
     status: row.status,
     ledgixItemId: null, // never exposed to public reads — see file header
+    availableQuantity: cache?.quantity_available ?? null,
   }
 }
 
@@ -187,7 +195,9 @@ function mapProduct(row: ProductRow): ProductWithRelations {
 export const PRODUCT_SELECT = `
   id, brand_id, name, slug, short_description, description, ingredients, directions, product_type,
   status, is_featured, seo_title, seo_description, published_at, attributes,
-  product_variants ( id, product_id, sku, title, price, compare_at_price, currency, attributes, status ),
+  product_variants ( id, product_id, sku, title, price, compare_at_price, currency, attributes, status,
+    inventory_cache ( quantity_available )
+  ),
   product_images ( id, product_id, variant_id, storage_path, alt_text, sort_order, is_primary ),
   brands ( id, name, slug ),
   product_categories ( categories ( id, name, slug ) ),
