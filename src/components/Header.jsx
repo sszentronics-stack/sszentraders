@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, Search, ShoppingBag, X } from 'lucide-react'
+import { Menu, Search, ShoppingBag, User, X } from 'lucide-react'
 import Logo from './Logo'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 const NAV = [
   { to: '/shop', label: 'Shop' },
@@ -15,6 +16,7 @@ const NAV = [
 
 export default function Header({ onSearch }) {
   const { count, setIsOpen } = useCart()
+  const { isAuthenticated, configured } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -59,6 +61,11 @@ export default function Header({ onSearch }) {
           <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>
             <Search size={20} />
           </button>
+          {configured && (
+            <Link to={isAuthenticated ? '/account' : '/login'} aria-label={isAuthenticated ? 'My account' : 'Sign in'}>
+              <User size={20} />
+            </Link>
+          )}
           <button
             type="button"
             className="relative"

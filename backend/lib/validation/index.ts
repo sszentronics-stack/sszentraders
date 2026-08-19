@@ -87,6 +87,62 @@ export type CreateProductInput = z.infer<typeof createProductSchema>
 
 export const idempotencyHeaderSchema = z.string().trim().min(8).max(200)
 
+// ---------------------------------------------------------------------------
+// Phase 2 — Customer Authentication & Profiles
+// ---------------------------------------------------------------------------
+
+/**
+ * Supabase Auth itself enforces a configurable minimum (default 6); Aura
+ * requires a stronger 8-char floor here so client-side validation matches
+ * what a security-conscious storefront should ask for even before the
+ * request reaches Supabase.
+ */
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(72, 'Password must be at most 72 characters')
+
+export const registerInputSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+  firstName: z.string().trim().min(1).max(120).optional(),
+  lastName: z.string().trim().min(1).max(120).optional(),
+  phone: pakistaniPhoneSchema.optional(),
+  marketingOptIn: z.boolean().default(false),
+  redirectTo: z.string().trim().max(500).optional(),
+})
+export type RegisterInput = z.infer<typeof registerInputSchema>
+
+export const loginInputSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, 'Password is required'),
+})
+export type LoginInput = z.infer<typeof loginInputSchema>
+
+export const passwordResetRequestSchema = z.object({
+  email: emailSchema,
+  redirectTo: z.string().trim().max(500).optional(),
+})
+export type PasswordResetRequestInput = z.infer<typeof passwordResetRequestSchema>
+
+export const passwordResetConfirmSchema = z.object({
+  password: passwordSchema,
+})
+export type PasswordResetConfirmInput = z.infer<typeof passwordResetConfirmSchema>
+
+export const updateProfileSchema = z.object({
+  firstName: z.string().trim().min(1).max(120).optional(),
+  lastName: z.string().trim().min(1).max(120).optional(),
+  phone: pakistaniPhoneSchema.optional(),
+  marketingOptIn: z.boolean().optional(),
+})
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
+
+/** Partial address input for edits — create still uses the full customerAddressSchema. */
+export const updateCustomerAddressSchema = customerAddressSchema.partial()
+export type UpdateCustomerAddressInput = z.infer<typeof updateCustomerAddressSchema>
+export type CreateCustomerAddressInput = z.infer<typeof customerAddressSchema>
+
 /** Validate `input` against `schema`, throwing a ValidationError (see ../errors) with field-level detail on failure. */
 export function parseOrThrow<T>(schema: z.ZodType<T>, input: unknown): T {
   const result = schema.safeParse(input)

@@ -23,6 +23,7 @@ never edit an already-applied migration; add a new one instead.
 | `0013_idempotency_and_audit.sql` | `idempotency_keys`, `audit_logs`. |
 | `0014_row_level_security.sql` | Enables RLS + policies on every table above, `is_admin()` / `current_profile_id()` helpers. |
 | `0015_storage_buckets.sql` | `product-images`, `brand-assets`, `category-assets` buckets + storage policies. |
+| `0016_address_default_enforcement.sql` | Phase 2: trigger that atomically clears a customer's previous default shipping/billing address when a new one is promoted, so the "one default per customer" partial unique indexes never block a legitimate change. |
 
 `../seed.sql` holds minimal, clearly-marked, safe-to-rerun DEV-ONLY seed data
 (3 brands, 3 categories, 1 product/variant matching the current live

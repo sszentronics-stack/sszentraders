@@ -444,3 +444,292 @@ img {
     font-size: 22px;
   }
 }
+
+/* ---------------------------------------------------------------------- */
+/* Phase 2 — auth & account forms                                          */
+/* ---------------------------------------------------------------------- */
+
+.auth-shell {
+  min-height: calc(100vh - 92px);
+  background: #fceee9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  background: #ffffff;
+  border: 1px solid #e5b6a8;
+  border-radius: 8px;
+  padding: 40px 32px;
+  box-shadow: 0 20px 50px rgba(34, 34, 34, 0.08);
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 32px 22px;
+  }
+}
+
+.auth-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: #222222;
+  margin-bottom: 6px;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #7a5b53;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.form-field {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a5b53;
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  border: 1px solid #c5998e;
+  border-radius: 4px;
+  padding: 13px 14px;
+  font-size: 15px;
+  color: #222222;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: #222222;
+}
+
+.form-input[aria-invalid='true'] {
+  border-color: #c31818;
+}
+
+.form-input-group {
+  position: relative;
+}
+
+.form-input-group .form-input {
+  padding-right: 44px;
+}
+
+.form-input-icon-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: #7a5b53;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+}
+
+.form-error {
+  color: #c31818;
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+
+.form-hint {
+  color: #7a5b53;
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+
+.form-banner {
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.form-banner-error {
+  background: rgba(195, 24, 24, 0.08);
+  color: #a11313;
+  border: 1px solid rgba(195, 24, 24, 0.25);
+}
+
+.form-banner-success {
+  background: rgba(90, 143, 110, 0.1);
+  color: #2f6b45;
+  border: 1px solid rgba(90, 143, 110, 0.3);
+}
+
+.form-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #7a5b53;
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+.form-checkbox-row input {
+  margin-top: 3px;
+  accent-color: #c98a7d;
+}
+
+.auth-footer-link {
+  text-align: center;
+  font-size: 13px;
+  color: #7a5b53;
+  margin-top: 22px;
+}
+
+.auth-footer-link a {
+  color: #222222;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.btn-lavender[disabled],
+.btn-outline[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Account shell */
+
+.account-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+}
+
+@media (max-width: 860px) {
+  .account-shell {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid #e5b6a8;
+  border-radius: 8px;
+  overflow: hidden;
+  height: max-content;
+}
+
+.account-nav a {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a5b53;
+  border-bottom: 1px solid #f1ddd7;
+}
+
+.account-nav a:last-child {
+  border-bottom: 0;
+}
+
+.account-nav a.active,
+.account-nav a:hover {
+  background: #fceee9;
+  color: #222222;
+}
+
+.account-panel {
+  background: #fff;
+  border: 1px solid #e5b6a8;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+@media (max-width: 480px) {
+  .account-panel {
+    padding: 22px 18px;
+  }
+}
+
+.address-card {
+  border: 1px solid #e5b6a8;
+  border-radius: 6px;
+  padding: 18px;
+  position: relative;
+}
+
+.address-card + .address-card {
+  margin-top: 16px;
+}
+
+.address-card-badges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.address-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fceee9;
+  color: #7a5b53;
+}
+
+.address-card-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 12.5px;
+}
+
+.address-card-actions button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #7a5b53;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.address-card-actions button:hover {
+  color: #222222;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
