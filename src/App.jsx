@@ -28,6 +28,26 @@ import ReturnDetail from './pages/account/ReturnDetail'
 import RequestReturn from './pages/account/RequestReturn'
 import ComingSoon from './pages/account/ComingSoon'
 import Loyalty from './pages/account/Loyalty'
+import RequireAdmin from './components/admin/RequireAdmin'
+import AdminLayout from './components/admin/AdminLayout'
+import AdminDashboard from './pages/admin/Dashboard'
+import AdminProductList from './pages/admin/products/ProductList'
+import AdminProductForm from './pages/admin/products/ProductForm'
+import AdminProductDetail from './pages/admin/products/ProductDetail'
+import AdminCatalogManager from './pages/admin/catalog/CatalogManager'
+import AdminOrderList from './pages/admin/orders/OrderList'
+import AdminOrderDetail from './pages/admin/orders/OrderDetail'
+import AdminCustomerList from './pages/admin/customers/CustomerList'
+import AdminCustomerDetail from './pages/admin/customers/CustomerDetail'
+import AdminPaymentsQueue from './pages/admin/payments/PaymentsQueue'
+import AdminShipmentsQueue from './pages/admin/shipments/ShipmentsQueue'
+import AdminReturnsQueue from './pages/admin/returns/ReturnsQueue'
+import AdminReturnDetail from './pages/admin/returns/ReturnDetail'
+import AdminReviewsQueue from './pages/admin/reviews/ReviewsQueue'
+import AdminErpSyncCenter from './pages/admin/erp/ErpSyncCenter'
+import AdminInventoryCenter from './pages/admin/inventory/InventoryCenter'
+import AdminSettings from './pages/admin/settings/Settings'
+import AdminAuditLog from './pages/admin/audit/AuditLog'
 import AdminPromotionsLayout from './pages/admin/promotions/AdminPromotionsLayout'
 import AdminCampaigns from './pages/admin/promotions/Campaigns'
 import AdminPromotions from './pages/admin/promotions/Promotions'
@@ -93,21 +113,47 @@ export default function App() {
                 </Route>
               </Route>
 
-              {/*
-                Phase 13: standalone admin promotions route tree — deliberately
-                OUTSIDE the storefront <Layout /> element above (no header/
-                footer/cart chrome) since Phase 12's shared admin shell may not
-                exist yet in this worktree. AdminPromotionsLayout carries its
-                own admin guard and nav. See the layout's header comment and
-                docs/phase-13-completion-report.md's known limitations for the
-                follow-up integration this implies.
-              */}
-              <Route path="/admin/promotions" element={<AdminPromotionsLayout />}>
-                <Route index element={<Navigate to="campaigns" replace />} />
-                <Route path="campaigns" element={<AdminCampaigns />} />
-                <Route path="promotions" element={<AdminPromotions />} />
-                <Route path="coupons" element={<AdminCoupons />} />
-                <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
+              {/* /admin/* is a deliberately separate internal-tool shell —
+                  no AnnouncementBar/Header/Footer/CartDrawer — gated by
+                  RequireAdmin (profiles.is_admin). See
+                  src/components/admin/AdminLayout.jsx. Phase 13's promotions
+                  UI is nested here as /admin/promotions/* (folded in during
+                  the Phase 12+13 merge — see docs/phase-12-completion-report.md
+                  and docs/phase-13-completion-report.md). */}
+              <Route
+                path="/admin"
+                element={
+                  <RequireAdmin>
+                    <AdminLayout />
+                  </RequireAdmin>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="products" element={<AdminProductList />} />
+                <Route path="products/new" element={<AdminProductForm />} />
+                <Route path="products/:id" element={<AdminProductDetail />} />
+                <Route path="catalog" element={<AdminCatalogManager />} />
+                <Route path="orders" element={<AdminOrderList />} />
+                <Route path="orders/:id" element={<AdminOrderDetail />} />
+                <Route path="customers" element={<AdminCustomerList />} />
+                <Route path="customers/:id" element={<AdminCustomerDetail />} />
+                <Route path="payments" element={<AdminPaymentsQueue />} />
+                <Route path="shipments" element={<AdminShipmentsQueue />} />
+                <Route path="returns" element={<AdminReturnsQueue />} />
+                <Route path="returns/:id" element={<AdminReturnDetail />} />
+                <Route path="reviews" element={<AdminReviewsQueue />} />
+                <Route path="erp" element={<AdminErpSyncCenter />} />
+                <Route path="inventory" element={<AdminInventoryCenter />} />
+                <Route path="promotions" element={<AdminPromotionsLayout />}>
+                  <Route index element={<Navigate to="campaigns" replace />} />
+                  <Route path="campaigns" element={<AdminCampaigns />} />
+                  <Route path="promotions" element={<AdminPromotions />} />
+                  <Route path="coupons" element={<AdminCoupons />} />
+                  <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
+                </Route>
+                <Route path="settings" element={<AdminSettings />} />
+                <Route path="audit-log" element={<AdminAuditLog />} />
+                <Route path="*" element={<Navigate to="/admin" replace />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />

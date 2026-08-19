@@ -33,6 +33,14 @@
  *                           locally-succeeded record — there are none —
  *                           would surface as missing); the comparison logic
  *                           itself is real and tested.
+ *   GET  /integrations/status  { ledgix: {configured}, easypaisa: {configured},
+ *                           leopards: {configured} } — admin only [Phase 12].
+ *                           Booleans only, computed from whether each
+ *                           integration's required secrets are present (see
+ *                           ../_shared/config.ts) — never returns a secret
+ *                           value itself. Lives here (rather than a new
+ *                           function) because it's the same "admin
+ *                           operational diagnostics" surface as /erp/health.
  *
  * SCHEDULING: once Phase 8's sync worker has real credentials, it would run
  * periodically via one of two serverless-compatible mechanisms (no
@@ -49,7 +57,7 @@
 import { withErrorHandling, okResponse } from '../_shared/http.ts'
 import { requireAdmin } from '../_shared/adminAuth.ts'
 import { getSupabaseAdminClient } from '../_shared/supabaseAdmin.ts'
-import { getLedGixConfig } from '../_shared/config.ts'
+import { getEasypaisaConfig, getLedGixConfig, getLeopardsConfig } from '../_shared/config.ts'
 import { NotFoundError, ValidationError } from '../../../backend/lib/errors/index.ts'
 import { LedGixErpProvider } from '../../../backend/lib/providers/ledgix/LedGixErpProvider.ts'
 import * as accounting from '../../../backend/services/accounting/accounting.service.ts'
@@ -101,6 +109,15 @@ Deno.serve(
     if (segments.length === 2 && segments[0] === 'erp' && segments[1] === 'reconciliation' && req.method === 'GET') {
       const issues = await runErpReconciliation(admin)
       return okResponse({ issues })
+    }
+
+    // GET /integrations/status — Phase 12: booleans only, never secret values.
+    if (segments.length === 2 && segments[0] === 'integrations' && segments[1] === 'status' && req.method === 'GET') {
+      return okResponse({
+        ledgix: { configured: getLedGixConfig() !== null },
+        easypaisa: { configured: getEasypaisaConfig() !== null },
+        leopards: { configured: getLeopardsConfig() !== null },
+      })
     }
 
     throw new NotFoundError('route', 'No matching route for this method/path on the accounting function.')

@@ -33,3 +33,4 @@ supabase/.temp
 # Coverage / build artifacts
 coverage
 *.tsbuildinfo
+.claude/worktrees/
