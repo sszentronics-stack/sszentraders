@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment / secrets — never commit real values. See .env.example.
+.env
+.env.local
+.env.*.local
+supabase/.env
+supabase/.temp
+
+# Coverage / build artifacts
+coverage
+*.tsbuildinfo
