@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assessPublishReadiness, computeDefaultBadge, computeDiscountPercent, isWithinCampaignWindow } from './index'
+import { assessPublishReadiness, computeDefaultBadge, computeDiscountPercent, isWithinCampaignWindow } from './index.ts'
 
 describe('computeDiscountPercent', () => {
   it('returns 0 when there is no compare-at price', () => {

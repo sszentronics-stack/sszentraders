@@ -12,7 +12,7 @@
  * as part of the storage path, so a rename/re-upload can never collide with
  * or overwrite an unrelated object.
  */
-import { ValidationError } from '../errors'
+import { ValidationError } from '../errors/index.ts'
 
 export const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'] as const
 export type AllowedImageMimeType = (typeof ALLOWED_IMAGE_MIME_TYPES)[number]

@@ -24,10 +24,10 @@ import {
   type CustomerContext,
   type DiscountBreakdown,
   type PromotionRule,
-} from '../../lib/promotions'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
-import { isFirstOrderCustomer } from './segmentation.service'
-import type { CartSummaryItem } from '../cart/cart.service'
+} from '../../lib/promotions/index.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import { isFirstOrderCustomer } from './segmentation.service.ts'
+import type { CartSummaryItem } from '../cart/cart.service.ts'
 
 const PROMOTION_COLUMNS =
   'id, campaign_id, name, discount_type, discount_value, status, starts_at, ends_at, min_spend, first_order_only, applies_to, scope_id'

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { decidePaymentCallback } from './callbackStateMachine'
+import { decidePaymentCallback } from './callbackStateMachine.ts'
 
 const basePayment = { status: 'pending' as const, amount: 12900, providerTransactionId: null }
 const baseIncoming = { providerTransactionId: 'txn-1', outcome: 'paid' as const, amount: 12900 }

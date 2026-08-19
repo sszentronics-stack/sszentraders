@@ -13,7 +13,7 @@
  * customer-scoped row — never trust a customerId/profileId/addressId
  * supplied by the browser without verifying it belongs to the caller.
  */
-import { AuthenticationError, AuthorizationError } from '../errors'
+import { AuthenticationError, AuthorizationError } from '../errors/index.ts'
 
 export interface AuthenticatedProfile {
   id: string

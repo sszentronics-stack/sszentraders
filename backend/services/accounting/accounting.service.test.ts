@@ -24,7 +24,7 @@ import {
   recordSaleTransaction,
   retryFinancialEventSync,
   type FinancialTransactionRecord,
-} from './accounting.service'
+} from './accounting.service.ts'
 
 interface Row {
   [key: string]: unknown
@@ -161,7 +161,7 @@ function asSupabase(db: FakeClient) {
   return db as unknown as import('@supabase/supabase-js').SupabaseClient
 }
 function asAuditWriter(db: FakeClient) {
-  return db as unknown as import('../../lib/audit').AuditLogWriter
+  return db as unknown as import('../../lib/audit/index.ts').AuditLogWriter
 }
 
 describe('recordSaleTransaction', () => {

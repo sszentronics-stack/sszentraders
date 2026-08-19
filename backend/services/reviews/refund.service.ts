@@ -24,14 +24,14 @@
  * local-first philosophy as every other accounting event in this codebase.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { PaymentProvider } from '../../lib/providers/PaymentProvider'
-import type { ErpProvider } from '../../lib/providers/ErpProvider'
-import { ConflictError, NotFoundError } from '../../lib/errors'
-import { writeAuditLog, type AuditLogWriter } from '../../lib/audit'
-import { recordRefundTransaction, getFinancialTransactionById } from '../accounting/accounting.service'
-import { refundEasypaisaPayment } from '../payments/easypaisa/easypaisa.service'
-import { attemptErpSync } from '../erp/ledgix/sync.service'
-import type { AdminActor } from './returns.service'
+import type { PaymentProvider } from '../../lib/providers/PaymentProvider.ts'
+import type { ErpProvider } from '../../lib/providers/ErpProvider.ts'
+import { ConflictError, NotFoundError } from '../../lib/errors/index.ts'
+import { writeAuditLog, type AuditLogWriter } from '../../lib/audit/index.ts'
+import { recordRefundTransaction, getFinancialTransactionById } from '../accounting/accounting.service.ts'
+import { refundEasypaisaPayment } from '../payments/easypaisa/easypaisa.service.ts'
+import { attemptErpSync } from '../erp/ledgix/sync.service.ts'
+import type { AdminActor } from './returns.service.ts'
 
 interface ReturnRowForRefund {
   id: string

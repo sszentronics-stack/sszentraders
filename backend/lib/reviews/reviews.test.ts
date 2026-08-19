@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeAggregateRating, evaluateReviewEligibility } from './index'
+import { computeAggregateRating, evaluateReviewEligibility } from './index.ts'
 
 describe('evaluateReviewEligibility', () => {
   it('is eligible for a delivered, not-yet-reviewed purchase', () => {

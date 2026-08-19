@@ -17,9 +17,9 @@ import type {
   CourierProvider,
   CreateShipmentInput,
   RequestPickupInput,
-} from '../../../lib/providers/CourierProvider'
-import { ConflictError, NotFoundError, ValidationError } from '../../../lib/errors'
-import type { ShipmentStatus } from './statusNormalization'
+} from '../../../lib/providers/CourierProvider.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../../lib/errors/index.ts'
+import type { ShipmentStatus } from './statusNormalization.ts'
 
 export interface ShipmentRecord {
   id: string

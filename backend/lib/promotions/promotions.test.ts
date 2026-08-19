@@ -9,7 +9,7 @@ import {
   type CouponRule,
   type CustomerContext,
   type PromotionRule,
-} from './index'
+} from './index.ts'
 
 function makePromotion(overrides: Partial<PromotionRule> = {}): PromotionRule {
   return {

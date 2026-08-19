@@ -7,13 +7,13 @@
  * truth (unique-violation -> ConflictError).
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
-import { generateUniqueSlug } from '../../lib/slug'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import { generateUniqueSlug } from '../../lib/slug/index.ts'
 import type {
   BrandInput,
   CategoryInput,
   CollectionInput,
-} from '../../lib/validation'
+} from '../../lib/validation/index.ts'
 
 const UNIQUE_VIOLATION = '23505'
 function isUniqueViolation(error: unknown): boolean {

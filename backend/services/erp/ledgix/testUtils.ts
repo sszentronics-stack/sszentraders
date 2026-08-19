@@ -151,5 +151,5 @@ export class FakeSupabaseClient {
 }
 
 export function asAuditWriter(db: FakeSupabaseClient) {
-  return db as unknown as import('../../../lib/audit').AuditLogWriter
+  return db as unknown as import('../../../lib/audit/index.ts').AuditLogWriter
 }

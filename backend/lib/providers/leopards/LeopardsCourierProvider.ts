@@ -9,8 +9,8 @@ import type {
   RequestPickupResult,
   TrackShipmentInput,
   TrackShipmentResult,
-} from '../CourierProvider'
-import { IntegrationNotConfiguredError } from '../errors'
+} from '../CourierProvider.ts'
+import { IntegrationNotConfiguredError } from '../errors.ts'
 
 export interface LeopardsConfig {
   apiKey: string

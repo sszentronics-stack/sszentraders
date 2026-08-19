@@ -11,28 +11,28 @@
  * than needing a second revalidation pass here.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { calculateOrderTotals } from '../../lib/money'
-import { buildOrderItemSnapshots, deliveryCost, generateUniqueOrderNumber, type DeliveryMethod } from '../../lib/orders'
-import { assertOrderStatusTransition, type OrderStatus } from '../../lib/status'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
-import { ensureCustomerForProfile } from '../../lib/auth/linking'
-import { makeCustomerLinkDeps } from '../auth/auth.service'
-import { getCartSummary, markCartConverted } from '../cart/cart.service'
+import { calculateOrderTotals } from '../../lib/money/index.ts'
+import { buildOrderItemSnapshots, deliveryCost, generateUniqueOrderNumber, type DeliveryMethod } from '../../lib/orders/index.ts'
+import { assertOrderStatusTransition, type OrderStatus } from '../../lib/status/index.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import { ensureCustomerForProfile } from '../../lib/auth/linking.ts'
+import { makeCustomerLinkDeps } from '../auth/auth.service.ts'
+import { getCartSummary, markCartConverted } from '../cart/cart.service.ts'
 import {
   recordCancellationTransaction,
   recordDeliveryChargeTransaction,
   recordDiscountTransaction,
   recordSaleTransaction,
-} from '../accounting/accounting.service'
-import type { CheckoutInput } from '../../lib/validation'
+} from '../accounting/accounting.service.ts'
+import type { CheckoutInput } from '../../lib/validation/index.ts'
 import {
   applyPromotionAtCheckout,
   recordAppliedPromotion,
   releasePromotionClaimOnFailure,
   type ClaimedPromotion,
-} from '../promotions/promotions.service'
-import { getLoyaltyBalance, redeemLoyaltyPoints } from '../promotions/loyalty.service'
-import { computeMaxRedeemablePoints, REDEMPTION_MINOR_UNITS_PER_POINT } from '../../lib/loyalty'
+} from '../promotions/promotions.service.ts'
+import { getLoyaltyBalance, redeemLoyaltyPoints } from '../promotions/loyalty.service.ts'
+import { computeMaxRedeemablePoints, REDEMPTION_MINOR_UNITS_PER_POINT } from '../../lib/loyalty/index.ts'
 
 const ORDER_COLUMNS = `
   id, order_number, customer_id, email, phone, currency, subtotal, discount_total, shipping_total, tax_total, grand_total,

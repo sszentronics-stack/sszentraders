@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { __internal } from './index'
+import { __internal } from './index.ts'
 
 describe('logger redaction', () => {
   it('redacts keys that look like secrets', () => {

@@ -7,7 +7,7 @@
  * this profile/email/phone" implementation.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { CustomerRow, LinkCustomerDeps } from '../../lib/auth/linking'
+import type { CustomerRow, LinkCustomerDeps } from '../../lib/auth/linking.ts'
 
 function mapCustomerRow(row: Record<string, unknown>): CustomerRow {
   return {

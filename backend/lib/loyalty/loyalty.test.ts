@@ -6,7 +6,7 @@ import {
   computeMaxRedeemablePoints,
   computeRedemptionValue,
   sumLedgerBalance,
-} from './index'
+} from './index.ts'
 
 describe('computeEarnedPoints', () => {
   it('earns 1 point per Rs. 1 (100 minor units), floored', () => {

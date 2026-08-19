@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildLocalReconciliationSnapshot, runErpReconciliation } from './reconciliation.service'
-import { FakeSupabaseClient } from './testUtils'
+import { buildLocalReconciliationSnapshot, runErpReconciliation } from './reconciliation.service.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 
 function asSupabase(db: FakeSupabaseClient) {
   return db as unknown as import('@supabase/supabase-js').SupabaseClient

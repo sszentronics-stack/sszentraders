@@ -5,7 +5,7 @@ import {
   buildFinancialEventIdempotencyKey,
   isFinancialTransactionType,
   isUnsyncedFinancialEventState,
-} from './index'
+} from './index.ts'
 
 describe('FINANCIAL_TRANSACTION_TYPES', () => {
   it('has documented debit/credit semantics for every type', () => {

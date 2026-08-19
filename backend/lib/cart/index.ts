@@ -10,8 +10,8 @@
  * a `variant` snapshot the caller fetched itself from the database in the
  * same request — a client-supplied price is never an input to this module.
  */
-import { calculateLineTotal, sumMinorUnits } from '../money'
-import { assessCheckoutAvailability } from '../inventory'
+import { calculateLineTotal, sumMinorUnits } from '../money/index.ts'
+import { assessCheckoutAvailability } from '../inventory/index.ts'
 
 export const MAX_LINE_QUANTITY = 999
 

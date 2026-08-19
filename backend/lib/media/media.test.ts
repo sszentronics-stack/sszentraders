@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ValidationError } from '../errors'
+import { ValidationError } from '../errors/index.ts'
 import {
   MAX_IMAGE_BYTES,
   buildBrandAssetStoragePath,
@@ -8,7 +8,7 @@ import {
   buildReviewImageStoragePath,
   sanitizeFileName,
   validateImageUpload,
-} from './index'
+} from './index.ts'
 
 describe('validateImageUpload', () => {
   it('accepts a valid jpeg under the size limit', () => {

@@ -11,11 +11,11 @@
  * moderation.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { evaluateReviewEligibility } from '../../lib/reviews'
-import { validateImageUpload, buildReviewImageStoragePath, type ImageUploadCandidate } from '../../lib/media'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
-import type { CreateReviewInput, ModerateReviewInput } from '../../lib/validation'
-import { writeAuditLog, type AuditLogWriter } from '../../lib/audit'
+import { evaluateReviewEligibility } from '../../lib/reviews/index.ts'
+import { validateImageUpload, buildReviewImageStoragePath, type ImageUploadCandidate } from '../../lib/media/index.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import type { CreateReviewInput, ModerateReviewInput } from '../../lib/validation/index.ts'
+import { writeAuditLog, type AuditLogWriter } from '../../lib/audit/index.ts'
 
 const REVIEW_IMAGES_BUCKET = 'review-images'
 

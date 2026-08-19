@@ -1,10 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, it, vi } from 'vitest'
-import { LeopardsCourierProvider } from '../../../lib/providers/leopards/LeopardsCourierProvider'
-import { IntegrationNotConfiguredError } from '../../../lib/providers/errors'
-import { ValidationError } from '../../../lib/errors'
-import { bookShipmentForOrder, cancelShipment } from './shipment.service'
-import { FakeSupabaseClient } from './testUtils'
+import { LeopardsCourierProvider } from '../../../lib/providers/leopards/LeopardsCourierProvider.ts'
+import { IntegrationNotConfiguredError } from '../../../lib/providers/errors.ts'
+import { ValidationError } from '../../../lib/errors/index.ts'
+import { bookShipmentForOrder, cancelShipment } from './shipment.service.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 
 const ORDER_ID = 'order-1'
 

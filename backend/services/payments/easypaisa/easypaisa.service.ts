@@ -16,13 +16,13 @@
  * (the Edge Function) has verified the webhook signature.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { PaymentProvider } from '../../../lib/providers/PaymentProvider'
-import { IntegrationNotConfiguredError } from '../../../lib/providers/errors'
-import { ConflictError, NotFoundError, ValidationError } from '../../../lib/errors'
-import type { PaymentStatus } from '../../../lib/status'
-import { getOrderForCaller } from '../../orders/orders.service'
-import { recordPaymentTransaction } from '../../accounting/accounting.service'
-import { decidePaymentCallback, type ProviderPaymentOutcome } from '../../../lib/payments/easypaisa/callbackStateMachine'
+import type { PaymentProvider } from '../../../lib/providers/PaymentProvider.ts'
+import { IntegrationNotConfiguredError } from '../../../lib/providers/errors.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../../lib/errors/index.ts'
+import type { PaymentStatus } from '../../../lib/status/index.ts'
+import { getOrderForCaller } from '../../orders/orders.service.ts'
+import { recordPaymentTransaction } from '../../accounting/accounting.service.ts'
+import { decidePaymentCallback, type ProviderPaymentOutcome } from '../../../lib/payments/easypaisa/callbackStateMachine.ts'
 
 const PROVIDER_NAME = 'easypaisa'
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { verifyWebhookSignature, __internal } from './signature'
+import { verifyWebhookSignature, __internal } from './signature.ts'
 
 describe('verifyWebhookSignature (generic HMAC-SHA256 framework)', () => {
   const secret = 'test-webhook-secret'

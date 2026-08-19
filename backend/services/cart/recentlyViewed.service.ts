@@ -5,7 +5,7 @@
  * cart.service.ts.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { trimToMostRecent } from '../../lib/cart'
+import { trimToMostRecent } from '../../lib/cart/index.ts'
 
 export const RECENTLY_VIEWED_LIMIT = 12
 

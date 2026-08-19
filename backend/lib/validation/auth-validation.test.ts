@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ValidationError } from '../errors'
+import { ValidationError } from '../errors/index.ts'
 import {
   loginInputSchema,
   parseOrThrow,
@@ -8,7 +8,7 @@ import {
   registerInputSchema,
   updateCustomerAddressSchema,
   updateProfileSchema,
-} from './index'
+} from './index.ts'
 
 describe('Phase 2 auth validation schemas', () => {
   it('accepts a valid registration payload and defaults marketingOptIn to false', () => {

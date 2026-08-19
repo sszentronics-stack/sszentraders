@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EmptySlugError, SlugExhaustedError, generateUniqueSlug, slugCandidate, slugify, slugifyStrict } from './index'
+import { EmptySlugError, SlugExhaustedError, generateUniqueSlug, slugCandidate, slugify, slugifyStrict } from './index.ts'
 
 describe('slugify', () => {
   it('lowercases, hyphenates, and trims punctuation', () => {

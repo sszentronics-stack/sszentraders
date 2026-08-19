@@ -18,8 +18,8 @@
  * real ERP snapshot exists.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { reconcileLocalWithErp, type ErpReconciliationRecord, type ReconciliationIssue } from '../../../lib/erp'
-import { ERP_ENTITY_TYPE_FINANCIAL_EVENT, type FinancialTransactionType } from '../../../lib/accounting'
+import { reconcileLocalWithErp, type ErpReconciliationRecord, type ReconciliationIssue } from '../../../lib/erp/index.ts'
+import { ERP_ENTITY_TYPE_FINANCIAL_EVENT, type FinancialTransactionType } from '../../../lib/accounting/index.ts'
 
 interface TransactionRow {
   id: string

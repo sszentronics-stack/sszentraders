@@ -7,7 +7,7 @@ import {
   returnNumberCandidate,
   ReturnNumberExhaustedError,
   RETURN_POLICY,
-} from './index'
+} from './index.ts'
 
 describe('reason codes', () => {
   it('recognizes valid reason codes', () => {

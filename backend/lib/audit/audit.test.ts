@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AuditMetadataContainsSecretError, writeAuditLog, type AuditLogWriter } from './index'
+import { AuditMetadataContainsSecretError, writeAuditLog, type AuditLogWriter } from './index.ts'
 
 function fakeClient(): AuditLogWriter & { inserted: Record<string, unknown>[] } {
   const inserted: Record<string, unknown>[] = []

@@ -15,8 +15,8 @@
  * ledger row).
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { assertRedeemable, computeMaxRedeemablePoints, computeRedemptionValue, sumLedgerBalance } from '../../lib/loyalty'
-import { NotFoundError } from '../../lib/errors'
+import { assertRedeemable, computeMaxRedeemablePoints, computeRedemptionValue, sumLedgerBalance } from '../../lib/loyalty/index.ts'
+import { NotFoundError } from '../../lib/errors/index.ts'
 
 export interface LoyaltyLedgerEntry {
   id: string

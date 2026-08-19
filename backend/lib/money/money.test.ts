@@ -7,7 +7,7 @@ import {
   sumMinorUnits,
   toMajorUnits,
   toMinorUnits,
-} from './index'
+} from './index.ts'
 
 describe('money helpers', () => {
   it('converts major units to minor units', () => {

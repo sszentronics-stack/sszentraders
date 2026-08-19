@@ -7,7 +7,7 @@ import {
   computeOrderConversionProxy,
   computeReturnRate,
   computeReturningCustomerRate,
-} from './index'
+} from './index.ts'
 
 describe('computeAverageOrderValue', () => {
   it('averages grand totals in minor units', () => {

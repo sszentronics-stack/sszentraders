@@ -13,9 +13,9 @@
  * fabricates a `ledgixCustomerId`.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { ErpProvider } from '../../../lib/providers/ErpProvider'
-import { decideCustomerSync } from '../../../lib/erp'
-import { NotFoundError } from '../../../lib/errors'
+import type { ErpProvider } from '../../../lib/providers/ErpProvider.ts'
+import { decideCustomerSync } from '../../../lib/erp/index.ts'
+import { NotFoundError } from '../../../lib/errors/index.ts'
 
 export interface CustomerForErpSync {
   id: string

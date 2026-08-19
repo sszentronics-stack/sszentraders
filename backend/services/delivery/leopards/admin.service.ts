@@ -5,10 +5,10 @@
  * other privileged action in this codebase.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { writeAuditLog, type AuditLogWriter } from '../../../lib/audit'
-import type { CourierProvider } from '../../../lib/providers/CourierProvider'
-import { bookShipmentForOrder, getShipmentOrThrow, type ShipmentRecord } from './shipment.service'
-import { syncShipmentStatus } from './tracking.service'
+import { writeAuditLog, type AuditLogWriter } from '../../../lib/audit/index.ts'
+import type { CourierProvider } from '../../../lib/providers/CourierProvider.ts'
+import { bookShipmentForOrder, getShipmentOrThrow, type ShipmentRecord } from './shipment.service.ts'
+import { syncShipmentStatus } from './tracking.service.ts'
 
 export interface ReconciliationFilters {
   /** Only shipments with a non-null booking_error (i.e. the last attempted courier call failed). */

@@ -26,16 +26,16 @@ import {
   isReturnReasonCode,
   type ReturnEligibilityOrderItem,
   type ReturnRequestLine as PolicyReturnRequestLine,
-} from '../../lib/returns'
-import { assertReturnStatusTransition, type ReturnStatus } from '../../lib/status'
-import { validateImageUpload, buildReturnEvidenceStoragePath, type ImageUploadCandidate } from '../../lib/media'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
-import { writeAuditLog, type AuditLogWriter } from '../../lib/audit'
-import type { CreateReturnRequestInput } from '../../lib/validation'
-import type { CourierProvider } from '../../lib/providers/CourierProvider'
-import { bookReturnPickup } from '../delivery/leopards/shipment.service'
-import { IntegrationNotConfiguredError } from '../../lib/providers/errors'
-import { recordReturnTransaction } from '../accounting/accounting.service'
+} from '../../lib/returns/index.ts'
+import { assertReturnStatusTransition, type ReturnStatus } from '../../lib/status/index.ts'
+import { validateImageUpload, buildReturnEvidenceStoragePath, type ImageUploadCandidate } from '../../lib/media/index.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import { writeAuditLog, type AuditLogWriter } from '../../lib/audit/index.ts'
+import type { CreateReturnRequestInput } from '../../lib/validation/index.ts'
+import type { CourierProvider } from '../../lib/providers/CourierProvider.ts'
+import { bookReturnPickup } from '../delivery/leopards/shipment.service.ts'
+import { IntegrationNotConfiguredError } from '../../lib/providers/errors.ts'
+import { recordReturnTransaction } from '../accounting/accounting.service.ts'
 
 const RETURN_EVIDENCE_BUCKET = 'return-evidence'
 

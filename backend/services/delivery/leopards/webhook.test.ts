@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { verifyLeopardsWebhookSignature, WebhookSecretNotConfiguredError } from './webhook'
+import { verifyLeopardsWebhookSignature, WebhookSecretNotConfiguredError } from './webhook.ts'
 
 async function sign(secret: string, body: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, [

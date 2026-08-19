@@ -13,11 +13,11 @@
  * untouched (only sync_status changes) — never zeroed, never guessed.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { ErpProvider } from '../../lib/providers/ErpProvider'
-import { IntegrationNotConfiguredError } from '../../lib/providers/errors'
-import { buildInventoryCacheUpserts } from '../../lib/inventory'
-import { ConflictError, NotFoundError } from '../../lib/errors'
-import { writeAuditLog, type AuditLogWriter } from '../../lib/audit'
+import type { ErpProvider } from '../../lib/providers/ErpProvider.ts'
+import { IntegrationNotConfiguredError } from '../../lib/providers/errors.ts'
+import { buildInventoryCacheUpserts } from '../../lib/inventory/index.ts'
+import { ConflictError, NotFoundError } from '../../lib/errors/index.ts'
+import { writeAuditLog, type AuditLogWriter } from '../../lib/audit/index.ts'
 
 const UNIQUE_VIOLATION = '23505'
 function isUniqueViolation(error: unknown): boolean {

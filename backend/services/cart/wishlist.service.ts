@@ -9,7 +9,7 @@
  * matching the spec's "graceful guest behavior" / no dead-end UI rule.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { NotFoundError } from '../../lib/errors'
+import { NotFoundError } from '../../lib/errors/index.ts'
 
 const WISHLIST_SELECT = `
   id, product_id, created_at,

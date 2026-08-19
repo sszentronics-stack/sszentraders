@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { getErpHealthStatus } from './health.service'
-import { FakeSupabaseClient } from './testUtils'
+import { getErpHealthStatus } from './health.service.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 
 function asSupabase(db: FakeSupabaseClient) {
   return db as unknown as import('@supabase/supabase-js').SupabaseClient

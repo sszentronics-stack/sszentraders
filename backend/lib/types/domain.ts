@@ -11,7 +11,7 @@
  * Timestamps are ISO-8601 UTC strings.
  */
 
-import type { FulfillmentStatus, OrderStatus, PaymentStatus } from '../status'
+import type { FulfillmentStatus, OrderStatus, PaymentStatus } from '../status/index.ts'
 
 export type ContentStatus = 'draft' | 'published' | 'archived'
 

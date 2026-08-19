@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildPendingIdempotencyRecord, decideIdempotency, hashRequestPayload } from './index'
+import { buildPendingIdempotencyRecord, decideIdempotency, hashRequestPayload } from './index.ts'
 
 describe('idempotency helper', () => {
   it('hashes equal payloads to the same value regardless of key order', async () => {

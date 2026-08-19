@@ -6,8 +6,8 @@ import type {
   RefundPaymentResult,
   VerifyPaymentInput,
   VerifyPaymentResult,
-} from '../PaymentProvider'
-import { IntegrationNotConfiguredError } from '../errors'
+} from '../PaymentProvider.ts'
+import { IntegrationNotConfiguredError } from '../errors.ts'
 
 export interface EasypaisaConfig {
   merchantId: string
