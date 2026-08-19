@@ -9,7 +9,7 @@
  * current payment row, calls `decidePaymentCallback`, and applies the
  * resulting action.
  */
-import type { PaymentStatus } from '../../status'
+import type { PaymentStatus } from '../../status/index.ts'
 
 /** The generic provider-reported outcome a callback/webhook or verifyPayment() call can carry. */
 export type ProviderPaymentOutcome = 'paid' | 'failed' | 'pending' | 'processing' | 'cancelled'

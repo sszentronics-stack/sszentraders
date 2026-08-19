@@ -10,7 +10,7 @@ import {
   isOrderStatus,
   isPaymentStatus,
   isReturnStatus,
-} from './index'
+} from './index.ts'
 
 describe('status validation', () => {
   it('recognizes valid order/payment/fulfillment statuses', () => {

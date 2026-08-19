@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { ValidationError } from '../errors'
+import { ValidationError } from '../errors/index.ts'
 import {
   createOrderSchema,
   customerAddressSchema,
   pakistaniPhoneSchema,
   parseOrThrow,
   slugSchema,
-} from './index'
+} from './index.ts'
 
 describe('validation schemas', () => {
   it('accepts valid Pakistani phone numbers', () => {

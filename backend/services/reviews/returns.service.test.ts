@@ -1,10 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
-import { LeopardsCourierProvider } from '../../lib/providers/leopards/LeopardsCourierProvider'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
-import { InvalidReturnStatusTransitionError } from '../../lib/status'
-import type { AuditLogWriter } from '../../lib/audit'
-import { FakeSupabaseClient } from './testUtils'
+import { LeopardsCourierProvider } from '../../lib/providers/leopards/LeopardsCourierProvider.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import { InvalidReturnStatusTransitionError } from '../../lib/status/index.ts'
+import type { AuditLogWriter } from '../../lib/audit/index.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 import {
   approveReturn,
   createReturnRequest,
@@ -16,7 +16,7 @@ import {
   moveReturnUnderReview,
   recordInspectionOutcome,
   rejectReturn,
-} from './returns.service'
+} from './returns.service.ts'
 
 const PROFILE_ID = 'profile-1'
 const CUSTOMER_ID = 'customer-1'

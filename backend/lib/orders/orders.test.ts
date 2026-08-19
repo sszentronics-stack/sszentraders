@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildOrderItemSnapshots, deliveryCost, generateUniqueOrderNumber, orderNumberCandidate } from './index'
+import { buildOrderItemSnapshots, deliveryCost, generateUniqueOrderNumber, orderNumberCandidate } from './index.ts'
 
 describe('orderNumberCandidate', () => {
   it('formats a human-friendly, date-prefixed order number', () => {

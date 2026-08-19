@@ -8,7 +8,7 @@
  * as-is from backend/lib/status (ORDER_STATUSES, assertOrderStatusTransition)
  * — not re-derived here.
  */
-import { calculateLineTotal } from '../money'
+import { calculateLineTotal } from '../money/index.ts'
 
 function datePart(date: Date): string {
   return date.toISOString().slice(0, 10).replace(/-/g, '')

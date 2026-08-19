@@ -4,7 +4,7 @@
  * Single authoritative source — do not re-derive these shapes elsewhere.
  */
 import { z } from 'zod'
-import { ValidationError } from '../errors'
+import { ValidationError } from '../errors/index.ts'
 
 export const uuidSchema = z.string().uuid()
 

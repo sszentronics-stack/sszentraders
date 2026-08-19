@@ -1,9 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
-import type { CourierProvider, TrackShipmentResult } from '../../../lib/providers/CourierProvider'
-import { ValidationError } from '../../../lib/errors'
-import { getOrderTrackingTimeline, syncShipmentStatus } from './tracking.service'
-import { FakeSupabaseClient } from './testUtils'
+import type { CourierProvider, TrackShipmentResult } from '../../../lib/providers/CourierProvider.ts'
+import { ValidationError } from '../../../lib/errors/index.ts'
+import { getOrderTrackingTimeline, syncShipmentStatus } from './tracking.service.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 
 const ORDER_ID = 'order-1'
 const SHIPMENT_ID = 'shipment-1'

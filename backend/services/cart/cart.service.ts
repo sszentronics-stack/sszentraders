@@ -13,9 +13,9 @@
  * that module's header for the full rationale.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { computeCartSubtotal, mergeCartLines, revalidateCartLine, type CartLineInput } from '../../lib/cart'
-import { NotFoundError, ValidationError } from '../../lib/errors'
-import { getAvailabilityForVariants } from '../inventory/inventory.service'
+import { computeCartSubtotal, mergeCartLines, revalidateCartLine, type CartLineInput } from '../../lib/cart/index.ts'
+import { NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import { getAvailabilityForVariants } from '../inventory/inventory.service.ts'
 
 const CART_ITEM_SELECT = `
   id, variant_id, quantity, unit_price_snapshot, added_at,

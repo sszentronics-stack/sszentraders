@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { AuthenticationError, AuthorizationError } from '../errors'
+import { AuthenticationError, AuthorizationError } from '../errors/index.ts'
 import {
   assertOwnsCustomerResource,
   assertOwnsResource,
   requireAuthenticatedProfile,
   type AuthenticatedProfile,
-} from './authorization'
+} from './authorization.ts'
 
 const customer: AuthenticatedProfile = { id: 'profile-1', authUserId: 'auth-1', isAdmin: false }
 const admin: AuthenticatedProfile = { id: 'profile-admin', authUserId: 'auth-admin', isAdmin: true }

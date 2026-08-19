@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findCustomersByEmailOrPhone, type CustomerLookupDeps, type CustomerLookupSummary } from './customerLookup'
+import { findCustomersByEmailOrPhone, type CustomerLookupDeps, type CustomerLookupSummary } from './customerLookup.ts'
 
 const ayesha: CustomerLookupSummary = {
   id: 'cust-1',

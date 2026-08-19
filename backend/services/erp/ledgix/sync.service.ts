@@ -32,11 +32,11 @@
  * admin endpoint) is the on-demand equivalent an operator can call today.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { ErpProvider } from '../../../lib/providers/ErpProvider'
-import { IntegrationNotConfiguredError } from '../../../lib/providers/errors'
-import { classifyErpSyncError, mapFinancialEventToErpAction } from '../../../lib/erp'
-import { ServerError } from '../../../lib/errors'
-import { writeAuditLog, type AuditLogWriter } from '../../../lib/audit'
+import type { ErpProvider } from '../../../lib/providers/ErpProvider.ts'
+import { IntegrationNotConfiguredError } from '../../../lib/providers/errors.ts'
+import { classifyErpSyncError, mapFinancialEventToErpAction } from '../../../lib/erp/index.ts'
+import { ServerError } from '../../../lib/errors/index.ts'
+import { writeAuditLog, type AuditLogWriter } from '../../../lib/audit/index.ts'
 import {
   getFinancialTransactionById,
   listUnsyncedFinancialEvents,
@@ -45,8 +45,8 @@ import {
   markErpSyncSkipped,
   markErpSyncSucceeded,
   type FinancialTransactionRecord,
-} from '../../accounting/accounting.service'
-import { resolveOrCreateErpCustomer } from './customer.service'
+} from '../../accounting/accounting.service.ts'
+import { resolveOrCreateErpCustomer } from './customer.service.ts'
 
 export type ErpSyncOutcome = 'succeeded' | 'failed' | 'skipped'
 

@@ -1,8 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
-import { NotFoundError, ValidationError } from '../../lib/errors'
-import type { AuditLogWriter } from '../../lib/audit'
-import { FakeSupabaseClient } from './testUtils'
+import { NotFoundError, ValidationError } from '../../lib/errors/index.ts'
+import type { AuditLogWriter } from '../../lib/audit/index.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 import {
   attachReviewImage,
   createReview,
@@ -11,7 +11,7 @@ import {
   listReviewableOrderItems,
   listReviewsForModeration,
   moderateReview,
-} from './reviews.service'
+} from './reviews.service.ts'
 
 const PROFILE_ID = 'profile-1'
 const CUSTOMER_ID = 'customer-1'

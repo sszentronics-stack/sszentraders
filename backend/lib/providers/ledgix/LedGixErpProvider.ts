@@ -9,8 +9,8 @@ import type {
   RecordCreditNoteInput,
   RecordReceiptInput,
   UpsertCustomerInput,
-} from '../ErpProvider'
-import { IntegrationNotConfiguredError } from '../errors'
+} from '../ErpProvider.ts'
+import { IntegrationNotConfiguredError } from '../errors.ts'
 
 export interface LedGixConfig {
   apiBaseUrl: string

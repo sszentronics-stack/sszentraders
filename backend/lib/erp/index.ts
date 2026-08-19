@@ -12,7 +12,7 @@
  * backend/lib/accounting's module doc for the shared "operational staging,
  * not a second ledger" framing this phase continues.
  */
-import type { FinancialTransactionType } from '../accounting'
+import type { FinancialTransactionType } from '../accounting/index.ts'
 
 /**
  * What kind of ERP document a given local financial event maps to, once a

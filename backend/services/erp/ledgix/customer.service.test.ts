@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import type { ErpProvider, ErpCustomerRef, UpsertCustomerInput } from '../../../lib/providers/ErpProvider'
-import { LedGixErpProvider } from '../../../lib/providers/ledgix/LedGixErpProvider'
-import { IntegrationNotConfiguredError } from '../../../lib/providers/errors'
-import { NotFoundError } from '../../../lib/errors'
-import { resolveOrCreateErpCustomer } from './customer.service'
-import { FakeSupabaseClient } from './testUtils'
+import type { ErpProvider, ErpCustomerRef, UpsertCustomerInput } from '../../../lib/providers/ErpProvider.ts'
+import { LedGixErpProvider } from '../../../lib/providers/ledgix/LedGixErpProvider.ts'
+import { IntegrationNotConfiguredError } from '../../../lib/providers/errors.ts'
+import { NotFoundError } from '../../../lib/errors/index.ts'
+import { resolveOrCreateErpCustomer } from './customer.service.ts'
+import { FakeSupabaseClient } from './testUtils.ts'
 
 function asSupabase(db: FakeSupabaseClient) {
   return db as unknown as import('@supabase/supabase-js').SupabaseClient

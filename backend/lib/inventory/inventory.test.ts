@@ -4,7 +4,7 @@ import {
   buildInventoryCacheUpserts,
   computeAvailabilityState,
   isInventoryCacheStale,
-} from './index'
+} from './index.ts'
 
 describe('computeAvailabilityState', () => {
   it('is unknown with no cache data', () => {

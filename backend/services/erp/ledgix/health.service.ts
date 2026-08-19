@@ -7,7 +7,7 @@
  * config itself.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { LedGixConfig } from '../../../lib/providers/ledgix/LedGixErpProvider'
+import type { LedGixConfig } from '../../../lib/providers/ledgix/LedGixErpProvider.ts'
 
 export interface ErpHealthStatus {
   provider: 'ledgix'

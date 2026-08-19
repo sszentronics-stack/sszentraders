@@ -10,15 +10,15 @@ import type {
   RecordCreditNoteInput,
   RecordReceiptInput,
   UpsertCustomerInput,
-} from '../../../lib/providers/ErpProvider'
-import { LedGixErpProvider } from '../../../lib/providers/ledgix/LedGixErpProvider'
+} from '../../../lib/providers/ErpProvider.ts'
+import { LedGixErpProvider } from '../../../lib/providers/ledgix/LedGixErpProvider.ts'
 import {
   recordCancellationTransaction,
   recordPaymentTransaction,
   recordSaleTransaction,
-} from '../../accounting/accounting.service'
-import { attemptErpSync, runErpSyncBatch } from './sync.service'
-import { FakeSupabaseClient, asAuditWriter } from './testUtils'
+} from '../../accounting/accounting.service.ts'
+import { attemptErpSync, runErpSyncBatch } from './sync.service.ts'
+import { FakeSupabaseClient, asAuditWriter } from './testUtils.ts'
 
 function asSupabase(db: FakeSupabaseClient) {
   return db as unknown as import('@supabase/supabase-js').SupabaseClient

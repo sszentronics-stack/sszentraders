@@ -44,9 +44,9 @@ import {
   ERP_ENTITY_TYPE_FINANCIAL_EVENT,
   buildFinancialEventIdempotencyKey,
   type FinancialTransactionType,
-} from '../../lib/accounting'
-import { ServerError } from '../../lib/errors'
-import { writeAuditLog, type AuditLogWriter } from '../../lib/audit'
+} from '../../lib/accounting/index.ts'
+import { ServerError } from '../../lib/errors/index.ts'
+import { writeAuditLog, type AuditLogWriter } from '../../lib/audit/index.ts'
 
 const UNIQUE_VIOLATION = '23505'
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LedGixWebhookSecretNotConfiguredError, verifyLedGixWebhookSignature } from './webhook'
+import { LedGixWebhookSecretNotConfiguredError, verifyLedGixWebhookSignature } from './webhook.ts'
 
 async function hmacSha256Hex(secret: string, message: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])

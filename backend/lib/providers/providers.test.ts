@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { LedGixErpProvider } from './ledgix/LedGixErpProvider'
-import { EasypaisaProvider } from './easypaisa/EasypaisaProvider'
-import { LeopardsCourierProvider } from './leopards/LeopardsCourierProvider'
-import { IntegrationNotConfiguredError } from './errors'
+import { LedGixErpProvider } from './ledgix/LedGixErpProvider.ts'
+import { EasypaisaProvider } from './easypaisa/EasypaisaProvider.ts'
+import { LeopardsCourierProvider } from './leopards/LeopardsCourierProvider.ts'
+import { IntegrationNotConfiguredError } from './errors.ts'
 
 describe('integration provider skeletons', () => {
   it('LedGixErpProvider throws IntegrationNotConfiguredError when unconfigured', async () => {

@@ -6,7 +6,7 @@ import {
   normalizeRawCourierStatus,
   requiresAccountingReview,
   resolveShipmentStatusUpdate,
-} from './statusNormalization'
+} from './statusNormalization.ts'
 
 // These are FIXTURES we constructed ourselves to exercise the normalization
 // logic — not real Leopards API sample payloads (none are available).

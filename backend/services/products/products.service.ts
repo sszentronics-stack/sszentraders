@@ -22,21 +22,21 @@
  *    price/sku directly (Phase 1), so archiving never breaks past orders.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { assessPublishReadiness } from '../../lib/catalog'
-import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors'
+import { assessPublishReadiness } from '../../lib/catalog/index.ts'
+import { ConflictError, NotFoundError, ValidationError } from '../../lib/errors/index.ts'
 import {
   buildProductImageStoragePath,
   validateImageUpload,
   type ImageUploadCandidate,
-} from '../../lib/media'
-import { generateUniqueSlug } from '../../lib/slug'
+} from '../../lib/media/index.ts'
+import { generateUniqueSlug } from '../../lib/slug/index.ts'
 import type {
   CreateProductInput,
   ProductImageInput,
   ReorderImagesInput,
   UpdateProductInput,
   UpdateVariantInput,
-} from '../../lib/validation'
+} from '../../lib/validation/index.ts'
 
 const UNIQUE_VIOLATION = '23505'
 

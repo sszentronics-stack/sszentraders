@@ -13,11 +13,11 @@
  * Phase 12/mobile (or a future storefront page) builds the UI on top of it.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { CourierProvider } from '../../../lib/providers/CourierProvider'
-import { NotFoundError, ValidationError } from '../../../lib/errors'
-import { getShipmentOrThrow, type ShipmentRecord } from './shipment.service'
-import { recordAdjustmentTransaction } from '../../accounting/accounting.service'
-import { requiresAccountingReview, resolveShipmentStatusUpdate, type ShipmentStatus } from './statusNormalization'
+import type { CourierProvider } from '../../../lib/providers/CourierProvider.ts'
+import { NotFoundError, ValidationError } from '../../../lib/errors/index.ts'
+import { getShipmentOrThrow, type ShipmentRecord } from './shipment.service.ts'
+import { recordAdjustmentTransaction } from '../../accounting/accounting.service.ts'
+import { requiresAccountingReview, resolveShipmentStatusUpdate, type ShipmentStatus } from './statusNormalization.ts'
 
 async function getLastEventAt(db: SupabaseClient, shipmentId: string): Promise<string | null> {
   const { data, error } = await db

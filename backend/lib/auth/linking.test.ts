@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ensureCustomerForProfile, type CustomerRow, type LinkCustomerDeps } from './linking'
+import { ensureCustomerForProfile, type CustomerRow, type LinkCustomerDeps } from './linking.ts'
 
 function makeFakeDeps(initialCustomers: CustomerRow[] = []): LinkCustomerDeps & { customers: CustomerRow[] } {
   const customers = [...initialCustomers]

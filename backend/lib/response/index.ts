@@ -3,7 +3,7 @@
  * Runtime-agnostic (returns plain objects); supabase/functions/_shared
  * wraps these into actual `Response` objects with the right status/headers.
  */
-import { toAppError } from '../errors'
+import { toAppError } from '../errors/index.ts'
 
 export interface SuccessEnvelope<T> {
   ok: true

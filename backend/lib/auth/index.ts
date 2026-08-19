@@ -1,3 +1,3 @@
-export * from './linking'
-export * from './authorization'
-export * from './customerLookup'
+export * from './linking.ts'
+export * from './authorization.ts'
+export * from './customerLookup.ts'

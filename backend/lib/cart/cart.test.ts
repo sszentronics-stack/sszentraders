@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeCartSubtotal, mergeCartLines, revalidateCartLine, trimToMostRecent } from './index'
+import { computeCartSubtotal, mergeCartLines, revalidateCartLine, trimToMostRecent } from './index.ts'
 
 describe('mergeCartLines', () => {
   it('sums quantities for the same variant across both lists', () => {

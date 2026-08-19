@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { IntegrationNotConfiguredError } from '../providers/errors'
+import { IntegrationNotConfiguredError } from '../providers/errors.ts'
 import {
   classifyErpSyncError,
   decideCustomerSync,
@@ -8,7 +8,7 @@ import {
   reconcileLocalWithErp,
   type ErpReconciliationRecord,
   type LocalReconciliationRecord,
-} from './index'
+} from './index.ts'
 
 describe('mapFinancialEventToErpAction', () => {
   it('maps sale to invoice', () => {
