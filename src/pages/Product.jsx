@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { buildWhatsAppProduct, formatPKR, salePercent } from '../data/products'
 import { useProduct } from '../hooks/useCatalog'
+import { useRecentlyViewed, useRecordRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import Disclaimer from '../components/Disclaimer'
 import ProductCard from '../components/ProductCard'
 import TrustBar from '../components/TrustBar'
-import { ChevronLeft, ChevronRight, Share2, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Heart, Share2, Star } from 'lucide-react'
 
 export default function Product() {
   const { slug } = useParams()
   const { product, others, loading, notFound } = useProduct(slug)
   const { addItem } = useCart()
+  const { isWishlisted, toggle: toggleWishlist } = useWishlist()
   const [active, setActive] = useState(0)
   const [qty, setQty] = useState(1)
   const [open, setOpen] = useState('description')
@@ -21,6 +24,12 @@ export default function Product() {
   useEffect(() => {
     setActive(0)
   }, [slug])
+
+  useRecordRecentlyViewed(product?.id)
+  const { items: recentlyViewed } = useRecentlyViewed(product?.id)
+
+  const sameCategory = product && product.category ? others.filter((p) => p.category === product.category) : []
+  const related = sameCategory.length > 0 ? sameCategory : others
 
   if (loading) {
     return (
@@ -163,10 +172,21 @@ export default function Product() {
             </div>
           </div>
 
-          <div className="mt-5 space-y-3">
-            <button type="button" className="btn-lavender" onClick={() => addItem(product, qty)}>
+          <div className="mt-5 flex gap-3">
+            <button type="button" className="btn-lavender flex-1" onClick={() => addItem(product, qty)}>
               Add to bag
             </button>
+            <button
+              type="button"
+              aria-label={isWishlisted(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-pressed={isWishlisted(product.id)}
+              className="w-12 shrink-0 border border-line grid place-items-center"
+              onClick={() => toggleWishlist(product)}
+            >
+              <Heart size={18} fill={isWishlisted(product.id) ? '#c31818' : 'none'} color={isWishlisted(product.id) ? '#c31818' : '#102b26'} />
+            </button>
+          </div>
+          <div className="mt-3">
             <a
               className="btn-outline block text-center"
               href={buildWhatsAppProduct(product, qty)}
@@ -240,11 +260,24 @@ export default function Product() {
         </Accordion>
       </div>
 
-      {others.length > 0 && (
+      {related.length > 0 && (
         <section className="mt-16">
-          <h2 className="text-2xl font-medium mb-8">Recommended products</h2>
+          <h2 className="text-2xl font-medium mb-8">
+            {sameCategory.length > 0 ? `More in ${product.category}` : 'Recommended products'}
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {others.map((p) => (
+            {related.slice(0, 4).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {recentlyViewed.length > 0 && (
+        <section className="mt-16">
+          <h2 className="text-2xl font-medium mb-8">Recently viewed</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {recentlyViewed.slice(0, 4).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

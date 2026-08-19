@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Menu, Search, ShoppingBag, User, X } from 'lucide-react'
 import Logo from './Logo'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { useProducts } from '../hooks/useCatalog'
+import { suggestProducts } from '../lib/productSearch'
+import { formatPKR } from '../data/products'
 
 const NAV = [
   { to: '/shop', label: 'Shop' },
@@ -17,18 +20,25 @@ const NAV = [
 export default function Header({ onSearch }) {
   const { count, setIsOpen } = useCart()
   const { isAuthenticated, configured } = useAuth()
+  const { products } = useProducts()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const navigate = useNavigate()
 
-  const submitSearch = (e) => {
-    e.preventDefault()
-    const q = query.trim()
+  const suggestions = useMemo(() => suggestProducts(products, query, 5), [products, query])
+
+  const goToShop = (q) => {
     setSearchOpen(false)
     setMenuOpen(false)
+    setQuery('')
     if (onSearch) onSearch()
     navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop')
+  }
+
+  const submitSearch = (e) => {
+    e.preventDefault()
+    goToShop(query.trim())
   }
 
   return (
@@ -94,6 +104,9 @@ export default function Header({ onSearch }) {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="What are you looking for?"
                 className="flex-1 border-0 outline-none text-lg py-2 text-ink"
+                role="combobox"
+                aria-expanded={suggestions.length > 0}
+                aria-controls="search-suggestions"
               />
               <button type="submit" className="text-sm font-medium">
                 Search
@@ -102,6 +115,37 @@ export default function Header({ onSearch }) {
                 <X size={18} />
               </button>
             </form>
+            {suggestions.length > 0 && (
+              <ul id="search-suggestions" className="container-aura mt-2 border-t border-[#eee] pt-2">
+                {suggestions.map((product) => (
+                  <li key={product.id}>
+                    <button
+                      type="button"
+                      className="w-full flex items-center gap-3 py-2.5 text-left hover:bg-meta"
+                      onClick={() => {
+                        setSearchOpen(false)
+                        setMenuOpen(false)
+                        setQuery('')
+                        if (onSearch) onSearch()
+                        navigate(`/products/${product.slug}`)
+                      }}
+                    >
+                      <img src={product.images[0]} alt="" className="w-10 h-10 object-contain bg-meta shrink-0" />
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-sm truncate">{product.name}</span>
+                        <span className="block text-xs text-ink-soft">{product.brand}</span>
+                      </span>
+                      <span className="text-sm shrink-0">{formatPKR(product.price)}</span>
+                    </button>
+                  </li>
+                ))}
+                <li>
+                  <button type="button" className="w-full text-left py-2 text-sm underline text-ink-soft" onClick={() => goToShop(query.trim())}>
+                    See all results for "{query.trim()}"
+                  </button>
+                </li>
+              </ul>
+            )}
           </div>
         </div>
       )}
