@@ -21,7 +21,7 @@ import { IntegrationNotConfiguredError } from '../../../lib/providers/errors'
 import { ConflictError, NotFoundError, ValidationError } from '../../../lib/errors'
 import type { PaymentStatus } from '../../../lib/status'
 import { getOrderForCaller } from '../../orders/orders.service'
-import { recordLocalFinancialEvent } from './localFinancialEvent'
+import { recordPaymentTransaction } from '../../accounting/accounting.service'
 import { decidePaymentCallback, type ProviderPaymentOutcome } from '../../../lib/payments/easypaisa/callbackStateMachine'
 
 const PROVIDER_NAME = 'easypaisa'
@@ -277,9 +277,11 @@ function normalizeOutcome(status: string | undefined): ProviderPaymentOutcome {
  * `callbackStateMachine.ts` for the pure decision logic this delegates to.
  *
  * On a verified `paid` transition, this also records a local financial
- * event directly (see `localFinancialEvent.ts`'s header for why — Phase 7's
- * accounting service may not exist yet at merge time) and leaves the ERP
- * receipt sync as an explicit TODO for Phase 8.
+ * event via Phase 7's accounting.service.ts (`recordPaymentTransaction` —
+ * consolidated in Phase 8 from this file's original self-contained insert,
+ * see docs/phase-8-completion-report.md) and leaves the ERP receipt sync as
+ * an explicit TODO for Phase 8's real sync worker to pick up via
+ * `listUnsyncedFinancialEvents()`.
  */
 export async function handleEasypaisaCallback(
   db: SupabaseClient,
@@ -337,18 +339,16 @@ export async function handleEasypaisaCallback(
     if (updateError) throw updateError
 
     if (decision.nextStatus === 'paid') {
-      await recordLocalFinancialEvent(db, {
-        orderId: payment.order_id,
-        paymentId: payment.id,
-        transactionType: 'sale',
-        amount: payment.amount,
-        currency: payment.currency,
-        description: `Easypaisa payment for order ${payment.order_id}`,
-      })
-      // TODO(Phase 8): once LedGix ERP sync is live, create/queue the ERP
-      // receipt here (e.g. insert an `erp_sync_jobs` row with
-      // entity_type='payment', entity_id=payment.id) instead of leaving the
-      // local record as the only trace of this sale.
+      await recordPaymentTransaction(
+        db,
+        { id: payment.id, orderId: payment.order_id, currency: payment.currency, amount: payment.amount },
+        'payments.easypaisa.handleEasypaisaCallback',
+      )
+      // TODO(Phase 8 sync worker): recordPaymentTransaction() above already
+      // queues a `pending` erp_sync_jobs row (Phase 7 behavior); LedGix ERP
+      // receipt sync itself is backend/services/erp/ledgix/sync.service.ts's
+      // job, driven by listUnsyncedFinancialEvents()/attemptErpSync() — not
+      // called synchronously from this webhook handler.
     }
   }
 

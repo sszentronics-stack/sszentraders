@@ -25,6 +25,9 @@ never edit an already-applied migration; add a new one instead.
 | `0015_storage_buckets.sql` | `product-images`, `brand-assets`, `category-assets` buckets + storage policies. |
 | `0016_address_default_enforcement.sql` | Phase 2: trigger that atomically clears a customer's previous default shipping/billing address when a new one is promoted, so the "one default per customer" partial unique indexes never block a legitimate change. |
 | `0019_leopards_shipments.sql` | Phase 11: `shipment_status` enum gains `pending_booking`/`rto_initiated`/`rto_in_transit`/`rto_delivered`; `shipments` gains `purpose`, `return_id`, `request_payload`, `booking_error`, `booking_attempted_at`, `idempotency_key`, and duplicate-booking-prevention indexes. |
+| `0020_accounting_adjustment_type.sql` | Phase 8 housekeeping: adds `'adjustment'` to `local_financial_transactions`' `transaction_type` check constraint, needed by the Phase 10/11 → Phase 7 accounting consolidation's `recordAdjustmentTransaction()`. |
+
+**Note:** `0019_accounting_local_financial_events.sql` (Phase 7) and `0019_leopards_shipments.sql` (Phase 11) share the same numeric prefix — both were built as parallel sibling agents off the same `main` commit and merged without renumbering. Both are additive `alter table`/`create index` migrations against disjoint tables/columns, so applying them in either order is safe; this is flagged here rather than silently left for someone to trip over.
 
 `../seed.sql` holds minimal, clearly-marked, safe-to-rerun DEV-ONLY seed data
 (3 brands, 3 categories, 1 product/variant matching the current live

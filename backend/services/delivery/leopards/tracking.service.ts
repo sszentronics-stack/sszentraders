@@ -16,7 +16,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CourierProvider } from '../../../lib/providers/CourierProvider'
 import { NotFoundError, ValidationError } from '../../../lib/errors'
 import { getShipmentOrThrow, type ShipmentRecord } from './shipment.service'
-import { recordCourierAccountingReview } from './accountingReview'
+import { recordAdjustmentTransaction } from '../../accounting/accounting.service'
 import { requiresAccountingReview, resolveShipmentStatusUpdate, type ShipmentStatus } from './statusNormalization'
 
 async function getLastEventAt(db: SupabaseClient, shipmentId: string): Promise<string | null> {
@@ -100,7 +100,11 @@ export async function applyRawStatusUpdate(
   if (requiresAccountingReview(decision.normalizedStatus) && shipment.orderId) {
     // RTO/failed-delivery: flag for review only — availability resync is
     // Phase 9's job, and this function deliberately never touches inventory.
-    await recordCourierAccountingReview(db, {
+    // Consolidated in Phase 8 to call Phase 7's accounting.service.ts
+    // directly (this phase originally shipped a self-contained
+    // ./accountingReview.ts insert, since Phase 7 was a parallel sibling
+    // agent at the time — see docs/phase-8-completion-report.md).
+    await recordAdjustmentTransaction(db, {
       orderId: shipment.orderId,
       shipmentId: shipment.id,
       reviewReason: decision.normalizedStatus,

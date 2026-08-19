@@ -32,6 +32,7 @@ export const FINANCIAL_TRANSACTION_TYPES = [
   'cancellation',
   'return',
   'refund',
+  'adjustment',
 ] as const
 
 export type FinancialTransactionType = (typeof FINANCIAL_TRANSACTION_TYPES)[number]
@@ -55,6 +56,7 @@ export const FINANCIAL_TRANSACTION_SEMANTICS: Record<FinancialTransactionType, s
   cancellation: 'Reverses an unfulfilled sale before payment settles (credit accounts receivable / debit revenue) — memo-only if no payment was ever collected.',
   return: 'Inventory/revenue reversal for goods returned by the customer (credit accounts receivable / debit revenue), ahead of any refund.',
   refund: 'Cash/bank paid back to the customer (credit cash or bank / debit accounts receivable).',
+  adjustment: 'Operational flag for manual accounting review (e.g. a courier RTO/failed-delivery event) — amount is deliberately 0 unless/until a human determines the real financial consequence; never a substitute for a real sale/refund/cancellation event.',
 }
 
 /**

@@ -12,8 +12,15 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
+  getFinancialTransactionById,
   listUnsyncedFinancialEvents,
+  markErpSyncFailed,
+  markErpSyncInProgress,
+  markErpSyncSkipped,
+  markErpSyncSucceeded,
+  recordAdjustmentTransaction,
   recordCancellationTransaction,
+  recordPaymentTransaction,
   recordSaleTransaction,
   retryFinancialEventSync,
   type FinancialTransactionRecord,
@@ -246,5 +253,103 @@ describe('retryFinancialEventSync', () => {
     expect(auditLogs).toHaveLength(1)
     expect(auditLogs[0]?.action).toBe('accounting.sync_retry_requested')
     expect(auditLogs[0]?.entity_id).toBe(record.id)
+  })
+})
+
+describe('recordPaymentTransaction', () => {
+  it('inserts a payment event distinct from the order sale event (Phase 10 consolidation call site)', async () => {
+    const db = makeFakeClient()
+    const sale = await recordSaleTransaction(asSupabase(db), { id: 'order-pay', currency: 'PKR', grandTotal: 4000 })
+    const payment = await recordPaymentTransaction(asSupabase(db), { id: 'payment-1', orderId: 'order-pay', currency: 'PKR', amount: 4000 })
+
+    expect(payment.id).not.toBe(sale.id)
+    expect(payment.transactionType).toBe('payment')
+    expect(payment.paymentId).toBe('payment-1')
+
+    // Calling it again for the same payment (e.g. duplicate webhook delivery) does not duplicate the row.
+    const again = await recordPaymentTransaction(asSupabase(db), { id: 'payment-1', orderId: 'order-pay', currency: 'PKR', amount: 4000 })
+    expect(again.id).toBe(payment.id)
+  })
+})
+
+describe('recordAdjustmentTransaction', () => {
+  it('records a zero-amount review flag (Phase 11 consolidation call site)', async () => {
+    const db = makeFakeClient()
+    const adjustment = await recordAdjustmentTransaction(asSupabase(db), {
+      orderId: 'order-rto',
+      shipmentId: 'shipment-1',
+      reviewReason: 'rto_initiated',
+    })
+    expect(adjustment.transactionType).toBe('adjustment')
+    expect(adjustment.amount).toBe(0)
+    expect(adjustment.shipmentId).toBe('shipment-1')
+  })
+
+  it('does not collide across distinct review reasons on the same shipment, but dedupes the same reason twice', async () => {
+    const db = makeFakeClient()
+    const failed = await recordAdjustmentTransaction(asSupabase(db), {
+      orderId: 'order-rto2',
+      shipmentId: 'shipment-2',
+      reviewReason: 'failed_delivery',
+    })
+    const rto = await recordAdjustmentTransaction(asSupabase(db), {
+      orderId: 'order-rto2',
+      shipmentId: 'shipment-2',
+      reviewReason: 'rto_initiated',
+    })
+    expect(failed.id).not.toBe(rto.id)
+
+    const failedAgain = await recordAdjustmentTransaction(asSupabase(db), {
+      orderId: 'order-rto2',
+      shipmentId: 'shipment-2',
+      reviewReason: 'failed_delivery',
+    })
+    expect(failedAgain.id).toBe(failed.id)
+  })
+})
+
+describe('ERP sync-state primitives', () => {
+  it('markErpSyncInProgress increments attempts and sets status', async () => {
+    const db = makeFakeClient()
+    const tx = await recordSaleTransaction(asSupabase(db), { id: 'order-sync-1', currency: 'PKR', grandTotal: 100 })
+    await markErpSyncInProgress(asSupabase(db), tx.id)
+    const job = (db._tables.get('erp_sync_jobs') ?? []).find((j) => j.entity_id === tx.id)!
+    expect(job.status).toBe('in_progress')
+    expect(job.attempts).toBe(1)
+  })
+
+  it('markErpSyncSucceeded stamps the ERP document reference and marks the job succeeded', async () => {
+    const db = makeFakeClient()
+    const tx = await recordSaleTransaction(asSupabase(db), { id: 'order-sync-2', currency: 'PKR', grandTotal: 100 })
+    await markErpSyncSucceeded(asSupabase(db), tx.id, { ledgixDocumentId: 'inv-99', ledgixDocumentNumber: 'INV-0099' })
+
+    const stored = await getFinancialTransactionById(asSupabase(db), tx.id)
+    expect(stored?.ledgixDocumentId).toBe('inv-99')
+    expect(stored?.ledgixDocumentNumber).toBe('INV-0099')
+
+    const job = (db._tables.get('erp_sync_jobs') ?? []).find((j) => j.entity_id === tx.id)!
+    expect(job.status).toBe('succeeded')
+  })
+
+  it('markErpSyncFailed records the sanitized error and never touches ledgix_document_id', async () => {
+    const db = makeFakeClient()
+    const tx = await recordSaleTransaction(asSupabase(db), { id: 'order-sync-3', currency: 'PKR', grandTotal: 100 })
+    await markErpSyncFailed(asSupabase(db), tx.id, 'LedGix ERP integration is not configured.')
+
+    const job = (db._tables.get('erp_sync_jobs') ?? []).find((j) => j.entity_id === tx.id)!
+    expect(job.status).toBe('failed')
+    expect(job.last_error).toBe('LedGix ERP integration is not configured.')
+
+    const stored = await getFinancialTransactionById(asSupabase(db), tx.id)
+    expect(stored?.ledgixDocumentId).toBeNull()
+  })
+
+  it('markErpSyncSkipped marks the job skipped without touching the financial transaction', async () => {
+    const db = makeFakeClient()
+    const tx = await recordSaleTransaction(asSupabase(db), { id: 'order-sync-4', currency: 'PKR', grandTotal: 100 })
+    await markErpSyncSkipped(asSupabase(db), tx.id, 'discount is netted into the sale invoice')
+
+    const job = (db._tables.get('erp_sync_jobs') ?? []).find((j) => j.entity_id === tx.id)!
+    expect(job.status).toBe('skipped')
   })
 })

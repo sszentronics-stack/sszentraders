@@ -371,6 +371,166 @@ export function recordRefundTransaction(
   })
 }
 
+export interface AdjustmentForAccounting {
+  orderId: string
+  shipmentId?: string | null
+  /** e.g. 'failed_delivery', 'rto_initiated', 'rto_in_transit', 'rto_delivered' — any short machine-readable reason code. */
+  reviewReason: string
+  note?: string
+}
+
+/**
+ * Records a zero-amount "flag for manual accounting review" event —
+ * e.g. a courier RTO/failed-delivery outcome (backend/services/delivery/leopards)
+ * that has an operational consequence but no automatically-determinable
+ * financial amount. Deliberately NEVER guesses a real amount; a human (or a
+ * future automated reconciliation pass) decides the actual financial
+ * consequence, same as the courier module's original design. Idempotency
+ * key includes the review reason (and shipment, when known) so the same
+ * shipment can accumulate distinct review flags across its lifecycle
+ * (failed_delivery, then rto_initiated, then rto_delivered) without
+ * colliding, while a duplicate webhook/poll delivery for the *same* reason
+ * on the *same* shipment is safely deduplicated.
+ */
+export function recordAdjustmentTransaction(
+  db: SupabaseClient,
+  adjustment: AdjustmentForAccounting,
+  source = 'system',
+): Promise<FinancialTransactionRecord> {
+  const entityId = adjustment.shipmentId ?? adjustment.orderId
+  return recordFinancialEvent(db, {
+    transactionType: 'adjustment',
+    idempotencyKey: buildFinancialEventIdempotencyKey('adjustment', entityId, adjustment.reviewReason),
+    amount: 0,
+    currency: 'PKR',
+    orderId: adjustment.orderId,
+    shipmentId: adjustment.shipmentId ?? null,
+    description: `[Accounting review needed] ${adjustment.reviewReason}${
+      adjustment.shipmentId ? ` on shipment ${adjustment.shipmentId}` : ''
+    }.${adjustment.note ? ` ${adjustment.note}` : ''} Requires manual accounting review — no financial amount has been assumed.`,
+    source,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// ERP-sync-state primitives — consumed by Phase 8's real sync worker
+// (backend/services/erp/ledgix/sync.service.ts) to record the outcome of an
+// actual sync attempt. These are the only functions in this file that stamp
+// local_financial_transactions.ledgix_document_id/ledgix_document_number —
+// centralizing ERP-reference writes here (rather than in the erp/ledgix
+// service layer) keeps this file the single owner of every write to
+// local_financial_transactions, matching Phase 7's original design.
+// ---------------------------------------------------------------------------
+
+async function getSyncJob(db: SupabaseClient, transactionId: string): Promise<{ id: string; attempts: number } | null> {
+  const { data, error } = await db
+    .from('erp_sync_jobs')
+    .select('id, attempts')
+    .eq('entity_type', ERP_ENTITY_TYPE_FINANCIAL_EVENT)
+    .eq('entity_id', transactionId)
+    .maybeSingle()
+  if (error) throw error
+  return (data as { id: string; attempts: number } | null) ?? null
+}
+
+/** Marks the sync attempt as started: status -> in_progress, attempts += 1. Creates the job row if the original best-effort insert never happened. */
+export async function markErpSyncInProgress(db: SupabaseClient, transactionId: string): Promise<void> {
+  const job = await getSyncJob(db, transactionId)
+  if (job) {
+    const { error } = await db
+      .from('erp_sync_jobs')
+      .update({ status: 'in_progress', attempts: job.attempts + 1, started_at: new Date().toISOString(), completed_at: null })
+      .eq('id', job.id)
+    if (error) throw error
+    return
+  }
+  const { error } = await db.from('erp_sync_jobs').insert({
+    provider: 'ledgix',
+    entity_type: ERP_ENTITY_TYPE_FINANCIAL_EVENT,
+    entity_id: transactionId,
+    direction: 'push',
+    status: 'in_progress',
+    attempts: 1,
+    started_at: new Date().toISOString(),
+  })
+  if (error) throw error
+}
+
+/**
+ * Marks a sync attempt as succeeded and stamps the real ERP document
+ * reference back onto local_financial_transactions — the ONLY place this
+ * ever happens, and only ever called after a real ErpProvider call actually
+ * returned a document reference (never speculatively, never on a
+ * not-configured throw). See this module's header and the phase spec's
+ * "never fabricate an ERP number" rule.
+ */
+export async function markErpSyncSucceeded(
+  db: SupabaseClient,
+  transactionId: string,
+  ref: { ledgixDocumentId: string; ledgixDocumentNumber: string },
+): Promise<void> {
+  const { error: txError } = await db
+    .from('local_financial_transactions')
+    .update({ ledgix_document_id: ref.ledgixDocumentId, ledgix_document_number: ref.ledgixDocumentNumber })
+    .eq('id', transactionId)
+  if (txError) throw txError
+
+  const job = await getSyncJob(db, transactionId)
+  if (!job) throw new ServerError(`No erp_sync_jobs row found for financial transaction "${transactionId}" to mark succeeded.`)
+  const { error } = await db
+    .from('erp_sync_jobs')
+    .update({ status: 'succeeded', completed_at: new Date().toISOString(), last_error: null })
+    .eq('id', job.id)
+  if (error) throw error
+}
+
+/** Marks a sync attempt as failed. `errorMessage` should already be sanitized (see backend/lib/logger's redaction pattern) — never the raw provider error object. */
+export async function markErpSyncFailed(db: SupabaseClient, transactionId: string, errorMessage: string): Promise<void> {
+  const job = await getSyncJob(db, transactionId)
+  if (!job) {
+    const { error } = await db.from('erp_sync_jobs').insert({
+      provider: 'ledgix',
+      entity_type: ERP_ENTITY_TYPE_FINANCIAL_EVENT,
+      entity_id: transactionId,
+      direction: 'push',
+      status: 'failed',
+      attempts: 1,
+      last_error: errorMessage,
+      completed_at: new Date().toISOString(),
+    })
+    if (error) throw error
+    return
+  }
+  const { error } = await db
+    .from('erp_sync_jobs')
+    .update({ status: 'failed', last_error: errorMessage, completed_at: new Date().toISOString() })
+    .eq('id', job.id)
+  if (error) throw error
+}
+
+/** Marks a sync job as intentionally skipped (e.g. discount/delivery_charge events, which are netted into the sale invoice rather than synced as their own ERP document — see backend/lib/erp's mapFinancialEventToErpAction). */
+export async function markErpSyncSkipped(db: SupabaseClient, transactionId: string, reason: string): Promise<void> {
+  const job = await getSyncJob(db, transactionId)
+  if (!job) {
+    const { error } = await db.from('erp_sync_jobs').insert({
+      provider: 'ledgix',
+      entity_type: ERP_ENTITY_TYPE_FINANCIAL_EVENT,
+      entity_id: transactionId,
+      direction: 'push',
+      status: 'skipped',
+      last_error: reason,
+      completed_at: new Date().toISOString(),
+    })
+    if (error) throw error
+    return
+  }
+  const { error } = await db
+    .from('erp_sync_jobs')
+    .update({ status: 'skipped', last_error: reason, completed_at: new Date().toISOString() })
+    .eq('id', job.id)
+  if (error) throw error
+}
+
 // ---------------------------------------------------------------------------
 // Diagnostics + retry primitives (consumed by Phase 8's real sync worker,
 // and usable ad hoc by an admin today — no admin UI here, that's Phase 12).
@@ -391,6 +551,13 @@ export interface ErpSyncJobSummary {
 export interface UnsyncedFinancialEvent {
   transaction: FinancialTransactionRecord
   syncJob: ErpSyncJobSummary | null
+}
+
+/** Fetches a single financial transaction by id — used by Phase 8's sync worker to load the record it's about to attempt syncing. */
+export async function getFinancialTransactionById(db: SupabaseClient, id: string): Promise<FinancialTransactionRecord | null> {
+  const { data, error } = await db.from('local_financial_transactions').select(TRANSACTION_COLUMNS).eq('id', id).maybeSingle()
+  if (error) throw error
+  return data ? mapRow(data as FinancialTransactionRow) : null
 }
 
 /**
