@@ -84,7 +84,7 @@ export type UpdateVariantInput = z.infer<typeof updateVariantSchema>
 
 /**
  * Free-form, admin-authored storefront content that doesn't warrant its own
- * column (see supabase/migrations/0016_catalog_content_attributes.sql).
+ * column (see supabase/migrations/0023_catalog_content_attributes.sql).
  * Every field is optional so partial admin edits never fail validation for
  * content they haven't filled in yet.
  */

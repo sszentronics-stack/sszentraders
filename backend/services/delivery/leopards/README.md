@@ -20,7 +20,7 @@ Status: **architecture implemented, real API calls not configured** (no Leopards
 - Interface: `backend/lib/providers/CourierProvider.ts` (now includes `requestPickup` and `bookReturnPickup` alongside the Phase 1 `createShipment`/`trackShipment`/`cancelShipment`).
 - Domain router (booking/pickup/cancel/tracking-timeline/reconciliation/retry): `supabase/functions/shipments/index.ts`.
 - Thin provider passthrough + inbound webhook receiver: `supabase/functions/integrations-leopards/index.ts`.
-- Schema: `supabase/migrations/0008_shipments.sql` (Phase 1) + `supabase/migrations/0019_leopards_shipments.sql` (Phase 11: `pending_booking`/RTO enum values, `purpose`/`return_id`/`request_payload`/`booking_error`/`idempotency_key` columns, duplicate-booking-prevention indexes).
+- Schema: `supabase/migrations/0008_shipments.sql` (Phase 1) + `supabase/migrations/0025_leopards_shipments.sql` (Phase 11: `pending_booking`/RTO enum values, `purpose`/`return_id`/`request_payload`/`booking_error`/`idempotency_key` columns, duplicate-booking-prevention indexes).
 
 ## What's still missing
 Real Leopards API documentation/credentials. Every field name, endpoint, and the webhook scheme are documented best-guesses — see docs/phase-11-completion-report.md's "Known limitations" section.

@@ -7,7 +7,7 @@
  * transit", "out for delivery", "delivered", "failed delivery", "RTO
  * initiated/in transit/delivered") onto Aura's own `shipment_status`
  * Postgres enum (supabase/migrations/0001_extensions_and_enums.sql,
- * extended by 0019_leopards_shipments.sql), and decides whether an incoming
+ * extended by 0025_leopards_shipments.sql), and decides whether an incoming
  * status update should actually be applied — protecting against stale/
  * out-of-order webhook or polling updates.
  *

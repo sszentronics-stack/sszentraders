@@ -3,7 +3,7 @@
  * courier pickup handoff — Phase 14 (Reviews, Returns & Customer Service).
  *
  * Extends the EXISTING `returns`/`return_items`/`return_events` schema from
- * Phase 1 (0009_returns.sql, extended by 0021_reviews_and_returns_workflow.sql)
+ * Phase 1 (0009_returns.sql, extended by 0024_reviews_and_returns_workflow.sql)
  * rather than inventing a parallel model. Eligibility is decided entirely
  * server-side by backend/lib/returns' evaluateReturnEligibility() — the
  * frontend never asserts eligibility, quantities, or amounts.

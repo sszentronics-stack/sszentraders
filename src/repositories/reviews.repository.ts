@@ -1,7 +1,7 @@
 /**
  * Reviews data access — Phase 14. Published reviews are read directly via
  * the anon-key browser client (RLS's `product_reviews_public_read` policy,
- * 0021_reviews_and_returns_workflow.sql, already restricts this to
+ * 0024_reviews_and_returns_workflow.sql, already restricts this to
  * `status = 'published'` regardless of what's requested here — same
  * "public RLS-safe read via a repository" pattern products.repository.ts
  * already establishes). Every write/self-read path goes through the
