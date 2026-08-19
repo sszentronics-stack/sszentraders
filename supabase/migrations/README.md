@@ -24,6 +24,7 @@ never edit an already-applied migration; add a new one instead.
 | `0014_row_level_security.sql` | Enables RLS + policies on every table above, `is_admin()` / `current_profile_id()` helpers. |
 | `0015_storage_buckets.sql` | `product-images`, `brand-assets`, `category-assets` buckets + storage policies. |
 | `0016_address_default_enforcement.sql` | Phase 2: trigger that atomically clears a customer's previous default shipping/billing address when a new one is promoted, so the "one default per customer" partial unique indexes never block a legitimate change. |
+| `0019_leopards_shipments.sql` | Phase 11: `shipment_status` enum gains `pending_booking`/`rto_initiated`/`rto_in_transit`/`rto_delivered`; `shipments` gains `purpose`, `return_id`, `request_payload`, `booking_error`, `booking_attempted_at`, `idempotency_key`, and duplicate-booking-prevention indexes. |
 
 `../seed.sql` holds minimal, clearly-marked, safe-to-rerun DEV-ONLY seed data
 (3 brands, 3 categories, 1 product/variant matching the current live
