@@ -1,19 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AdminCard, ErrorState, LoadingState, StatusPill, useConfirm } from '../../../components/admin/ui'
+import { AdminBreadcrumb, AdminCard, ErrorState, LoadingState, StatusPill, useConfirm } from '../../../components/admin/ui'
 import { useAdminToast } from '../../../context/admin/AdminToastContext'
 import {
   getAdminProduct, updateProduct, setProductStatus, addVariant, updateVariant, archiveVariant,
   requestImageUploadUrl, uploadProductImageFile, recordProductImage, setPrimaryProductImage, removeProductImage,
 } from '../../../repositories/admin/products.admin.repository'
 import { formatMoney, toMinorUnits } from '../../../../backend/lib/money/index'
-
-function imageSrc(path) {
-  // Storage bucket is private (signed upload only); the admin gallery
-  // shows the storage path as a caption rather than attempting to render
-  // an unsigned public URL that would 404 without a live project.
-  return path
-}
+import { getPublicImageUrl } from '../../../lib/supabase/storage'
 
 export default function ProductDetail() {
   const { id } = useParams()
@@ -163,6 +157,7 @@ export default function ProductDetail() {
   return (
     <div className="admin-page">
       {dialog}
+      <AdminBreadcrumb to="/admin/products" label="Products" />
       <header className="admin-page-header">
         <h1>{p.name}</h1>
         <div className="admin-header-actions">
@@ -219,7 +214,12 @@ export default function ProductDetail() {
         <div className="admin-image-gallery">
           {(p.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order).map((img) => (
             <div key={img.id} className={`admin-image-tile ${img.is_primary ? 'is-primary' : ''}`}>
-              <div className="admin-image-tile-path" title={img.storage_path}>{imageSrc(img.storage_path)}</div>
+              <img
+                className="admin-image-tile-thumb"
+                src={getPublicImageUrl('product-images', img.storage_path)}
+                alt={img.alt_text ?? ''}
+                title={img.storage_path}
+              />
               <div className="admin-image-tile-actions">
                 {!img.is_primary && <button type="button" className="admin-link-btn" onClick={() => handleSetPrimary(img.id)}>Set primary</button>}
                 {img.is_primary && <span className="admin-pill admin-pill-good">Primary</span>}

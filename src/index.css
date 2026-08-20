@@ -1453,6 +1453,23 @@ img {
   border-top: 1px solid #f1ddd7;
 }
 
+.admin-breadcrumb {
+  margin-bottom: 12px;
+}
+
+.admin-breadcrumb-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #7a5b53;
+  text-decoration: none;
+}
+
+.admin-breadcrumb-back:hover {
+  color: #c98a7d;
+}
+
 .admin-image-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -1476,6 +1493,16 @@ img {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #7a5b53;
+  margin-bottom: 8px;
+}
+
+.admin-image-tile-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #faf5f3;
+  border-radius: 4px;
   margin-bottom: 8px;
 }
 

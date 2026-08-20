@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AdminCard, ErrorState, LoadingState, StatusPill } from '../../../components/admin/ui'
+import { AdminBreadcrumb, AdminCard, ErrorState, LoadingState, StatusPill } from '../../../components/admin/ui'
 import { getAdminCustomerDetail } from '../../../repositories/admin/customers.admin.repository'
 import { formatMoney } from '../../../../backend/lib/money/index'
 
@@ -25,6 +25,7 @@ export default function CustomerDetail() {
 
   return (
     <div className="admin-page">
+      <AdminBreadcrumb to="/admin/customers" label="Customers" />
       <header className="admin-page-header">
         <h1>{[c.firstName, c.lastName].filter(Boolean).join(' ') || c.customerNumber}</h1>
         <StatusPill status={c.status} />

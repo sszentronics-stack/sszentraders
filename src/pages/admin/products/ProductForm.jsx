@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AdminCard } from '../../../components/admin/ui'
+import { AdminBreadcrumb, AdminCard } from '../../../components/admin/ui'
 import { useAdminToast } from '../../../context/admin/AdminToastContext'
 import { createProduct } from '../../../repositories/admin/products.admin.repository'
 import { listAllBrands } from '../../../repositories/admin/catalog.admin.repository'
@@ -69,6 +69,7 @@ export default function ProductForm() {
 
   return (
     <div className="admin-page">
+      <AdminBreadcrumb to="/admin/products" label="Products" />
       <header className="admin-page-header">
         <h1>New product</h1>
       </header>

@@ -172,6 +172,15 @@ export default function Header({ onSearch }) {
                 {item.label}
               </Link>
             ))}
+            {configured && (
+              <Link
+                to={isAuthenticated ? '/account' : '/login'}
+                onClick={() => setMenuOpen(false)}
+                className="nav-link text-base"
+              >
+                {isAuthenticated ? 'My Account' : 'Sign In'}
+              </Link>
+            )}
           </div>
         </div>
       )}

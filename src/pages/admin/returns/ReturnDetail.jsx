@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AdminCard, ErrorState, LoadingState, StatusPill, useConfirm } from '../../../components/admin/ui'
+import { AdminBreadcrumb, AdminCard, ErrorState, LoadingState, StatusPill, useConfirm } from '../../../components/admin/ui'
 import { useAdminToast } from '../../../context/admin/AdminToastContext'
 import {
   getReturnDetail, moveReturnUnderReview, approveReturn, rejectReturn, markReturnReceived, recordInspectionOutcome, closeReturn,
@@ -76,6 +76,7 @@ export default function ReturnDetail() {
   return (
     <div className="admin-page">
       {dialog}
+      <AdminBreadcrumb to="/admin/returns" label="Returns" />
       <header className="admin-page-header">
         <h1>Return {r.returnNumber}</h1>
         <StatusPill status={r.status} />

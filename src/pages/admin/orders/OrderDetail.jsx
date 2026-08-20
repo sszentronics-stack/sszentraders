@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AdminCard, ErrorState, LoadingState, StatusPill, useConfirm } from '../../../components/admin/ui'
+import { AdminBreadcrumb, AdminCard, ErrorState, LoadingState, StatusPill, useConfirm } from '../../../components/admin/ui'
 import { useAdminToast } from '../../../context/admin/AdminToastContext'
 import { getOrder, cancelOrder } from '../../../repositories/orders.repository'
 import { getOrderTrackingTimeline } from '../../../repositories/admin/shipments.admin.repository'
@@ -52,6 +52,7 @@ export default function OrderDetail() {
   return (
     <div className="admin-page">
       {dialog}
+      <AdminBreadcrumb to="/admin/orders" label="Orders" />
       <header className="admin-page-header">
         <h1>Order {o.orderNumber}</h1>
         <div className="admin-header-actions">

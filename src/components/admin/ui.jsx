@@ -5,6 +5,24 @@
  * used together; split out if any grows past a screen.
  */
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { ChevronLeft } from 'lucide-react'
+
+/**
+ * Back-link above a detail page's title, e.g. `<AdminBreadcrumb to="/admin/products" label="Products" />`
+ * renders "← Products" so a nested detail view (product, order, customer,
+ * return) never strands the admin with no way back except the sidebar.
+ */
+export function AdminBreadcrumb({ to, label }) {
+  return (
+    <nav className="admin-breadcrumb" aria-label="Breadcrumb">
+      <Link to={to} className="admin-breadcrumb-back">
+        <ChevronLeft size={16} />
+        {label}
+      </Link>
+    </nav>
+  )
+}
 
 export function AdminCard({ title, action, children, className = '' }) {
   return (
