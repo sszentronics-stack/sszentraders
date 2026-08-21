@@ -115,14 +115,26 @@ export default function ProductDetail() {
   }
 
   async function handleUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
     setUploading(true)
     try {
-      const { path, token } = await requestImageUploadUrl(id, { fileName: file.name, mimeType: file.type, sizeBytes: file.size })
-      await uploadProductImageFile(path, token, file)
-      await recordProductImage(id, { storagePath: path, sortOrder: p.product_images?.length ?? 0, isPrimary: (p.product_images ?? []).length === 0 })
-      toast.success('Image uploaded.')
+      let sortBase = p.product_images?.length ?? 0
+      for (let i = 0; i < files.length; i += 1) {
+        const file = files[i]
+        const { path, token } = await requestImageUploadUrl(id, {
+          fileName: file.name,
+          mimeType: file.type,
+          sizeBytes: file.size,
+        })
+        await uploadProductImageFile(path, token, file)
+        await recordProductImage(id, {
+          storagePath: path,
+          sortOrder: sortBase + i,
+          isPrimary: sortBase === 0 && i === 0,
+        })
+      }
+      toast.success(files.length === 1 ? 'Image uploaded.' : `${files.length} images uploaded.`)
       await reload()
     } catch (err) {
       toast.error(err?.message ?? 'Failed to upload image.')
@@ -229,8 +241,15 @@ export default function ProductDetail() {
           ))}
         </div>
         <label className="admin-btn admin-btn-ghost admin-upload-btn">
-          {uploading ? 'Uploading…' : 'Upload image'}
-          <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} hidden />
+          {uploading ? 'Uploading…' : 'Upload images'}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleUpload}
+            disabled={uploading}
+            hidden
+          />
         </label>
       </AdminCard>
     </div>

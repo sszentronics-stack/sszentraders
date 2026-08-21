@@ -15,6 +15,27 @@ const ORGANIZATION_JSON_LD = {
   sameAs: [],
 }
 
+const FEATURED_TRIO = [
+  {
+    label: 'SADOER Collagen',
+    to: '/products/sadoer-collagen-anti-aging-facial-mask',
+    image: '/products/sadoer-collagen/1.png',
+    caption: 'Anti-aging sheet mask',
+  },
+  {
+    label: 'SOME BY MI',
+    to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner',
+    image: '/products/some-by-mi/1.jpg',
+    caption: '30 Days Miracle Toner',
+  },
+  {
+    label: 'Mighty Patch',
+    to: '/products/hero-mighty-patch-invisible-plus',
+    image: '/products/mighty-patch/1.jpg',
+    caption: 'Invisible+ daytime patches',
+  },
+]
+
 const CATEGORIES = [
   { label: 'Acne Care', to: '/shop?category=Acne+Care', image: '/products/mighty-patch/1.jpg' },
   { label: 'Toners', to: '/shop?category=Toners', image: '/products/some-by-mi/1.jpg' },
@@ -37,6 +58,24 @@ export default function Home() {
     <>
       <HeroSlider />
 
+      <section className="home-trio" aria-label="Featured products">
+        <div className="container-aura">
+          <div className="home-trio-grid">
+            {FEATURED_TRIO.map((item) => (
+              <Link key={item.label} to={item.to} className="home-trio-card">
+                <div className="home-trio-media">
+                  <img src={item.image} alt="" />
+                </div>
+                <div className="home-trio-copy">
+                  <h2>{item.label}</h2>
+                  <p>{item.caption}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="container-aura py-12 md:py-16">
         <div className="flex items-end justify-between gap-4 mb-8">
           <div className="section-tabs">
@@ -54,8 +93,8 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 max-w-[900px] gap-x-6 gap-y-10" aria-busy="true" aria-label="Loading products">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="home-product-grid" aria-busy="true" aria-label="Loading products">
+            {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="aspect-square bg-meta" />
                 <div className="mt-3 h-4 bg-meta w-3/4" />
@@ -68,7 +107,7 @@ export default function Home() {
             {error ? 'We could not load products right now. Please try again shortly.' : 'No products to show yet.'}
           </p>
         ) : (
-          <div className="grid grid-cols-2 max-w-[900px] gap-x-6 gap-y-10">
+          <div className="home-product-grid">
             {list.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

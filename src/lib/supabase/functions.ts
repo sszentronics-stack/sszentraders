@@ -53,10 +53,17 @@ export async function callEdgeFunction<T>(
         const body = (await context.clone().json()) as ErrorEnvelope
         unwrappedMessage = body?.error?.message
       } catch {
-        // response body wasn't our JSON envelope — fall back to the generic message below
+        // response body wasn't our JSON envelope — fall back below
       }
     }
-    throw new Error(unwrappedMessage ?? error.message ?? 'Request failed.')
+    const raw = unwrappedMessage ?? error.message ?? 'Request failed.'
+    if (/failed to send a request to the edge function/i.test(raw)) {
+      throw new Error(
+        `Edge Function "${name.split('/')[0]}" is not deployed yet. ` +
+          `Deploy with: npx supabase functions deploy (see package.json script db:deploy-functions).`,
+      )
+    }
+    throw new Error(raw)
   }
 
   return isSuccessEnvelope<T>(data) ? data.data : (data as T)
