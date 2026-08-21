@@ -1,18 +1,18 @@
 -- Fix login for sszentronics@gmail.com
--- Password will be set to: 12345678
+-- Password will be set to: CHANGE_ME_ADMIN_PASSWORD
 -- Run in SQL Editor:
 -- https://supabase.com/dashboard/project/jooukhdxxllutkdqznqt/sql/new
 --
 -- IMPORTANT: This only works if the Auth user already exists.
 -- If the SELECT at the bottom returns 0 rows, create the user first:
--- Authentication → Users → Add user → email + password 12345678 → Auto Confirm ON
+-- Authentication → Users → Add user → email + password CHANGE_ME_ADMIN_PASSWORD → Auto Confirm ON
 
 create extension if not exists pgcrypto with schema extensions;
 
 -- 1) Confirm email + set password (bcrypt)
 update auth.users
 set
-  encrypted_password = extensions.crypt('12345678', extensions.gen_salt('bf')),
+  encrypted_password = extensions.crypt('CHANGE_ME_ADMIN_PASSWORD', extensions.gen_salt('bf')),
   email_confirmed_at = coalesce(email_confirmed_at, timezone('utc', now())),
   confirmation_token = '',
   recovery_token = '',
