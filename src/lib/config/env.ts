@@ -49,16 +49,24 @@ let cachedSupabaseConfig: SupabaseClientConfig | null = null
 /** Throws MissingEnvVarError with a helpful message if Supabase env vars are absent. */
 export function getSupabaseConfig(): SupabaseClientConfig {
   if (cachedSupabaseConfig) return cachedSupabaseConfig
+  // Supabase's new Connect UI labels this "publishable"; this app historically
+  // uses VITE_SUPABASE_ANON_KEY. Accept either so either dashboard copy works.
+  const anonKey =
+    readOptional('VITE_SUPABASE_ANON_KEY') ?? readOptional('VITE_SUPABASE_PUBLISHABLE_KEY')
+  if (!anonKey) throw new MissingEnvVarError('VITE_SUPABASE_ANON_KEY')
   cachedSupabaseConfig = {
     url: readRequired('VITE_SUPABASE_URL'),
-    anonKey: readRequired('VITE_SUPABASE_ANON_KEY'),
+    anonKey,
   }
   return cachedSupabaseConfig
 }
 
 /** Non-throwing check for feature-flag-style guards (see src/lib/supabase/client.ts). */
 export function hasSupabaseConfig(): boolean {
-  return Boolean(readOptional('VITE_SUPABASE_URL') && readOptional('VITE_SUPABASE_ANON_KEY'))
+  return Boolean(
+    readOptional('VITE_SUPABASE_URL') &&
+      (readOptional('VITE_SUPABASE_ANON_KEY') || readOptional('VITE_SUPABASE_PUBLISHABLE_KEY')),
+  )
 }
 
 export function getAppConfig() {

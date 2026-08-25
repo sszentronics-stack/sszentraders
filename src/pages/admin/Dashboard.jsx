@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AdminCard, StatBox, LoadingState } from '../../components/admin/ui'
+import { AreaTrendChart, DonutChart, HorizontalBars, VerticalBarChart, QUEUE_COLORS, DASHBOARD_COLORS } from '../../components/admin/AdminCharts'
 import { formatMoney } from '../../../backend/lib/money/index'
+import { isSupabaseConfigured } from '../../lib/supabase/client'
+import {
+  mockDashboardLoaders,
+} from '../../mocks/adminDashboard.mock'
 import { getTodayOrderStats, countPendingOrders } from '../../repositories/admin/orders.admin.repository'
 import { countPaymentsNeedingAttention } from '../../repositories/admin/payments.admin.repository'
 import { listShipmentsForReconciliation } from '../../repositories/admin/shipments.admin.repository'
@@ -11,9 +16,8 @@ import { listUnmappedVariants } from '../../repositories/admin/inventory.admin.r
 
 /**
  * Ops home: queues + key commerce metrics. Every card loads independently
- * (Promise.allSettled) so one failing/unreachable dependency (e.g. no live
- * Supabase project in this environment) never blanks the whole page —
- * each card shows its own empty/error state instead.
+ * so one failing dependency never blanks the whole page. When Supabase is
+ * not configured, static mock loaders power a UI-only preview.
  */
 function useCard(loader) {
   const [state, setState] = useState({ status: 'loading', data: null, error: null })
@@ -36,21 +40,106 @@ function Cell({ state, render }) {
   return render(state.data)
 }
 
+function isEdgeMissingError(err) {
+  const msg = String(err?.message ?? err ?? '')
+  return /not deployed|failed to send a request to the edge function|edge function/i.test(msg)
+}
+
+/** Prefer live data; if Edge Functions aren't deployed yet, use mocks so the UI stays usable. */
+function withMockFallback(liveLoader, mockLoader) {
+  return async () => {
+    try {
+      return await liveLoader()
+    } catch (err) {
+      if (isEdgeMissingError(err)) return mockLoader()
+      throw err
+    }
+  }
+}
+
+function getLoaders() {
+  const mocks = mockDashboardLoaders()
+  if (!isSupabaseConfigured()) return mocks
+
+  return {
+    getTodayOrderStats: withMockFallback(getTodayOrderStats, mocks.getTodayOrderStats),
+    countPendingOrders: withMockFallback(countPendingOrders, mocks.countPendingOrders),
+    countPaymentsNeedingAttention: withMockFallback(
+      countPaymentsNeedingAttention,
+      mocks.countPaymentsNeedingAttention,
+    ),
+    listShipmentsForReconciliation: withMockFallback(
+      () => listShipmentsForReconciliation({ onlyBookingErrors: true, limit: 50 }),
+      mocks.listShipmentsForReconciliation,
+    ),
+    listReturnsForAdmin: withMockFallback(
+      () => listReturnsForAdmin({ status: 'requested', limit: 50 }),
+      mocks.listReturnsForAdmin,
+    ),
+    listUnsyncedFinancialEvents: withMockFallback(
+      () => listUnsyncedFinancialEvents(200),
+      mocks.listUnsyncedFinancialEvents,
+    ),
+    getErpHealth: withMockFallback(getErpHealth, mocks.getErpHealth),
+    listUnmappedVariants: withMockFallback(listUnmappedVariants, mocks.listUnmappedVariants),
+    getOrdersTrend: mocks.getOrdersTrend,
+    getRevenueBars: mocks.getRevenueBars,
+    getOrdersYearly: mocks.getOrdersYearly,
+    getRevenueYearly: mocks.getRevenueYearly,
+  }
+}
+
 export default function Dashboard() {
-  const today = useCard(getTodayOrderStats)
-  const pendingOrders = useCard(countPendingOrders)
-  const payments = useCard(countPaymentsNeedingAttention)
-  const shipments = useCard(() => listShipmentsForReconciliation({ onlyBookingErrors: true, limit: 50 }))
-  const returnsQueue = useCard(() => listReturnsForAdmin({ status: 'requested', limit: 50 }))
-  const erpUnsynced = useCard(() => listUnsyncedFinancialEvents(200))
-  const erpHealth = useCard(getErpHealth)
-  const inventory = useCard(listUnmappedVariants)
+  const loaders = getLoaders()
+  const today = useCard(loaders.getTodayOrderStats)
+  const pendingOrders = useCard(loaders.countPendingOrders)
+  const payments = useCard(loaders.countPaymentsNeedingAttention)
+  const shipments = useCard(loaders.listShipmentsForReconciliation)
+  const returnsQueue = useCard(loaders.listReturnsForAdmin)
+  const erpUnsynced = useCard(loaders.listUnsyncedFinancialEvents)
+  const erpHealth = useCard(loaders.getErpHealth)
+  const inventory = useCard(loaders.listUnmappedVariants)
+  const trend = useCard(loaders.getOrdersTrend)
+  const revenueBars = useCard(loaders.getRevenueBars)
+  const yearlyOrders = useCard(loaders.getOrdersYearly)
+  const yearlyRevenue = useCard(loaders.getRevenueYearly)
+
+  const queueReady =
+    pendingOrders.status === 'ok' &&
+    payments.status === 'ok' &&
+    shipments.status === 'ok' &&
+    returnsQueue.status === 'ok' &&
+    erpUnsynced.status === 'ok'
+
+  const queueCounts = useMemo(() => {
+    if (!queueReady) return null
+    const erpFailed = erpUnsynced.data.events.filter((e) => e.syncJob?.status === 'failed').length
+    return {
+      pending: pendingOrders.data,
+      payments: payments.data,
+      shipments: shipments.data.length,
+      returnsCount: returnsQueue.data.length,
+      erpFailed,
+    }
+  }, [queueReady, pendingOrders.data, payments.data, shipments.data, returnsQueue.data, erpUnsynced.data])
+
+  const donutSegments = queueCounts
+    ? [
+        { label: 'Orders', value: queueCounts.pending, color: QUEUE_COLORS.orders },
+        { label: 'Payments', value: queueCounts.payments, color: QUEUE_COLORS.payments },
+        { label: 'Shipments', value: queueCounts.shipments, color: QUEUE_COLORS.shipments },
+        { label: 'Returns', value: queueCounts.returnsCount, color: QUEUE_COLORS.returns },
+        { label: 'ERP', value: queueCounts.erpFailed, color: QUEUE_COLORS.erp },
+      ].filter((s) => s.value > 0)
+    : []
 
   return (
     <div className="admin-page">
       <header className="admin-page-header">
-        <h1>Dashboard</h1>
-        <p>Today, at a glance.</p>
+        <div>
+          <h1>Dashboard</h1>
+          <p>Today’s ops snapshot for Aura Beauty Care.</p>
+        </div>
       </header>
 
       <div className="admin-stat-grid">
@@ -59,8 +148,51 @@ export default function Dashboard() {
         <Cell state={pendingOrders} render={(d) => <StatBox label="Pending confirmation" value={d} tone={d > 0 ? 'warn' : 'default'} />} />
         <Cell
           state={erpHealth}
-          render={(d) => <StatBox label="ERP" value={d.configured ? 'Connected' : 'Not configured'} tone={d.configured ? 'good' : 'warn'} hint={`${d.pendingSyncCount} pending sync`} />}
+          render={(d) => (
+            <StatBox
+              label="ERP"
+              value={d.configured ? 'Connected' : 'Not configured'}
+              tone={d.configured ? 'good' : 'warn'}
+              hint={`${d.pendingSyncCount} pending sync`}
+            />
+          )}
         />
+      </div>
+
+      <div className="admin-charts-grid">
+        <AdminCard title="Orders this week">
+          <Cell state={trend} render={(points) => <AreaTrendChart points={points} color={DASHBOARD_COLORS.rose} />} />
+        </AdminCard>
+        <AdminCard title="Attention mix">
+          {queueCounts ? (
+            donutSegments.length ? (
+              <DonutChart segments={donutSegments} />
+            ) : (
+              <p className="admin-muted">Nothing in the queues right now.</p>
+            )
+          ) : (
+            <LoadingState />
+          )}
+        </AdminCard>
+      </div>
+
+      <AdminCard title="Orders this year">
+        <Cell
+          state={yearlyOrders}
+          render={(points) => <AreaTrendChart points={points} height={210} color={DASHBOARD_COLORS.roseDeep} />}
+        />
+      </AdminCard>
+
+      <div className="admin-charts-grid">
+        <AdminCard title="Revenue this week">
+          <Cell state={revenueBars} render={(rows) => <HorizontalBars rows={rows} />} />
+        </AdminCard>
+        <AdminCard title="Revenue this year">
+          <Cell
+            state={yearlyRevenue}
+            render={(points) => <VerticalBarChart points={points} color={DASHBOARD_COLORS.rose} />}
+          />
+        </AdminCard>
       </div>
 
       <div className="admin-grid-2">

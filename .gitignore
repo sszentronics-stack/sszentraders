@@ -34,3 +34,7 @@ supabase/.temp
 coverage
 *.tsbuildinfo
 .claude/worktrees/
+
+# Private portable secrets guide
+SECRETS-AND-HOW-TO-RUN.txt
+

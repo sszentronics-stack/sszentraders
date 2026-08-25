@@ -2,8 +2,12 @@
  * Shared Zod validation schemas, used at every mutation boundary
  * (Edge Function request bodies) and reusable by frontend forms later.
  * Single authoritative source — do not re-derive these shapes elsewhere.
+ *
+ * Use npm: specifier so Supabase Edge deploy bundling resolves zod without
+ * relying on deno.json import-map discovery (CLI remote bundle quirk).
+ * Vite aliases `npm:zod@4.4.3` → `zod` in vite.config.js for the storefront.
  */
-import { z } from 'zod'
+import { z } from 'npm:zod@4.4.3'
 import { ValidationError } from '../errors/index.ts'
 
 export const uuidSchema = z.string().uuid()

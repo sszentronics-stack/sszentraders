@@ -88,9 +88,15 @@ const ADDRESS_COLUMNS =
 
 export async function getMyProfile(): Promise<Profile | null> {
   const client = getSupabaseBrowserClient()
-  const {
-    data: { user },
-  } = await client.auth.getUser()
+  let user = null
+  const { data: userData, error: userError } = await client.auth.getUser()
+  if (!userError && userData?.user) {
+    user = userData.user
+  } else {
+    // getUser() can fail with some key setups; session is enough for RLS.
+    const { data: sessionData } = await client.auth.getSession()
+    user = sessionData.session?.user ?? null
+  }
   if (!user) return null
 
   const { data, error } = await client

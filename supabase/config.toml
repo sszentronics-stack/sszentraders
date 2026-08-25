@@ -1,0 +1,76 @@
+# Aura Beauty Care — Supabase local/remote config
+# https://supabase.com/docs/guides/cli/config
+
+project_id = "jooukhdxxllutkdqznqt"
+
+[api]
+enabled = true
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+
+# Shared import map so bare "zod" resolves during remote deploy bundling.
+# Publishable API keys are not JWTs — gateway JWT verify must be off;
+# Auth is enforced inside each function instead.
+[functions.auth]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.products]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.catalog]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.cart]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.orders]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.payments]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.shipments]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.returns]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.reviews]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.inventory]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.accounting]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.promotions]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.integrations-ledgix]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.integrations-easypaisa]
+verify_jwt = false
+import_map = "./functions/import_map.json"
+
+[functions.integrations-leopards]
+verify_jwt = false
+import_map = "./functions/import_map.json"
