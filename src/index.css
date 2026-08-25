@@ -1292,6 +1292,40 @@ img {
   gap: 10px;
 }
 
+.toast-stack {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+}
+
+.toast-success {
+  background: var(--color-ink);
+}
+
+.toast-error {
+  background: var(--color-sale);
+}
+
+.toast-info {
+  background: var(--color-ink-soft);
+}
+
 .admin-toast-stack {
   position: fixed;
   bottom: 20px;

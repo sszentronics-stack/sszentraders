@@ -7,6 +7,7 @@ import { useRecentlyViewed, useRecordRecentlyViewed } from '../hooks/useRecently
 import { useSeo, useJsonLd } from '../hooks/useSeo'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
+import { useToast } from '../context/ToastContext'
 import Disclaimer from '../components/Disclaimer'
 import ProductCard from '../components/ProductCard'
 import TrustBar from '../components/TrustBar'
@@ -18,6 +19,7 @@ export default function Product() {
   const { product, others, loading, notFound } = useProduct(slug)
   const { addItem } = useCart()
   const { isWishlisted, toggle: toggleWishlist } = useWishlist()
+  const toast = useToast()
   const [active, setActive] = useState(0)
   const [qty, setQty] = useState(1)
   const [open, setOpen] = useState('description')
@@ -258,7 +260,23 @@ export default function Product() {
           <button
             type="button"
             className="mt-4 text-sm flex items-center gap-2"
-            onClick={() => navigator.share?.({ title: product.name, url: window.location.href })}
+            onClick={async () => {
+              const shareData = { title: product.name, url: window.location.href }
+              if (navigator.share) {
+                try {
+                  await navigator.share(shareData)
+                } catch {
+                  // User cancelled the native share sheet — not an error.
+                }
+                return
+              }
+              try {
+                await navigator.clipboard.writeText(shareData.url)
+                toast.success('Link copied to clipboard')
+              } catch {
+                toast.error('Could not copy the link. Please copy it from the address bar.')
+              }
+            }}
           >
             <Share2 size={15} /> Share
           </button>

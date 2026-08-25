@@ -4,6 +4,7 @@ import { getPublicImageUrl } from '../lib/supabase/storage'
 import { toMajorUnits } from '../../backend/lib/money'
 import * as wishlistApi from '../repositories/wishlist.repository'
 import { useAuth } from './AuthContext'
+import { useToast } from './ToastContext'
 
 const WishlistContext = createContext(null)
 const STORAGE_KEY = 'aura-beauty-wishlist'
@@ -31,6 +32,7 @@ function mapItems(items) {
 export function WishlistProvider({ children }) {
   const configured = isSupabaseConfigured()
   const { session, ensureGuestSession } = useAuth()
+  const toast = useToast()
 
   const [productIds, setProductIds] = useState(() => {
     if (configured) return []
@@ -89,21 +91,26 @@ export function WishlistProvider({ children }) {
     async (product) => {
       const productId = product.id
       if (!configured) {
-        setProductIds((prev) => (prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]))
+        const wasWishlisted = productIds.includes(productId)
+        setProductIds((prev) => (wasWishlisted ? prev.filter((id) => id !== productId) : [...prev, productId]))
+        toast.success(wasWishlisted ? 'Removed from wishlist' : 'Added to wishlist')
         return
       }
       try {
         await ensureGuestSession()
         if (isWishlisted(productId)) {
           setItems(mapItems(await wishlistApi.removeFromWishlist(productId)))
+          toast.success('Removed from wishlist')
         } else {
           setItems(mapItems(await wishlistApi.addToWishlist(productId)))
+          toast.success('Added to wishlist')
         }
       } catch (err) {
         console.error('Failed to update wishlist.', err)
+        toast.error(err?.message ?? 'Could not update your wishlist. Please try again.')
       }
     },
-    [configured, ensureGuestSession, isWishlisted],
+    [configured, ensureGuestSession, isWishlisted, productIds, toast],
   )
 
   const value = useMemo(

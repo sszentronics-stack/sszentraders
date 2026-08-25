@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { CartProvider } from './context/CartContext'
 import { WishlistProvider } from './context/WishlistContext'
 import { AuthProvider } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import Home from './pages/Home'
@@ -82,6 +83,7 @@ function ScrollToTop() {
 
 export default function App() {
   return (
+    <ToastProvider>
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
@@ -186,5 +188,6 @@ export default function App() {
         </WishlistProvider>
       </CartProvider>
     </AuthProvider>
+    </ToastProvider>
   )
 }
