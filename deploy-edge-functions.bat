@@ -15,7 +15,7 @@ if errorlevel 1 (
 
 echo.
 echo Step 2: Link project...
-call npx.cmd supabase link --project-ref jooukhdxxllutkdqznqt
+call npx.cmd supabase link --project-ref kcwntiotjnunavektiwm
 if errorlevel 1 (
   echo Link failed.
   pause
@@ -33,5 +33,5 @@ if errorlevel 1 (
 
 echo.
 echo Done. Check:
-echo https://supabase.com/dashboard/project/jooukhdxxllutkdqznqt/functions
+echo https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/functions
 pause

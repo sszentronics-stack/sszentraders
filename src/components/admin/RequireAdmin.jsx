@@ -57,7 +57,15 @@ export default function RequireAdmin({ children }) {
   }, [configured, initializing, isAuthenticated, authProfile, session?.user?.id])
 
   if (!configured) {
-    return children
+    // Fail closed, not open: if Supabase env vars are ever missing/broken,
+    // /admin must not silently render unguarded (see git history — this
+    // briefly regressed to `return children` here, which would have made
+    // the entire admin console accessible with no gate at all).
+    return (
+      <div className="container-aura py-24 text-center">
+        <p className="text-ink-soft">The admin dashboard is not available yet.</p>
+      </div>
+    )
   }
 
   if (initializing) {

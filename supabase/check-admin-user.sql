@@ -1,6 +1,6 @@
 -- Optional check only — does NOT set the password correctly for Supabase Auth.
 -- Use the Dashboard to set password (see instructions below).
--- https://supabase.com/dashboard/project/jooukhdxxllutkdqznqt/auth/users
+-- https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/auth/users
 
 -- Show whether the auth user + admin profile exist
 select

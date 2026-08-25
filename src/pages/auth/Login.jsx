@@ -28,18 +28,12 @@ export default function Login() {
     try {
       await login({ email: email.trim(), password })
       navigate(redirectTo, { replace: true })
-      } catch (err) {
+    } catch (err) {
       const msg = String(err?.message ?? '')
       if (/email not confirmed/i.test(msg)) {
-        setError(
-          'Email not confirmed. In Supabase → Authentication → Users, open your user and confirm the email (or recreate with Auto Confirm ON).',
-        )
+        setError('Please confirm your email before signing in. Check your inbox for the verification link.')
       } else if (/invalid login credentials|invalid_credentials/i.test(msg)) {
-        setError(
-          'Incorrect email or password. In Supabase → Authentication → Users: delete this user if it exists, then Add user with Auto Confirm ON and password 12345678.',
-        )
-      } else if (msg) {
-        setError(msg)
+        setError('Incorrect email or password. Please try again.')
       } else {
         setError('Incorrect email or password. Please try again.')
       }

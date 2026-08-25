@@ -3,7 +3,7 @@
 -- Source: supabase/migrations/*.sql (25 files)
 --
 -- HOW TO APPLY
--- 1. Open https://supabase.com/dashboard/project/jooukhdxxllutkdqznqt/sql/new
+-- 1. Open https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
 -- 2. Paste this entire file into the SQL Editor
 -- 3. Click Run
 --
