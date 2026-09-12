@@ -20,7 +20,7 @@ export default function Shop() {
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   useSeo({
-    title: 'Shop All Skincare | Aura Beauty Care',
+    title: 'Shop All Skincare | SS Zen Traders',
     description: 'Browse authentic Korean and US skincare — acne patches, toners, masks, and anti-aging essentials. Nationwide delivery in Pakistan.',
   })
 

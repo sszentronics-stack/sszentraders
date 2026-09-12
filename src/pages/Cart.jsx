@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from '../lib/supabase/client'
 import { useSeo } from '../hooks/useSeo'
 
 export default function Cart() {
-  useSeo({ title: 'Your Cart | Aura Beauty Care', noindex: true })
+  useSeo({ title: 'Your Cart | SS Zen Traders', noindex: true })
   const configured = isSupabaseConfigured()
   const navigate = useNavigate()
   const { items, total, updateQty, removeItem, clearCart, removedNotice, dismissRemovedNotice } = useCart()
@@ -82,7 +82,7 @@ export default function Cart() {
             </button>
             <a
               className="btn-outline block text-center mt-3"
-              href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi Aura Beauty Care! I have a question before placing my order.')}`}
+              href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi SS Zen Traders! I have a question before placing my order.')}`}
               target="_blank"
               rel="noreferrer"
             >

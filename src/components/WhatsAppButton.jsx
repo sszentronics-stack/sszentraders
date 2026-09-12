@@ -4,7 +4,7 @@ export default function WhatsAppButton() {
   return (
     <a
       className="wa-float"
-      href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi Aura Beauty Care! I have a question about your products.')}`}
+      href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi SS Zen Traders! I have a question about your products.')}`}
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"

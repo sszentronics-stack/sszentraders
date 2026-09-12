@@ -77,7 +77,7 @@ export default function AdminLayout() {
   const { pathname } = useLocation()
   const [openSections, setOpenSections] = useState(() => new Set([activeSectionId(pathname)]))
 
-  useSeo({ title: 'Admin | Aura Beauty Care', noindex: true })
+  useSeo({ title: 'Admin | SS Zen Traders', noindex: true })
 
   useEffect(() => {
     const current = activeSectionId(pathname)
@@ -103,7 +103,7 @@ export default function AdminLayout() {
       <div className="admin-shell">
         <aside className="admin-sidebar">
           <Link to="/admin" className="admin-brand">
-            Aura <span>Ops</span>
+            SS Zen <span>Ops</span>
           </Link>
           {!configured ? (
             <p className="admin-sidebar-email" style={{ margin: '0 0 0.75rem', opacity: 0.75 }}>

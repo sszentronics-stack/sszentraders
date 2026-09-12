@@ -93,7 +93,7 @@ export default function RequireAdmin({ children }) {
     return (
       <div className="container-aura py-24 text-center">
         <h1 className="text-2xl font-medium font-display mb-3">Restricted</h1>
-        <p className="text-ink-soft mb-4">This area is limited to Aura staff accounts.</p>
+        <p className="text-ink-soft mb-4">This area is limited to SS Zen Traders staff accounts.</p>
         <p className="text-ink-soft text-sm">
           Signed in as {session?.user?.email}. Run <code>supabase/ensure-admin.sql</code> in the SQL Editor, then refresh.
         </p>

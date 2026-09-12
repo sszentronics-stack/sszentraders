@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="md:col-span-1">
           <Logo variant="light" />
           <p className="mt-4 text-sm text-white/80 leading-relaxed">
-            Aura Beauty Care brings authentic skincare to Pakistan. Shop SADOER Collagen Mask, Hero
+            SS Zen Traders brings authentic skincare to Pakistan. Shop SADOER Collagen Mask, Hero
             Mighty Patch, and SOME BY MI 30 Days Miracle Toner — genuine products, WhatsApp ordering,
             cash on delivery. We deliver across Islamabad and Rawalpindi.
           </p>
@@ -80,7 +80,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-white/20">
         <div className="container-aura py-4 text-xs text-white/75 flex flex-col sm:flex-row gap-2 justify-between">
-          <span>Copyright © {new Date().getFullYear()}, Aura Beauty Care. All rights reserved.</span>
+          <span>Copyright © {new Date().getFullYear()}, SS Zen Traders. All rights reserved.</span>
           <span>See our terms of use and privacy notice.</span>
         </div>
       </div>

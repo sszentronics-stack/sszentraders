@@ -26,7 +26,7 @@ const EMPTY_ADDRESS = {
 }
 
 export default function Checkout() {
-  useSeo({ title: 'Checkout | Aura Beauty Care', noindex: true })
+  useSeo({ title: 'Checkout | SS Zen Traders', noindex: true })
   const navigate = useNavigate()
   const { isAuthenticated, user, ensureGuestSession } = useAuth()
   const { items, total, loading: cartLoading, clearCart } = useCart()

@@ -10,7 +10,7 @@ import { useSeo } from '../hooks/useSeo'
  * catch-all route now points here instead of redirecting.
  */
 export default function NotFound() {
-  useSeo({ title: 'Page Not Found | Aura Beauty Care', noindex: true })
+  useSeo({ title: 'Page Not Found | SS Zen Traders', noindex: true })
 
   return (
     <div className="container-aura py-20 text-center">

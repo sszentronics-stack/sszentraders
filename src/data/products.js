@@ -15,7 +15,7 @@ export const WHATSAPP_NUMBER = '923079594474'
 export const WHATSAPP_DISPLAY = '+92 307 9594474'
 export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`
 
-export const PRODUCT_DISCLAIMER = `While we work to ensure that product information is correct, on occasion manufacturers may alter their ingredient lists. Actual product packaging and materials may contain more and/or different information than that shown on our Web site. We recommend that you do not solely rely on the information presented and that you always read labels, warnings, and directions before using or consuming a product. For additional information about a product, please contact the manufacturer. Content on this site is for reference purposes and is not intended to substitute for advice given by a physician, pharmacist, or other licensed health-care professional. You should not use this information as self-diagnosis or for treating a health problem or disease. Contact your health-care provider immediately if you suspect that you have a medical problem. Information and statements regarding dietary supplements have not been evaluated by the Food and Drug Administration and are not intended to diagnose, treat, cure, or prevent any disease or health condition. Aura Beauty Care assumes no liability for inaccuracies or misstatements about products.`
+export const PRODUCT_DISCLAIMER = `While we work to ensure that product information is correct, on occasion manufacturers may alter their ingredient lists. Actual product packaging and materials may contain more and/or different information than that shown on our Web site. We recommend that you do not solely rely on the information presented and that you always read labels, warnings, and directions before using or consuming a product. For additional information about a product, please contact the manufacturer. Content on this site is for reference purposes and is not intended to substitute for advice given by a physician, pharmacist, or other licensed health-care professional. You should not use this information as self-diagnosis or for treating a health problem or disease. Contact your health-care provider immediately if you suspect that you have a medical problem. Information and statements regarding dietary supplements have not been evaluated by the Food and Drug Administration and are not intended to diagnose, treat, cure, or prevent any disease or health condition. SS Zen Traders assumes no liability for inaccuracies or misstatements about products.`
 
 export const products = [
   {
@@ -106,7 +106,7 @@ Part of the SADOER Collagen Firming Series. Each 25g sachet is packed with hydro
       'Barely-there for daytime use',
       '39 patches: 15 small + 24 medium',
     ],
-    description: `The original award-winning hydrocolloid pimple patch — now in a barely-there Invisible+ formula made for daytime. Mighty Patch Invisible+ from Hero Cosmetics is Aura Beauty Care’s number one product: a thin, discreet sticker that flattens blemishes without popping.
+    description: `The original award-winning hydrocolloid pimple patch — now in a barely-there Invisible+ formula made for daytime. Mighty Patch Invisible+ from Hero Cosmetics is SS Zen Traders’s number one product: a thin, discreet sticker that flattens blemishes without popping.
 
 Each pack includes 39 hydrocolloid patches in two sizes so you can cover different spots. Stick it on clean, dry skin, go about your day, and let the patch absorb fluid while it shields the blemish from dirt and bacteria.`,
     benefits: [
@@ -211,7 +211,7 @@ export function buildWhatsAppOrder(items, customer = {}) {
   )
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0)
   const header = [
-    'Hello Aura Beauty Care, I would like to place an order:',
+    'Hello SS Zen Traders, I would like to place an order:',
     '',
     ...lines,
     '',

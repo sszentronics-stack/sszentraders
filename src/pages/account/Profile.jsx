@@ -113,7 +113,7 @@ export default function Profile() {
             checked={form.marketingOptIn}
             onChange={(e) => setField('marketingOptIn')(e.target.checked)}
           />
-          <span>Send me offers and updates from Aura Beauty Care.</span>
+          <span>Send me offers and updates from SS Zen Traders.</span>
         </label>
 
         <button type="submit" className="btn-lavender" style={{ width: 'auto' }} disabled={status === 'saving'}>

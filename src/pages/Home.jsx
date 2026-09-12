@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const ORGANIZATION_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Aura Beauty Care',
+  name: 'SS Zen Traders',
   url: typeof window !== 'undefined' ? window.location.origin : undefined,
   description: 'Authentic Korean and US skincare in Pakistan — Hero Mighty Patch, SOME BY MI, and more.',
   sameAs: [],
@@ -49,7 +49,7 @@ export default function Home() {
   const list = tab === 'best' ? [...products].sort((a, b) => Number(b.featured) - Number(a.featured)) : products
 
   useSeo({
-    title: 'Aura Beauty Care | Authentic Skincare in Pakistan',
+    title: 'SS Zen Traders | Authentic Skincare in Pakistan',
     description: 'Authentic Korean and US skincare in Pakistan. Shop Hero Mighty Patch and SOME BY MI. Order on WhatsApp, cash on delivery, nationwide shipping.',
   })
   useJsonLd(ORGANIZATION_JSON_LD)
@@ -137,12 +137,12 @@ export default function Home() {
 
       <section className="container-aura py-14 md:py-20 grid md:grid-cols-2 gap-10 items-center">
         <div>
-          <p className="label-wide text-ink-soft mb-3">Why Aura Beauty Care</p>
+          <p className="label-wide text-ink-soft mb-3">Why SS Zen Traders</p>
           <h2 className="text-3xl md:text-4xl font-medium leading-tight">
             Authentic skincare, delivered across Islamabad and Rawalpindi
           </h2>
           <p className="mt-4 text-ink-soft leading-relaxed">
-            We started Aura Beauty Care so you can shop genuine SADOER collagen masks, Hero Cosmetics
+            We started SS Zen Traders so you can shop genuine SADOER collagen masks, Hero Cosmetics
             Mighty Patch, and SOME BY MI without guessing what is real. Every order is confirmed on
             WhatsApp. Cash on delivery is available, and we deliver across Islamabad and Rawalpindi.
           </p>

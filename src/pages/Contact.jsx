@@ -3,8 +3,8 @@ import { useSeo } from '../hooks/useSeo'
 
 export default function Contact() {
   useSeo({
-    title: 'Contact Us | Aura Beauty Care',
-    description: 'Questions about an order or a product? Message Aura Beauty Care on WhatsApp — the fastest way to reach us.',
+    title: 'Contact Us | SS Zen Traders',
+    description: 'Questions about an order or a product? Message SS Zen Traders on WhatsApp — the fastest way to reach us.',
   })
 
   return (
@@ -13,7 +13,7 @@ export default function Contact() {
         <h1 className="text-4xl font-medium mb-4">Contact</h1>
         <p className="text-ink-soft mb-6">
           Questions about Mighty Patch, SOME BY MI, shipping, or an existing order? Message us on
-          WhatsApp — that is the fastest way to reach Aura Beauty Care.
+          WhatsApp — that is the fastest way to reach SS Zen Traders.
         </p>
         <p className="mb-2">
           <strong>WhatsApp:</strong>{' '}
@@ -35,7 +35,7 @@ export default function Contact() {
         </p>
         <a
           className="btn-lavender inline-block w-auto px-8"
-          href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi Aura Beauty Care! I would like help with an order.')}`}
+          href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi SS Zen Traders! I would like help with an order.')}`}
           target="_blank"
           rel="noreferrer"
         >

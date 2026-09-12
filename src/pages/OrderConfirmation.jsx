@@ -87,7 +87,7 @@ export default function OrderConfirmation() {
 
   const canCancel = order.orderStatus === 'pending' || order.orderStatus === 'confirmed'
   const canRequestReturn = order.orderStatus === 'delivered'
-  const supportMessage = `Hi Aura Beauty Care! I have a question about my order ${order.orderNumber}.`
+  const supportMessage = `Hi SS Zen Traders! I have a question about my order ${order.orderNumber}.`
 
   return (
     <div className="container-aura py-10 md:py-14 max-w-2xl">

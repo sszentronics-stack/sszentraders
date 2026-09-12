@@ -6,7 +6,7 @@ import { registerInputSchema } from '../../../backend/lib/validation/index'
 import { useSeo } from '../../hooks/useSeo'
 
 export default function Register() {
-  useSeo({ title: 'Create Account | Aura Beauty Care', noindex: true })
+  useSeo({ title: 'Create Account | SS Zen Traders', noindex: true })
   const { register, configured } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -175,7 +175,7 @@ export default function Register() {
               onChange={(e) => setField('marketingOptIn')(e.target.checked)}
               disabled={!configured}
             />
-            <span>Send me offers and updates from Aura Beauty Care.</span>
+            <span>Send me offers and updates from SS Zen Traders.</span>
           </label>
 
           <button type="submit" className="btn-lavender" disabled={submitting || !configured}>

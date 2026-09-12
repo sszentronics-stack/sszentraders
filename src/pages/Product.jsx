@@ -34,7 +34,7 @@ export default function Product() {
   const { items: recentlyViewed } = useRecentlyViewed(product?.id)
 
   useSeo({
-    title: product ? `${product.name} | Aura Beauty Care` : 'Product | Aura Beauty Care',
+    title: product ? `${product.name} | SS Zen Traders` : 'Product | SS Zen Traders',
     description: product ? (product.tagline || product.description)?.slice(0, 160) : undefined,
     image: product?.images?.[0],
   })
@@ -232,7 +232,7 @@ export default function Product() {
             {isSupabaseConfigured() ? (
               <a
                 className="btn-outline block text-center"
-                href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi Aura Beauty Care! I have a question about ${product.name}.`)}`}
+                href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi SS Zen Traders! I have a question about ${product.name}.`)}`}
                 target="_blank"
                 rel="noreferrer"
               >

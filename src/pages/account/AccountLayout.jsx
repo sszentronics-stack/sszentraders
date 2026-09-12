@@ -16,7 +16,7 @@ export default function AccountLayout() {
   const { profile, user, logout } = useAuth()
   const displayName = profile?.firstName || user?.email
 
-  useSeo({ title: 'My Account | Aura Beauty Care', noindex: true })
+  useSeo({ title: 'My Account | SS Zen Traders', noindex: true })
 
   return (
     <div className="container-aura py-12 md:py-16">
