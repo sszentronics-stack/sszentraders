@@ -50,7 +50,7 @@ export default function Orders() {
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      setError('Order history is not available right now.')
+      setOrders([])
       return
     }
     ordersApi
@@ -70,9 +70,9 @@ export default function Orders() {
   if (orders.length === 0) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-medium font-display mb-3">No orders yet</h2>
-        <p className="text-ink-soft max-w-md mx-auto mb-6">When you place an order, it will show up here.</p>
-        <Link to="/shop" className="btn-lavender inline-block w-auto px-8">Browse products</Link>
+        <h2 className="h3 mb-3">No orders yet</h2>
+        <p className="text-secondary mb-4">WhatsApp orders are confirmed by our team. Once an order is placed on your account, the number, status, and total show up here.</p>
+        <Link to="/shop" className="btn btn-dark">Browse the shop</Link>
       </div>
     )
   }

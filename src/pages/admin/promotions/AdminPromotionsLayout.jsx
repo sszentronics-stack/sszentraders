@@ -12,6 +12,7 @@ const NAV = [
   { to: '/admin/promotions/campaigns', label: 'Campaigns' },
   { to: '/admin/promotions/promotions', label: 'Promotions' },
   { to: '/admin/promotions/coupons', label: 'Coupons' },
+  { to: '/admin/promotions/influencers', label: 'Influencer codes' },
   { to: '/admin/promotions/abandoned-carts', label: 'Abandoned Carts' },
 ]
 

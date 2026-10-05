@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { buildWhatsAppProduct, formatPKR, salePercent, WHATSAPP_LINK } from '../data/products'
+import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 import { useProduct } from '../hooks/useCatalog'
 import { useRecentlyViewed, useRecordRecentlyViewed } from '../hooks/useRecentlyViewed'
@@ -12,7 +13,7 @@ import Disclaimer from '../components/Disclaimer'
 import ProductCard from '../components/ProductCard'
 import TrustBar from '../components/TrustBar'
 import ReviewsSection from '../components/ReviewsSection'
-import { ChevronLeft, ChevronRight, Heart, Share2, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Heart, Share2 } from 'lucide-react'
 
 export default function Product() {
   const { slug } = useParams()
@@ -32,6 +33,7 @@ export default function Product() {
 
   useRecordRecentlyViewed(product?.id)
   const { items: recentlyViewed } = useRecentlyViewed(product?.id)
+  const appliedPromo = useAppliedInfluencerPromo()
 
   useSeo({
     title: product ? `${product.name} | SS Zen Traders` : 'Product | SS Zen Traders',
@@ -79,7 +81,8 @@ export default function Product() {
 
   if (notFound) return <Navigate to="/shop" replace />
 
-  const off = salePercent(product)
+  const salePrice = priceAfterInfluencer(product.price, appliedPromo)
+  const off = salePrice < product.price ? Math.round(((product.price - salePrice) / product.price) * 100) : salePercent(product)
   const last = product.images.length - 1
   const showPrev = () => setActive((i) => (i === 0 ? last : i - 1))
   const showNext = () => setActive((i) => (i === last ? 0 : i + 1))
@@ -97,7 +100,8 @@ export default function Product() {
   ))
 
   return (
-    <div className="container-aura py-8 md:py-12">
+    <div className="ssz-section">
+      <div className="ssz-container">
       <nav className="text-sm text-ink-soft mb-6">
         <Link to="/">Home</Link>
         <span className="mx-2">/</span>
@@ -106,7 +110,7 @@ export default function Product() {
         <span className="text-ink">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+      <div className="ssz-product">
         <div className="min-w-0 w-full">
           <div className="flex gap-3 min-w-0 w-full items-start">
             <div className="hidden sm:flex flex-col gap-2 w-16 shrink-0 max-h-[min(70vw,520px)] overflow-y-auto">
@@ -161,26 +165,17 @@ export default function Product() {
           </div>
         </div>
 
-        <div className="min-w-0">
-          <p className="text-sm uppercase tracking-wide text-ink-soft">{product.brand}</p>
-          <h1 className="text-3xl md:text-4xl font-medium mt-1 leading-tight">{product.name}</h1>
-          <p className="mt-2 text-ink-soft">{product.subtitle}</p>
-          <div className="flex items-center gap-1 mt-3 text-sm">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={13} fill="#102b26" color="#102b26" />
-            ))}
-            <span className="ml-1">{product.rating}</span>
-            <span className="text-ink-soft">({product.reviewCount} reviews)</span>
-          </div>
+        <div className="ssz-product__details min-w-0">
+          <p>{product.brand}</p>
+          <h1>{product.name}</h1>
+          <p>{product.tagline}</p>
 
-          <p className="mt-5 text-xl">
-            {product.compareAt > product.price && (
-              <span className="price-compare">{formatPKR(product.compareAt)}</span>
+          <p className="ssz-price">
+            {(product.compareAt > salePrice || product.price > salePrice) && (
+              <s>{formatPKR(product.compareAt > product.price ? product.compareAt : product.price)}</s>
             )}
-            <span className={off ? 'price-sale text-2xl' : 'font-medium text-2xl'}>
-              {formatPKR(product.price)}
-            </span>
-            {off > 0 && <span className="price-sale ml-2 text-base">{off}% off</span>}
+            {formatPKR(salePrice)}
+            {off > 0 && <span className="ssz-badge" style={{ marginLeft: 8 }}>Sale</span>}
           </p>
 
           {product.availability === 'out_of_stock' && (
@@ -198,7 +193,7 @@ export default function Product() {
 
           <div className="mt-6">
             <p className="text-sm mb-2">Quantity</p>
-            <div className="qty">
+            <div className="ssz-qty">
               <button type="button" onClick={() => setQty((n) => Math.max(1, n - 1))} disabled={product.availability === 'out_of_stock'}>
                 −
               </button>
@@ -209,14 +204,14 @@ export default function Product() {
             </div>
           </div>
 
-          <div className="mt-5 flex gap-3">
+          <div className="ssz-actions">
             <button
               type="button"
-              className="btn-lavender flex-1"
+              className="ssz-btn ssz-btn--outline"
               onClick={() => addItem(product, qty)}
               disabled={product.availability === 'out_of_stock'}
             >
-              {product.availability === 'out_of_stock' ? 'Out of stock' : 'Add to bag'}
+              {product.availability === 'out_of_stock' ? 'Sold out' : 'Add to cart'}
             </button>
             <button
               type="button"
@@ -225,14 +220,14 @@ export default function Product() {
               className="w-12 shrink-0 border border-line grid place-items-center"
               onClick={() => toggleWishlist(product)}
             >
-              <Heart size={18} fill={isWishlisted(product.id) ? '#c31818' : 'none'} color={isWishlisted(product.id) ? '#c31818' : '#102b26'} />
+              <Heart size={18} fill={isWishlisted(product.id) ? '#9a3b32' : 'none'} color={isWishlisted(product.id) ? '#9a3b32' : '#1c1c1c'} />
             </button>
           </div>
           <div className="mt-3">
             {isSupabaseConfigured() ? (
               <a
-                className="btn-outline block text-center"
-                href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi SS Zen Traders! I have a question about ${product.name}.`)}`}
+                className="ssz-btn"
+                href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi SSzentronics! I have a question about ${product.name}.`)}`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -240,12 +235,12 @@ export default function Product() {
               </a>
             ) : (
               <a
-                className="btn-outline block text-center"
+                className="ssz-btn"
                 href={buildWhatsAppProduct(product, qty)}
                 target="_blank"
                 rel="noreferrer"
               >
-                Buy it now on WhatsApp
+                Buy now
               </a>
             )}
           </div>
@@ -284,26 +279,23 @@ export default function Product() {
       </div>
 
       <div className="mt-12 max-w-3xl">
-        <Accordion
-          id="description"
-          title="Description"
-          open={open}
-          setOpen={setOpen}
-        >
-          <h3 className="font-medium mb-2">{product.name} — {product.tagline}</h3>
+        <Accordion id="description" title="Description" open={open} setOpen={setOpen}>
           <p className="whitespace-pre-line mb-4">{product.description}</p>
-          <p className="font-medium mb-2">Key benefits</p>
-          <ul className="list-disc pl-5 space-y-1 mb-4">
+          <ul className="list-disc pl-5 space-y-1">
             {product.benefits.map((b) => (
               <li key={b}>{b}</li>
             ))}
           </ul>
-          <p className="font-medium mb-2">How to use</p>
+        </Accordion>
+        <Accordion id="directions" title="Directions" open={open} setOpen={setOpen}>
           <ol className="list-decimal pl-5 space-y-1">
             {product.howToUse.map((s) => (
               <li key={s}>{s}</li>
             ))}
           </ol>
+        </Accordion>
+        <Accordion id="cautions" title="Cautions" open={open} setOpen={setOpen}>
+          <p>Discontinue if irritation occurs. Avoid contact with eyes. For external use only. Read the label before use.</p>
         </Accordion>
         <Accordion id="ingredients" title="Ingredients" open={open} setOpen={setOpen}>
           <p>{product.ingredients}</p>
@@ -336,24 +328,25 @@ export default function Product() {
           <h2 className="text-2xl font-medium mb-8">
             {sameCategory.length > 0 ? `More in ${product.category}` : 'Recommended products'}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <ul className="ssz-grid">
             {related.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <li key={p.id}><ProductCard product={p} /></li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
 
       {recentlyViewed.length > 0 && (
         <section className="mt-16">
           <h2 className="text-2xl font-medium mb-8">Recently viewed</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <ul className="ssz-grid">
             {recentlyViewed.slice(0, 4).map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <li key={p.id}><ProductCard product={p} /></li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
+      </div>
     </div>
   )
 }

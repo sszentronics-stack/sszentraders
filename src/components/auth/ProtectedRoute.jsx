@@ -7,11 +7,7 @@ export default function ProtectedRoute({ children }) {
   const location = useLocation()
 
   if (!configured) {
-    return (
-      <div className="container-aura py-16 text-center">
-        <p className="text-ink-soft">Accounts are not available yet. Please check back soon.</p>
-      </div>
-    )
+    return children
   }
 
   if (initializing) {

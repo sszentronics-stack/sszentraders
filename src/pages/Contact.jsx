@@ -1,47 +1,53 @@
-import { WHATSAPP_DISPLAY, WHATSAPP_LINK } from '../data/products'
+import { useState } from 'react'
+import { WHATSAPP_LINK } from '../data/products'
 import { useSeo } from '../hooks/useSeo'
 
 export default function Contact() {
+  const [sent, setSent] = useState(false)
   useSeo({
-    title: 'Contact Us | SS Zen Traders',
-    description: 'Questions about an order or a product? Message SS Zen Traders on WhatsApp — the fastest way to reach us.',
+    title: 'Contact | SS Zen Traders',
+    description: 'Contact SS Zen Traders at the Islamabad office, by email, or on WhatsApp.',
   })
 
+  function submit(event) {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const body = `Name: ${data.get('name')}\nEmail: ${data.get('email')}\nPhone: ${data.get('phone')}\n\n${data.get('message')}`
+    window.location.href = `mailto:info@sszentraders.com?subject=${encodeURIComponent('Website message')}&body=${encodeURIComponent(body)}`
+    setSent(true)
+  }
+
   return (
-    <div className="container-aura py-12 md:py-16 grid md:grid-cols-2 gap-12">
-      <div>
-        <h1 className="text-4xl font-medium mb-4">Contact</h1>
-        <p className="text-ink-soft mb-6">
-          Questions about Mighty Patch, SOME BY MI, shipping, or an existing order? Message us on
-          WhatsApp — that is the fastest way to reach SS Zen Traders.
-        </p>
-        <p className="mb-2">
-          <strong>WhatsApp:</strong>{' '}
-          <a className="underline" href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
-            {WHATSAPP_DISPLAY}
-          </a>
-        </p>
-        <p className="mb-2">
-          <strong>Hours:</strong> 11:00 AM – 9:00 PM (Pakistan time)
-        </p>
-        <p>
-          <strong>Shipping:</strong> Delivery across Islamabad and Rawalpindi
-        </p>
+    <section className="ssz-section">
+      <div className="ssz-container ssz-contact">
+        <div>
+          <h1>Contact</h1>
+          <p>Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad</p>
+          <p><a href="tel:03079594474">03079594474</a></p>
+          <p><a href="mailto:info@sszentraders.com">info@sszentraders.com</a></p>
+          <p><a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">Chat on WhatsApp</a></p>
+        </div>
+        <form className="ssz-form" onSubmit={submit}>
+          <label>
+            Name
+            <input name="name" required autoComplete="name" />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" required autoComplete="email" />
+          </label>
+          <label>
+            Phone
+            <input name="phone" type="tel" autoComplete="tel" />
+          </label>
+          <label>
+            Message
+            <textarea name="message" rows={5} required />
+          </label>
+          <button className="ssz-btn" type="submit">Send message</button>
+          {sent && <p className="ssz-note">Your email app will open with this message.</p>}
+        </form>
       </div>
-      <div className="bg-meta p-8">
-        <h2 className="text-xl font-medium mb-3">Start a chat</h2>
-        <p className="text-sm text-ink-soft mb-5">
-          Tell us which product you want and your city. We will confirm price, stock, and delivery.
-        </p>
-        <a
-          className="btn-lavender inline-block w-auto px-8"
-          href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi SS Zen Traders! I would like help with an order.')}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Chat on WhatsApp
-        </a>
-      </div>
-    </div>
+    </section>
   )
 }

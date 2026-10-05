@@ -1,0 +1,140 @@
+:root {
+  --bs-primary: #1c1c1c;
+  --bs-primary-rgb: 28, 28, 28;
+  --bs-body-font-family: "Outfit", system-ui, sans-serif;
+  --bs-body-color: #1c1c1c;
+  --bs-link-color: #1c1c1c;
+  --bs-link-hover-color: #000;
+}
+
+.btn-dark {
+  --bs-btn-bg: #1c1c1c;
+  --bs-btn-border-color: #1c1c1c;
+  --bs-btn-hover-bg: #333;
+  --bs-btn-hover-border-color: #333;
+}
+
+.account-pill {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.25rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: #1c1c1c;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.account-pill:hover,
+.account-pill.active {
+  background: #1c1c1c;
+  color: #fff;
+}
+
+.shop-banner-img {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  max-height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.shop-banner-kicker {
+  letter-spacing: 0.16em;
+}
+
+.shop-banner-title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.banner-tile {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: #1c1c1c;
+}
+
+.banner-tile img {
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+  background: #f6f3f0;
+  display: block;
+}
+
+.banner-tile:hover img {
+  outline: 1px solid #1c1c1c;
+}
+
+.banner-tile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 0.15rem 0;
+}
+
+.banner-tile-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.banner-tile-title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.6rem;
+  line-height: 1.05;
+}
+
+.banner-tile-price {
+  font-size: 0.9rem;
+}
+
+.banner-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.banner-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(17, 17, 17, 0.78);
+}
+
+.banner-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  width: min(980px, 100%);
+  background: #fff;
+}
+
+.banner-lightbox-panel img {
+  width: 100%;
+  max-height: 68vh;
+  object-fit: contain;
+  background: #f6f3f0;
+  display: block;
+}
+
+.banner-lightbox-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem 1.25rem;
+  align-items: center;
+}

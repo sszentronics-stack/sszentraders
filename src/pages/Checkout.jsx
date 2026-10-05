@@ -9,6 +9,7 @@ import * as ordersApi from '../repositories/orders.repository'
 import * as customersApi from '../repositories/customers.repository'
 import * as promotionsApi from '../repositories/promotions.repository'
 import { isSupabaseConfigured } from '../lib/supabase/client'
+import { findInfluencerCode, quoteInfluencerCode, recordInfluencerRedemption, setAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { useSeo } from '../hooks/useSeo'
 
 const STEPS = ['contact', 'address', 'delivery', 'payment', 'review']
@@ -26,7 +27,7 @@ const EMPTY_ADDRESS = {
 }
 
 export default function Checkout() {
-  useSeo({ title: 'Checkout | SS Zen Traders', noindex: true })
+  useSeo({ title: 'Checkout | SSzentronics', noindex: true })
   const navigate = useNavigate()
   const { isAuthenticated, user, ensureGuestSession } = useAuth()
   const { items, total, loading: cartLoading, clearCart } = useCart()
@@ -70,11 +71,36 @@ export default function Checkout() {
       return
     }
     setCouponChecking(true)
+    const typed = couponCodeInput.trim()
+    const customerPhone = phone.trim() || address.phone
     try {
-      const preview = await promotionsApi.previewDiscount(couponCodeInput.trim())
-      setCouponPreview(preview)
+      if (findInfluencerCode(typed)) {
+        const local = quoteInfluencerCode(typed, total, customerPhone)
+        setCouponPreview(local)
+        if (local.eligible) {
+          setAppliedInfluencerPromo({
+            code: local.couponCode,
+            phone: customerPhone,
+            phoneKey: local.phoneKey,
+            influencerName: local.promotionName,
+            discountType: local.discountType,
+            discountValue: local.discountValue,
+          })
+        }
+        return
+      }
+      let preview = null
+      if (isSupabaseConfigured()) {
+        preview = await promotionsApi.previewDiscount(typed)
+      }
+      setCouponPreview(preview ?? { eligible: false, reasons: ['This coupon could not be applied.'], discountAmount: 0, freeShipping: false })
     } catch (err) {
-      setCouponPreview({ eligible: false, reasons: [err?.message ?? 'Could not check this coupon.'], discountAmount: 0, freeShipping: false })
+      const local = quoteInfluencerCode(typed, total, customerPhone)
+      setCouponPreview(
+        local.eligible
+          ? local
+          : { eligible: false, reasons: [err?.message ?? 'Could not check this coupon.'], discountAmount: 0, freeShipping: false },
+      )
     } finally {
       setCouponChecking(false)
     }
@@ -200,9 +226,21 @@ export default function Checkout() {
       return
     }
 
+    const customerPhone = phone.trim() || address.phone
+    if (findInfluencerCode(couponPreview?.couponCode)) {
+      const gate = quoteInfluencerCode(couponPreview.couponCode, total, customerPhone)
+      if (!gate.eligible) {
+        setSubmitError(gate.reasons[0])
+        return
+      }
+    }
+
     setSubmitting(true)
     try {
       const order = await ordersApi.createOrder(parsed.data, idempotencyKey)
+      if (findInfluencerCode(couponPreview?.couponCode)) {
+        recordInfluencerRedemption(couponPreview.couponCode, customerPhone)
+      }
       await clearCart().catch(() => undefined) // server cart is already converted server-side; this just clears local state if needed
       navigate(`/order-confirmation/${order.id}`, { replace: true })
     } catch (err) {

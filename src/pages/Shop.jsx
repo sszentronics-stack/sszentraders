@@ -20,8 +20,8 @@ export default function Shop() {
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   useSeo({
-    title: 'Shop All Skincare | SS Zen Traders',
-    description: 'Browse authentic Korean and US skincare — acne patches, toners, masks, and anti-aging essentials. Nationwide delivery in Pakistan.',
+    title: 'Shop | SS Zen Traders',
+    description: 'Shop SADOER, Hero Cosmetics, and SOME BY MI at SS Zen Traders.',
   })
 
   const q = params.get('q') || ''
@@ -62,13 +62,9 @@ export default function Shop() {
   }, [minPrice, maxPrice])
 
   return (
-    <div className="container-aura py-10 md:py-14">
-      <p className="text-sm text-ink-soft mb-2">
-        <span>Home</span>
-        <span className="mx-2">/</span>
-        <span>Shop</span>
-      </p>
-      <h1 className="text-3xl md:text-4xl font-medium mb-2">Shop</h1>
+    <div className="ssz-section">
+      <div className="ssz-container">
+      <h1>Shop</h1>
       {!loading && (
         <p className="text-ink-soft mb-6">
           {sorted.length} result{sorted.length === 1 ? '' : 's'}
@@ -96,6 +92,7 @@ export default function Shop() {
         <label className="flex items-center gap-2 text-sm ml-auto">
           <span className="text-ink-soft hidden sm:inline">Sort by</span>
           <select
+            className="ssz-sort"
             value={sort}
             onChange={(e) => updateParam('sort', e.target.value === 'relevance' ? '' : e.target.value)}
             className="border border-line bg-white px-2.5 py-2 text-sm"
@@ -110,7 +107,7 @@ export default function Shop() {
         </label>
       </div>
 
-      <div className="grid lg:grid-cols-[220px_1fr] gap-10">
+      <div className="ssz-shop-layout">
         <FilterPanel
           className="hidden lg:block"
           facets={facets}
@@ -142,11 +139,13 @@ export default function Shop() {
           ) : sorted.length === 0 ? (
             <NoResults error={error} hasActiveFilters={hasActiveFilters} categories={facets.categories} onClearFilters={clearFilters} />
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
+            <ul className="ssz-grid" style={{ '--cols': 3 }}>
               {sorted.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <li key={product.id}>
+                  <ProductCard product={product} />
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </div>
@@ -187,13 +186,14 @@ export default function Shop() {
           </aside>
         </div>
       )}
+      </div>
     </div>
   )
 }
 
 function FilterPanel({ className = '', facets, category, brand, availability, priceInputs, setPriceInputs, onCategory, onBrand, onAvailability, onApplyPrice }) {
   return (
-    <div className={className}>
+    <div className={`ssz-filters ${className}`}>
       <div className="mb-8">
         <p className="label-wide text-ink-soft mb-3">Category</p>
         <div className="space-y-2">

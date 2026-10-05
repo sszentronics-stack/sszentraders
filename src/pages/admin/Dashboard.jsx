@@ -138,7 +138,7 @@ export default function Dashboard() {
       <header className="admin-page-header">
         <div>
           <h1>Dashboard</h1>
-          <p>Today’s ops snapshot for SS Zen Traders.</p>
+          <p>Today’s ops snapshot for SSzentronics.</p>
         </div>
       </header>
 

@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SS Zen Traders: design reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&family=Josefin+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   SS ZEN TRADERS DESIGN REFERENCE
+   Everything Cursor needs is in this file: tokens, components, motion.
+   Grey and pink blocks are placeholders for real photos and videos.
+   ===================================================================== */
+
+/* ---------- 1. TOKENS ---------- */
+:root {
+  /* colour */
+  --ssz-ink: #121212;
+  --ssz-paper: #ffffff;
+  --ssz-mist: #f3f3f3;
+  --ssz-rose-gold: #b76e79;   /* replace with exact logo colour */
+  --ssz-rose-deep: #8c4a55;
+  --ssz-blush: #f4e4e1;
+  --ssz-text: rgba(18, 18, 18, .75);
+  --ssz-line: rgba(18, 18, 18, .1);
+  --ssz-line-strong: rgba(18, 18, 18, .55);
+
+  /* type */
+  --ssz-font-body: "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ssz-font-display: "Josefin Sans", "Assistant", system-ui, sans-serif;
+
+  /* layout */
+  --ssz-page: 1200px;
+  --ssz-gutter: 15px;
+  --ssz-gap: 4px;
+  --ssz-section-y: 36px;
+
+  /* motion */
+  --ssz-t-short: .1s;
+  --ssz-t-default: .2s;
+  --ssz-t-bar: .25s;
+  --ssz-t-medium: .3s;
+  --ssz-t-long: .5s;
+  --ssz-t-xlong: .6s;
+  --ssz-ease-out: cubic-bezier(0, 0, .3, 1);
+  --ssz-ease-pop: cubic-bezier(.22, 1, .36, 1);
+}
+@media (min-width: 750px) {
+  :root { --ssz-gutter: 50px; --ssz-gap: 8px; --ssz-section-y: 48px; }
+}
+
+/* ---------- 2. BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--ssz-paper); color: var(--ssz-text);
+  font-family: var(--ssz-font-body); font-size: 15px; line-height: 1.8; letter-spacing: .6px;
+}
+@media (min-width: 750px) { body { font-size: 16px; } }
+img, video { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { margin: 0; color: var(--ssz-ink); font-weight: 400; line-height: 1.3; letter-spacing: .6px; }
+h1 { font-size: 30px; } h2 { font-size: 20px; } h3 { font-size: 15px; }
+@media (min-width: 750px) { h1 { font-size: 40px; } h2 { font-size: 24px; } h3 { font-size: 16px; } }
+:focus-visible { outline: 2px solid var(--ssz-ink); outline-offset: 3px; }
+
+.ssz-container { width: 100%; max-width: var(--ssz-page); margin: 0 auto; padding: 0 var(--ssz-gutter); }
+.ssz-section { padding: var(--ssz-section-y) 0; }
+.ssz-section--mist { background: var(--ssz-mist); }
+.ssz-section__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.ssz-display { font-family: var(--ssz-font-display); }
+
+/* placeholder blocks (delete when real media is added) */
+.ssz-ph { display: grid; place-items: center; text-align: center; font-size: 12px; color: rgba(18,18,18,.55);
+  background: linear-gradient(135deg, #ececec, #dcdcdc); }
+.ssz-ph--alt { background: linear-gradient(135deg, var(--ssz-blush), #e7c9c6); }
+.ssz-ph--rose { background: linear-gradient(135deg, #cf9aa2, var(--ssz-rose-deep)); color: #fff; }
+.ssz-ph--dark { background: linear-gradient(135deg, #5a4a4c, #1d1a1a); color: #fff; }
+.ssz-ph--top { align-items: start; padding-top: 20px; }
+
+/* ---------- 3. BUTTONS AND LINKS ---------- */
+.ssz-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 45px; padding: 0 30px;
+  font: inherit; font-size: 15px; letter-spacing: 1px; text-decoration: none; cursor: pointer;
+  color: #fff; background: var(--ssz-ink); border: 0; border-radius: 0;
+  box-shadow: 0 0 0 1px var(--ssz-ink); transition: box-shadow var(--ssz-t-short) ease;
+}
+.ssz-btn:hover { box-shadow: 0 0 0 2.3px var(--ssz-ink); }            /* outline grows 1.3px */
+.ssz-btn--outline { color: var(--ssz-ink); background: transparent; }
+.ssz-btn[disabled] { opacity: .5; cursor: not-allowed; box-shadow: 0 0 0 1px var(--ssz-ink); }
+
+.ssz-link { text-underline-offset: 3px; text-decoration-thickness: 1px; transition: text-decoration-thickness var(--ssz-t-short) ease; }
+.ssz-link:hover { text-decoration-thickness: 2px; color: var(--ssz-ink); }
+
+.ssz-arrow-link { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ssz-ink); }
+.ssz-arrow-link svg { width: 14px; height: 14px; transition: transform var(--ssz-t-short) ease; }
+.ssz-arrow-link:hover svg { transform: translateX(3px); }               /* arrow nudge */
+
+.ssz-badge { display: inline-block; padding: 3px 12px; font-size: 12px; line-height: 1.4; letter-spacing: 1px;
+  color: #fff; background: var(--ssz-rose-gold); border-radius: 40px; }
+
+/* ---------- 4. ANNOUNCEMENT BAR (rotates every 5s) ---------- */
+.ssz-announce { position: relative; height: 38px; overflow: hidden; background: var(--ssz-ink); color: #fff; font-size: 13px; letter-spacing: 1px; }
+.ssz-announce__msg { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 0 12px;
+  opacity: 0; transform: translateX(10px); transition: opacity var(--ssz-t-bar) ease, transform var(--ssz-t-bar) ease; }
+.ssz-announce__msg.is-active { opacity: 1; transform: none; }
+.ssz-announce__msg.is-leaving { opacity: 0; transform: translateX(-10px); }
+
+/* ---------- 5. HEADER (sticky, hides on scroll down, returns on scroll up) ---------- */
+.ssz-header { position: sticky; top: 0; z-index: 20; background: var(--ssz-paper); border-bottom: 1px solid var(--ssz-line);
+  transition: transform var(--ssz-t-default) ease-out; }
+.ssz-header.is-hidden { transform: translateY(-100%); }
+.ssz-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+.ssz-logo { font-family: var(--ssz-font-display); font-size: 20px; letter-spacing: 3px; color: var(--ssz-ink); text-decoration: none; white-space: nowrap; }
+.ssz-nav { display: none; align-items: center; gap: 4px; }
+@media (min-width: 990px) { .ssz-nav { display: flex; } }
+.ssz-nav__item { padding: 12px; font-size: 14px; color: var(--ssz-text); text-decoration: none; cursor: pointer; list-style: none; }
+.ssz-nav__item::-webkit-details-marker { display: none; }
+.ssz-nav__item span { text-underline-offset: 3px; }
+.ssz-nav__item:hover { color: var(--ssz-ink); }
+.ssz-nav__item:hover span, details[open] > .ssz-nav__item span { text-decoration: underline; }
+.ssz-menu { position: relative; }
+.ssz-menu__panel { position: absolute; top: 100%; left: 0; min-width: 200px; padding: 12px 0; margin: 0; list-style: none;
+  background: var(--ssz-paper); border: 1px solid var(--ssz-line); }
+.ssz-menu__panel a { display: block; padding: 6px 20px; font-size: 14px; text-decoration: none; }
+.ssz-menu__panel a:hover { text-decoration: underline; text-underline-offset: 3px; color: var(--ssz-ink); }
+details[open] > .ssz-menu__panel { animation: ssz-menu-open var(--ssz-t-default) ease; }
+@keyframes ssz-menu-open { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: none; } }
+.ssz-header__icons { display: flex; gap: 4px; }
+.ssz-icon-btn { display: grid; place-items: center; width: 44px; height: 44px; color: var(--ssz-ink); background: none; border: 0; cursor: pointer; }
+.ssz-icon-btn svg { width: 20px; height: 20px; transition: transform var(--ssz-t-short) ease; }
+.ssz-icon-btn:hover svg { transform: scale(1.07); }
+
+.ssz-menu-btn { display: grid; }
+@media (min-width: 990px) { .ssz-menu-btn { display: none; } }
+
+/* mobile menu drawer: slides in from the left, backdrop fades */
+.ssz-drawer { position: fixed; inset: 0; z-index: 30; visibility: hidden; transition: visibility 0s linear var(--ssz-t-medium); }
+.ssz-drawer.is-open { visibility: visible; transition-delay: 0s; }
+.ssz-drawer__backdrop { position: absolute; inset: 0; background: rgba(18, 18, 18, .5); opacity: 0; transition: opacity var(--ssz-t-medium) ease; }
+.ssz-drawer__panel { position: absolute; top: 0; bottom: 0; left: 0; width: min(86vw, 360px); padding: 16px 0; overflow-y: auto;
+  background: var(--ssz-paper); border-right: 1px solid var(--ssz-line); transform: translateX(-100%); transition: transform var(--ssz-t-medium) ease; }
+.ssz-drawer.is-open .ssz-drawer__backdrop { opacity: 1; }
+.ssz-drawer.is-open .ssz-drawer__panel { transform: none; }
+.ssz-drawer__panel a { display: block; padding: 12px 24px; font-size: 18px; color: var(--ssz-ink); text-decoration: none; }
+.ssz-drawer__panel a:hover { background: var(--ssz-mist); }
+
+/* ---------- 6. SCROLL REVEAL ---------- */
+/* Hidden only when JS is running, so content is never lost without JS. */
+.ssz-js .ssz-reveal { opacity: 0; }
+.ssz-js .ssz-reveal.is-visible { animation: ssz-slide-in var(--ssz-t-xlong) var(--ssz-ease-out) forwards; animation-delay: calc(var(--i, 0) * 75ms); }
+.ssz-js .ssz-reveal--fade.is-visible { animation-name: ssz-fade-in; }
+@keyframes ssz-slide-in { from { opacity: .01; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+@keyframes ssz-fade-in { from { opacity: .01; } to { opacity: 1; } }
+
+/* ---------- 7. STORY CIRCLES ---------- */
+.ssz-stories { display: flex; gap: 18px; padding: 20px var(--ssz-gutter); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--ssz-gutter); scrollbar-width: none; }
+.ssz-stories::-webkit-scrollbar { display: none; }
+@media (min-width: 750px) { .ssz-stories { justify-content: center; gap: 28px; } }
+.ssz-story { flex: 0 0 auto; width: 72px; scroll-snap-align: start; text-align: center; text-decoration: none; font-size: 13px; line-height: 1.3; color: var(--ssz-text); }
+@media (min-width: 750px) { .ssz-story { width: 88px; } }
+.ssz-story:hover { color: var(--ssz-ink); }
+.ssz-story__circle { position: relative; width: 100%; aspect-ratio: 1; margin-bottom: 10px; }
+.ssz-story__img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.ssz-story__ring { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); overflow: visible;
+  fill: none; stroke: var(--ssz-rose-gold); stroke-width: 3; stroke-dasharray: 1; transform-origin: center; }
+@keyframes ssz-ring-draw {
+  from { stroke: var(--ssz-rose-gold); stroke-dasharray: 1; }
+  to   { stroke: var(--ssz-rose-deep); stroke-dasharray: 8; transform: rotate(180deg); }
+}
+
+/* ---------- 8. HERO BANNER (slides crossfade) ---------- */
+.ssz-banner { position: relative; display: grid; min-height: 62vh; color: #fff; }
+@media (min-width: 750px) { .ssz-banner { min-height: 76vh; } }
+.ssz-banner__slide { grid-area: 1 / 1; position: relative; display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; visibility: hidden; transition: opacity var(--ssz-t-long) ease-in-out, visibility 0s linear var(--ssz-t-long); }
+.ssz-banner__slide.is-active { opacity: 1; visibility: visible; transition-delay: 0s; }
+.ssz-banner__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ssz-banner__slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0) 60%); }
+.ssz-banner__content { position: relative; z-index: 1; max-width: 760px; padding: 0 var(--ssz-gutter) 48px; text-align: center; }
+.ssz-banner__heading { font-family: var(--ssz-font-display); font-size: 32px; line-height: 1.1; color: #fff; }
+@media (min-width: 750px) { .ssz-banner__heading { font-size: 50px; } }
+.ssz-banner__text { margin: 12px 0 20px; color: rgba(255,255,255,.9); }
+.ssz-banner__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.ssz-banner__btn { display: inline-block; padding: 12px 24px; font-family: var(--ssz-font-display); font-size: 16px; line-height: 1.5; text-decoration: none;
+  color: var(--ssz-ink); background: #fff; border: 1px solid #fff; border-radius: 0; transition: all var(--ssz-t-bar) ease; }
+.ssz-banner__btn:hover { color: #fff; background: #000; border-color: #000; }
+.ssz-banner__btn--ghost { color: #fff; background: transparent; }
+.ssz-banner__dots { position: absolute; z-index: 2; left: 0; right: 0; bottom: 16px; display: flex; justify-content: center; gap: 8px; }
+.ssz-banner__dot { width: 8px; height: 8px; padding: 0; border: 1px solid #fff; border-radius: 50%; background: transparent; cursor: pointer; }
+.ssz-banner__dot.is-active { background: #fff; }
+
+/* ---------- 9. PRODUCT GRID AND CARD ---------- */
+.ssz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--ssz-gap); list-style: none; margin: 0; padding: 0; }
+@media (min-width: 750px) { .ssz-grid { grid-template-columns: repeat(var(--cols, 4), 1fr); } }
+.ssz-card { display: block; text-decoration: none; color: inherit; }
+.ssz-card__media { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--ssz-mist); }
+.ssz-card__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: opacity var(--ssz-t-long) ease, transform var(--ssz-t-long) ease; }
+.ssz-card__img--hover { opacity: 0; }
+.ssz-card__badge { position: absolute; z-index: 1; left: 10px; bottom: 10px; }
+.ssz-card__info { padding: 14px 0 20px; }
+.ssz-card__title { font-size: 14px; }
+.ssz-card:hover .ssz-card__title { text-decoration: underline; text-underline-offset: 3px; }
+.ssz-price { margin-top: 6px; font-size: 16px; color: var(--ssz-ink); }
+.ssz-price s { margin-right: 8px; font-size: 13px; color: var(--ssz-text); }
+@media (hover: hover) {
+  .ssz-card:hover .ssz-card__img:not(.ssz-card__img--hover) { opacity: 0; }
+  .ssz-card:hover .ssz-card__img--hover { opacity: 1; transform: scale(1.03); }
+  .ssz-card:hover .ssz-card__img:only-child { opacity: 1; transform: scale(1.03); }   /* single image: zoom only */
+}
+
+/* ---------- 10. BEFORE / AFTER SLIDER ---------- */
+.ssz-ba { --pos: 50%; position: relative; max-width: 720px; margin: 0 auto; aspect-ratio: 4 / 3; overflow: hidden; }
+.ssz-ba__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ssz-ba__img--top { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.ssz-ba__divider { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: #fff; pointer-events: none; }
+.ssz-ba__handle { position: absolute; top: 50%; left: calc(var(--pos) - 18px); width: 36px; height: 36px; display: grid; place-items: center;
+  color: var(--ssz-ink); background: #fff; border: 1px solid #5d5d5d; border-radius: 50%; transform: translateY(-50%); pointer-events: none;
+  transition: transform var(--ssz-t-default); }
+.ssz-ba__handle svg { width: 16px; height: 16px; }
+.ssz-ba__range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+.ssz-ba__range:hover ~ .ssz-ba__handle, .ssz-ba__range:focus-visible ~ .ssz-ba__handle { transform: translateY(-50%) scale(1.1); }
+.ssz-ba__range:focus-visible ~ .ssz-ba__handle { outline: 2px solid var(--ssz-ink); outline-offset: 3px; }
+.ssz-ba__label { position: absolute; bottom: 12px; padding: 2px 12px; font-size: 12px; color: var(--ssz-ink); background: rgba(255,255,255,.9); border-radius: 40px; pointer-events: none; }
+.ssz-ba__label--before { left: 12px; } .ssz-ba__label--after { right: 12px; }
+
+/* ---------- 11. SHOPPABLE VIDEO CAROUSEL ---------- */
+.ssz-sv__track { display: flex; gap: 16px; margin: 0; padding: 0 0 4px; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
+.ssz-sv__track::-webkit-scrollbar { display: none; }
+.ssz-sv__card { flex: 0 0 calc((100% - 16px) / 1.3); scroll-snap-align: start; }                         /* 1.3 cards */
+@media (min-width: 768px)  { .ssz-sv__card { flex-basis: calc((100% - 32px) / 3); } }                    /* 3 cards */
+@media (min-width: 1024px) { .ssz-sv__card { flex-basis: calc((100% - 64px) / 5); } }                    /* 5 cards */
+.ssz-sv__video { position: relative; display: block; width: 100%; padding: 0; font: inherit; letter-spacing: inherit; aspect-ratio: 9 / 16; overflow: hidden; border: 0; border-radius: 10px; cursor: pointer; background: #000; }
+.ssz-sv__video > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ssz-sv__video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0) 45%); }
+.ssz-sv__caption { position: absolute; z-index: 1; inset: auto 12px 12px 12px; height: auto; margin: 0; font-size: 13px; line-height: 1.4; text-align: left; color: #fff; }
+.ssz-sv__product { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: center; margin-top: 10px; }
+.ssz-sv__thumb { width: 48px; height: 48px; object-fit: cover; }
+.ssz-sv__name { font-size: 13px; line-height: 1.3; color: var(--ssz-ink); }
+.ssz-sv__price { font-size: 13px; }
+.ssz-sv__add { width: 100%; margin-top: 10px; padding: 9px 12px; font-family: var(--ssz-font-display); font-size: 14px; cursor: pointer;
+  color: #000; background: #fff; border: 1px solid #000; border-radius: 0; transition: all var(--ssz-t-bar) ease; }
+.ssz-sv__add:hover { color: #fff; background: #000; }
+.ssz-sv__nav { display: none; gap: 8px; }
+@media (hover: hover) and (min-width: 768px) { .ssz-sv__nav { display: flex; } }
+.ssz-sv__arrow { display: grid; place-items: center; width: 40px; height: 40px; color: var(--ssz-ink); background: var(--ssz-paper); border: 1px solid var(--ssz-line-strong); border-radius: 50%; cursor: pointer; transition: all var(--ssz-t-bar) ease; }
+.ssz-sv__arrow:hover { color: #fff; background: var(--ssz-ink); }
+.ssz-sv__arrow svg { width: 14px; height: 14px; }
+
+/* ---------- 12. DIALOG (video modal, pop-in) ---------- */
+.ssz-dialog { width: min(92vw, 760px); padding: 0; color: inherit; background: var(--ssz-paper); border: 1px solid var(--ssz-line); }
+.ssz-dialog[open] { animation: ssz-pop-in .34s var(--ssz-ease-pop); }
+.ssz-dialog::backdrop { background: rgba(0, 0, 0, .6); animation: ssz-fade-in .28s ease-out; }
+@keyframes ssz-pop-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+.ssz-dialog__body { display: grid; gap: 20px; padding: 20px; }
+@media (min-width: 750px) { .ssz-dialog__body { grid-template-columns: 300px 1fr; align-items: center; } }
+.ssz-dialog__close { position: absolute; top: 8px; right: 8px; }
+
+/* ---------- 13. TESTIMONIAL MARQUEE (45s loop, pauses on hover) ---------- */
+.ssz-marquee { overflow: hidden; }
+.ssz-marquee + .ssz-marquee { margin-top: 12px; }
+.ssz-marquee__track { display: flex; gap: 16px; width: max-content; margin: 0; padding: 0; list-style: none; }
+.ssz-marquee__item { display: flex; align-items: center; gap: 12px; padding: 8px 24px 8px 8px; font-size: 15px; white-space: nowrap;
+  background: var(--ssz-paper); border: 1px solid var(--ssz-line); border-radius: 100px; }
+.ssz-marquee__avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+.ssz-marquee__rating { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: var(--ssz-ink); }
+.ssz-marquee__rating svg { width: 14px; height: 14px; fill: var(--ssz-rose-gold); }
+@keyframes ssz-marquee { from { transform: translateX(0); } to { transform: translateX(calc(-50% - 8px)); } }  /* 8px = half the gap */
+
+/* ---------- 14. SPINNER (loading state on buttons) ---------- */
+.ssz-spinner { width: 18px; height: 18px; animation: ssz-rotate 1.4s linear infinite; }
+.ssz-spinner circle { fill: none; stroke: currentColor; stroke-width: 6; stroke-dasharray: 280; stroke-dashoffset: 0; transform-origin: center; animation: ssz-dash 1.4s ease-in-out infinite; }
+@keyframes ssz-rotate { to { transform: rotate(270deg); } }
+@keyframes ssz-dash { 0% { stroke-dashoffset: 280; } 50% { stroke-dashoffset: 75; transform: rotate(135deg); } 100% { stroke-dashoffset: 280; transform: rotate(450deg); } }
+
+/* ---------- 15. FOOTER ---------- */
+.ssz-footer { padding: 48px 0 24px; border-top: 1px solid var(--ssz-line); font-size: 14px; }
+.ssz-footer__grid { display: grid; gap: 32px; }
+@media (min-width: 750px) { .ssz-footer__grid { grid-template-columns: repeat(4, 1fr); } }
+.ssz-footer h2 { margin-bottom: 12px; font-size: 16px; }
+.ssz-footer ul { margin: 0; padding: 0; list-style: none; }
+.ssz-footer li a { display: inline-block; padding: 4px 0; text-decoration: none; }
+.ssz-footer li a:hover { color: var(--ssz-ink); text-decoration: underline; text-underline-offset: 3px; }
+.ssz-field { display: flex; }
+.ssz-field input { flex: 1; min-width: 0; height: 45px; padding: 0 14px; font: inherit; color: var(--ssz-ink); background: transparent; border: 1px solid var(--ssz-line-strong); border-right: 0; border-radius: 0; }
+.ssz-footer__bottom { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--ssz-line); font-size: 12px; text-align: center; }
+
+/* ---------- 16. MOTION SWITCH ---------- */
+/* Looping and automatic animation runs only when the visitor allows motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .ssz-story__ring { animation: ssz-ring-draw 6s ease-out infinite alternate; }
+  .ssz-story:hover .ssz-story__ring { animation-duration: 10s; }
+  .ssz-marquee__track { animation: ssz-marquee var(--ssz-marquee-speed, 45s) linear infinite; }
+  .ssz-marquee__track--reverse { animation-direction: reverse; }
+  .ssz-marquee:hover .ssz-marquee__track { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ssz-js .ssz-reveal { opacity: 1; animation: none !important; }
+  .ssz-marquee { overflow-x: auto; }
+  .ssz-spinner, .ssz-spinner circle { animation-duration: 3s; }
+  * { scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="ssz-announce" data-ssz-announce aria-live="polite">
+  <p class="ssz-announce__msg is-active">Cash on delivery available</p>
+  <p class="ssz-announce__msg">Every order confirmed on WhatsApp</p>
+  <p class="ssz-announce__msg">7-day easy returns and exchanges</p>
+</div>
+
+<!-- HEADER -->
+<header class="ssz-header" data-ssz-header>
+  <div class="ssz-container ssz-header__inner">
+    <button class="ssz-icon-btn ssz-menu-btn" data-ssz-drawer-open aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <a class="ssz-logo" href="#">SS ZEN TRADERS</a> <!-- replace with logo image -->
+    <nav class="ssz-nav" aria-label="Main">
+      <a class="ssz-nav__item" href="#"><span>Home</span></a>
+      <a class="ssz-nav__item" href="#"><span>Shop</span></a>
+      <details class="ssz-menu">
+        <summary class="ssz-nav__item"><span>Brands</span></summary>
+        <ul class="ssz-menu__panel">
+          <li><a href="#">SADOER</a></li>
+          <li><a href="#">Hero Cosmetics</a></li>
+          <li><a href="#">SOME BY MI</a></li>
+        </ul>
+      </details>
+      <a class="ssz-nav__item" href="#"><span>About us</span></a>
+      <a class="ssz-nav__item" href="#"><span>Contact</span></a>
+    </nav>
+    <div class="ssz-header__icons">
+      <button class="ssz-icon-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+      <button class="ssz-icon-btn" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE MENU DRAWER -->
+<div class="ssz-drawer" data-ssz-drawer>
+  <div class="ssz-drawer__backdrop" data-ssz-drawer-close></div>
+  <nav class="ssz-drawer__panel" aria-label="Mobile">
+    <button class="ssz-icon-btn" data-ssz-drawer-close aria-label="Close menu" style="margin-left: 12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+    <a href="#">Home</a><a href="#">Shop</a><a href="#">SADOER</a><a href="#">Hero Cosmetics</a><a href="#">SOME BY MI</a><a href="#">About us</a><a href="#">Contact</a>
+  </nav>
+</div>
+
+<main>
+
+<!-- STORY CIRCLES -->
+<nav class="ssz-stories" aria-label="Shop by category">
+  <a class="ssz-story" href="#"><div class="ssz-story__circle"><div class="ssz-story__img ssz-ph ssz-ph--alt"></div><svg class="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg></div>SADOER</a>
+  <a class="ssz-story" href="#"><div class="ssz-story__circle"><div class="ssz-story__img ssz-ph"></div><svg class="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg></div>Hero</a>
+  <a class="ssz-story" href="#"><div class="ssz-story__circle"><div class="ssz-story__img ssz-ph ssz-ph--alt"></div><svg class="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg></div>SOME BY MI</a>
+  <a class="ssz-story" href="#"><div class="ssz-story__circle"><div class="ssz-story__img ssz-ph"></div><svg class="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg></div>Masks</a>
+  <a class="ssz-story" href="#"><div class="ssz-story__circle"><div class="ssz-story__img ssz-ph ssz-ph--alt"></div><svg class="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg></div>Toners</a>
+  <a class="ssz-story" href="#"><div class="ssz-story__circle"><div class="ssz-story__img ssz-ph"></div><svg class="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/></svg></div>Patches</a>
+</nav>
+
+<!-- HERO BANNER -->
+<section class="ssz-banner" data-ssz-banner data-interval="5000" aria-label="Featured">
+  <div class="ssz-banner__slide is-active">
+    <div class="ssz-banner__media ssz-ph ssz-ph--rose ssz-ph--top">Hero video or photo 1</div>
+    <div class="ssz-banner__content">
+      <h1 class="ssz-banner__heading">Authentic skincare, without the guesswork</h1>
+      <p class="ssz-banner__text">Genuine products, confirmed with you on WhatsApp before they ship.</p>
+      <div class="ssz-banner__actions">
+        <a class="ssz-banner__btn" href="#">Shop all products</a>
+        <a class="ssz-banner__btn ssz-banner__btn--ghost" href="#">See our brands</a>
+      </div>
+    </div>
+  </div>
+  <div class="ssz-banner__slide">
+    <div class="ssz-banner__media ssz-ph ssz-ph--dark ssz-ph--top">Hero video or photo 2</div>
+    <div class="ssz-banner__content">
+      <h2 class="ssz-banner__heading">SOME BY MI 30 Days Miracle Toner</h2>
+      <p class="ssz-banner__text">AHA, BHA and PHA in one daily toner.</p>
+      <div class="ssz-banner__actions"><a class="ssz-banner__btn" href="#">Shop the toner</a></div>
+    </div>
+  </div>
+  <div class="ssz-banner__dots" data-ssz-banner-dots></div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="ssz-section ssz-section--mist">
+  <div class="ssz-container">
+    <div class="ssz-section__head">
+      <h2 class="ssz-reveal">Featured products</h2>
+      <a class="ssz-arrow-link ssz-reveal" href="#">View all <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1 7h12M8 2l5 5-5 5"/></svg></a>
+    </div>
+    <ul class="ssz-grid" style="--cols: 3" data-ssz-cascade>
+      <li class="ssz-reveal"><a class="ssz-card" href="#">
+        <div class="ssz-card__media"><div class="ssz-card__img ssz-ph">Product photo</div><div class="ssz-card__img ssz-card__img--hover ssz-ph ssz-ph--alt">Second photo (on hover)</div><span class="ssz-badge ssz-card__badge">Sale</span></div>
+        <div class="ssz-card__info"><h3 class="ssz-card__title">SADOER Collagen Anti-Aging Facial Mask</h3><div class="ssz-price"><s>Rs.800.00</s>Rs.549.00</div></div></a></li>
+      <li class="ssz-reveal"><a class="ssz-card" href="#">
+        <div class="ssz-card__media"><div class="ssz-card__img ssz-ph">Product photo</div><div class="ssz-card__img ssz-card__img--hover ssz-ph ssz-ph--alt">Second photo (on hover)</div><span class="ssz-badge ssz-card__badge">Sale</span></div>
+        <div class="ssz-card__info"><h3 class="ssz-card__title">Hero Mighty Patch Invisible+</h3><div class="ssz-price"><s>Rs.5,999.00</s>Rs.4,400.00</div></div></a></li>
+      <li class="ssz-reveal"><a class="ssz-card" href="#">
+        <div class="ssz-card__media"><div class="ssz-card__img ssz-ph">Product photo</div><div class="ssz-card__img ssz-card__img--hover ssz-ph ssz-ph--alt">Second photo (on hover)</div><span class="ssz-badge ssz-card__badge">Sale</span></div>
+        <div class="ssz-card__info"><h3 class="ssz-card__title">SOME BY MI AHA BHA PHA 30 Days Miracle Toner</h3><div class="ssz-price"><s>Rs.11,999.00</s>Rs.7,900.00</div></div></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="ssz-section">
+  <div class="ssz-container">
+    <div class="ssz-section__head" style="justify-content: center"><h2 class="ssz-reveal">Before and after</h2></div>
+    <div class="ssz-ba ssz-reveal ssz-reveal--fade" data-ssz-ba>
+      <div class="ssz-ba__img ssz-ph ssz-ph--alt ssz-ph--top">After photo</div>
+      <div class="ssz-ba__img ssz-ba__img--top ssz-ph ssz-ph--top">Before photo</div>
+      <span class="ssz-ba__label ssz-ba__label--before">Before</span>
+      <span class="ssz-ba__label ssz-ba__label--after">After</span>
+      <span class="ssz-ba__divider"></span>
+      <input class="ssz-ba__range" type="range" min="0" max="100" value="50" aria-label="Move to compare before and after">
+      <span class="ssz-ba__handle"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3 2 8l4 5M10 3l4 5-4 5"/></svg></span>
+    </div>
+  </div>
+</section>
+
+<!-- SHOPPABLE VIDEOS -->
+<section class="ssz-section ssz-section--mist">
+  <div class="ssz-container" data-ssz-sv>
+    <div class="ssz-section__head">
+      <h2 class="ssz-display ssz-reveal" style="font-size: 28px">Watch and shop</h2>
+      <div class="ssz-sv__nav">
+        <button class="ssz-sv__arrow" data-dir="-1" aria-label="Previous videos"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2 4 7l5 5"/></svg></button>
+        <button class="ssz-sv__arrow" data-dir="1" aria-label="Next videos"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m5 2 5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <ul class="ssz-sv__track" data-ssz-cascade>
+      <li class="ssz-sv__card ssz-reveal"><button class="ssz-sv__video" data-ssz-open><div class="ssz-ph ssz-ph--dark">Vertical video 9:16</div><p class="ssz-sv__caption">Video caption</p></button>
+        <div class="ssz-sv__product"><div class="ssz-sv__thumb ssz-ph"></div><div><div class="ssz-sv__name">SADOER Collagen Facial Mask</div><div class="ssz-sv__price">Rs.549.00</div></div></div><button class="ssz-sv__add">Add to cart</button></li>
+      <li class="ssz-sv__card ssz-reveal"><button class="ssz-sv__video" data-ssz-open><div class="ssz-ph ssz-ph--rose">Vertical video 9:16</div><p class="ssz-sv__caption">Video caption</p></button>
+        <div class="ssz-sv__product"><div class="ssz-sv__thumb ssz-ph"></div><div><div class="ssz-sv__name">Hero Mighty Patch Invisible+</div><div class="ssz-sv__price">Rs.4,400.00</div></div></div><button class="ssz-sv__add">Add to cart</button></li>
+      <li class="ssz-sv__card ssz-reveal"><button class="ssz-sv__video" data-ssz-open><div class="ssz-ph ssz-ph--dark">Vertical video 9:16</div><p class="ssz-sv__caption">Video caption</p></button>
+        <div class="ssz-sv__product"><div class="ssz-sv__thumb ssz-ph"></div><div><div class="ssz-sv__name">SOME BY MI Miracle Toner</div><div class="ssz-sv__price">Rs.7,900.00</div></div></div><button class="ssz-sv__add">Add to cart</button></li>
+      <li class="ssz-sv__card ssz-reveal"><button class="ssz-sv__video" data-ssz-open><div class="ssz-ph ssz-ph--rose">Vertical video 9:16</div><p class="ssz-sv__caption">Video caption</p></button>
+        <div class="ssz-sv__product"><div class="ssz-sv__thumb ssz-ph"></div><div><div class="ssz-sv__name">SADOER Collagen Facial Mask</div><div class="ssz-sv__price">Rs.549.00</div></div></div><button class="ssz-sv__add">Add to cart</button></li>
+      <li class="ssz-sv__card ssz-reveal"><button class="ssz-sv__video" data-ssz-open><div class="ssz-ph ssz-ph--dark">Vertical video 9:16</div><p class="ssz-sv__caption">Video caption</p></button>
+        <div class="ssz-sv__product"><div class="ssz-sv__thumb ssz-ph"></div><div><div class="ssz-sv__name">Hero Mighty Patch Invisible+</div><div class="ssz-sv__price">Rs.4,400.00</div></div></div><button class="ssz-sv__add">Add to cart</button></li>
+      <li class="ssz-sv__card ssz-reveal"><button class="ssz-sv__video" data-ssz-open><div class="ssz-ph ssz-ph--rose">Vertical video 9:16</div><p class="ssz-sv__caption">Video caption</p></button>
+        <div class="ssz-sv__product"><div class="ssz-sv__thumb ssz-ph"></div><div><div class="ssz-sv__name">SOME BY MI Miracle Toner</div><div class="ssz-sv__price">Rs.7,900.00</div></div></div><button class="ssz-sv__add">Add to cart</button></li>
+    </ul>
+  </div>
+</section>
+
+<!-- VIDEO DIALOG -->
+<dialog class="ssz-dialog" data-ssz-dialog aria-label="Product video">
+  <button class="ssz-icon-btn ssz-dialog__close" data-ssz-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+  <div class="ssz-dialog__body">
+    <div class="ssz-ph ssz-ph--dark" style="aspect-ratio: 9/16; max-height: 60vh; margin: 0 auto; border-radius: 10px">Video with sound and controls</div>
+    <div>
+      <h2>Product name</h2>
+      <div class="ssz-price">Rs.0.00</div>
+      <p>Short product description.</p>
+      <button class="ssz-btn">Add to cart</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- TESTIMONIAL MARQUEE (real customer reviews only) -->
+<section class="ssz-section">
+  <div class="ssz-container"><div class="ssz-section__head" style="justify-content: center"><h2 class="ssz-reveal">What customers say</h2></div></div>
+  <div class="ssz-marquee" data-ssz-marquee>
+    <ul class="ssz-marquee__track">
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph ssz-ph--alt"></div><span class="ssz-marquee__rating">5 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>Real customer review goes here</li>
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph"></div><span class="ssz-marquee__rating">5 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>One short sentence from a verified buyer</li>
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph ssz-ph--alt"></div><span class="ssz-marquee__rating">4 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>Keep each quote under 120 characters</li>
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph"></div><span class="ssz-marquee__rating">5 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>Real customer review goes here</li>
+    </ul>
+  </div>
+  <div class="ssz-marquee" data-ssz-marquee>
+    <ul class="ssz-marquee__track ssz-marquee__track--reverse">
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph"></div><span class="ssz-marquee__rating">5 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>One short sentence from a verified buyer</li>
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph ssz-ph--alt"></div><span class="ssz-marquee__rating">5 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>Real customer review goes here</li>
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph"></div><span class="ssz-marquee__rating">4 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>Keep each quote under 120 characters</li>
+      <li class="ssz-marquee__item"><div class="ssz-marquee__avatar ssz-ph ssz-ph--alt"></div><span class="ssz-marquee__rating">5 <svg viewBox="0 0 20 20"><path d="m10 1 2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L10 15l-5.6 3.1 1.2-6.2L1 7.6l6.3-.8L10 1Z"/></svg></span>One short sentence from a verified buyer</li>
+    </ul>
+  </div>
+</section>
+
+<!-- COMPONENT SAMPLES -->
+<section class="ssz-section ssz-section--mist">
+  <div class="ssz-container">
+    <div class="ssz-section__head"><h2 class="ssz-reveal">Buttons and states</h2></div>
+    <div class="ssz-reveal" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center">
+      <button class="ssz-btn">Add to cart</button>
+      <button class="ssz-btn ssz-btn--outline">View details</button>
+      <button class="ssz-btn" aria-label="Adding to cart"><svg class="ssz-spinner" viewBox="0 0 66 66"><circle cx="33" cy="33" r="30"/></svg></button>
+      <button class="ssz-btn" disabled>Sold out</button>
+      <span class="ssz-badge">Sale</span>
+      <a class="ssz-link" href="#">Text link</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="ssz-footer">
+  <div class="ssz-container">
+    <div class="ssz-footer__grid" data-ssz-cascade>
+      <div class="ssz-reveal"><h2>Quick links</h2><ul><li><a href="#">Home</a></li><li><a href="#">Shop</a></li><li><a href="#">About us</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div class="ssz-reveal"><h2>Customer care</h2><ul><li><a href="#">Shipping policy</a></li><li><a href="#">Refunds</a></li><li><a href="#">Privacy policy</a></li></ul></div>
+      <div class="ssz-reveal"><h2>Office</h2><p style="margin: 0">Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad<br>03079594474<br>info@sszentraders.com</p></div>
+      <div class="ssz-reveal"><h2>Subscribe to our emails</h2><form class="ssz-field" onsubmit="return false"><input type="email" placeholder="Email" aria-label="Email"><button class="ssz-btn">Subscribe</button></form></div>
+    </div>
+    <div class="ssz-footer__bottom">© <span data-ssz-year></span> SS Zen Traders</div>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   BEHAVIOUR. Plain JavaScript, no libraries.
+   Each block is independent. Port them to the project's own framework.
+   ===================================================================== */
+(() => {
+  const root = document.documentElement;
+  root.classList.add('ssz-js');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 1. Scroll reveal: add .is-visible once, 50px before the element enters. Stagger siblings by 75ms. */
+  document.querySelectorAll('[data-ssz-cascade]').forEach(group =>
+    [...group.children].forEach((el, i) => el.style.setProperty('--i', i)));
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+  }), { rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.ssz-reveal').forEach(el => io.observe(el));
+
+  /* 2. Header: hide on scroll down, show on scroll up. */
+  const header = document.querySelector('[data-ssz-header]');
+  let lastY = scrollY;
+  addEventListener('scroll', () => {
+    const y = scrollY;
+    header.classList.toggle('is-hidden', y > lastY && y > header.offsetHeight + 40);
+    lastY = y;
+  }, { passive: true });
+
+  /* 3. Dropdown menus: close on outside click and on Escape. */
+  addEventListener('click', e => document.querySelectorAll('.ssz-menu[open]').forEach(m => { if (!m.contains(e.target)) m.open = false; }));
+  addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.ssz-menu[open]').forEach(m => m.open = false); });
+
+  /* 3b. Mobile drawer. */
+  const drawer = document.querySelector('[data-ssz-drawer]');
+  document.querySelectorAll('[data-ssz-drawer-open]').forEach(b => b.addEventListener('click', () => drawer.classList.add('is-open')));
+  drawer.querySelectorAll('[data-ssz-drawer-close]').forEach(b => b.addEventListener('click', () => drawer.classList.remove('is-open')));
+  addEventListener('keydown', e => { if (e.key === 'Escape') drawer.classList.remove('is-open'); });
+
+  /* 4. Announcement bar: next message every 5s. */
+  const bar = document.querySelector('[data-ssz-announce]');
+  if (bar && !reduceMotion) {
+    const msgs = [...bar.children]; let i = 0;
+    setInterval(() => {
+      const prev = msgs[i]; i = (i + 1) % msgs.length;
+      prev.classList.remove('is-active'); prev.classList.add('is-leaving');
+      msgs[i].classList.add('is-active');
+      setTimeout(() => prev.classList.remove('is-leaving'), 300);
+    }, 5000);
+  }
+
+  /* 5. Hero banner: crossfade. Image slides advance on a timer.
+        For video slides, call go(next) on the video's "ended" event instead. */
+  document.querySelectorAll('[data-ssz-banner]').forEach(banner => {
+    const slides = [...banner.querySelectorAll('.ssz-banner__slide')];
+    const dotsWrap = banner.querySelector('[data-ssz-banner-dots]');
+    if (slides.length < 2) return;
+    let i = 0, timer;
+    const dots = slides.map((_, n) => {
+      const d = document.createElement('button');
+      d.className = 'ssz-banner__dot'; d.setAttribute('aria-label', 'Show slide ' + (n + 1));
+      d.addEventListener('click', () => { go(n); start(); });
+      dotsWrap.append(d); return d;
+    });
+    const go = n => {
+      i = n;
+      slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
+      dots.forEach((d, k) => d.classList.toggle('is-active', k === i));
+    };
+    const start = () => { clearInterval(timer); if (!reduceMotion) timer = setInterval(() => go((i + 1) % slides.length), +banner.dataset.interval || 5000); };
+    go(0);
+    new IntersectionObserver(([e]) => e.isIntersecting ? start() : clearInterval(timer)).observe(banner);   // pause off screen
+  });
+
+  /* 6. Before / after: the range input drives one CSS variable. */
+  document.querySelectorAll('[data-ssz-ba]').forEach(ba => {
+    const range = ba.querySelector('.ssz-ba__range');
+    range.addEventListener('input', () => ba.style.setProperty('--pos', range.value + '%'));
+  });
+
+  /* 7. Shoppable videos: arrows scroll by one card; video opens the dialog.
+        With real <video> elements, play each one only while it is in view. */
+  document.querySelectorAll('[data-ssz-sv]').forEach(sv => {
+    const track = sv.querySelector('.ssz-sv__track');
+    sv.querySelectorAll('.ssz-sv__arrow').forEach(btn => btn.addEventListener('click', () => {
+      const card = track.querySelector('.ssz-sv__card');
+      track.scrollBy({ left: +btn.dataset.dir * (card.offsetWidth + 16) });
+    }));
+    const inView = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? e.target.play() : e.target.pause()), { threshold: .5 });
+    track.querySelectorAll('video').forEach(v => inView.observe(v));
+  });
+  const dialog = document.querySelector('[data-ssz-dialog]');
+  document.querySelectorAll('[data-ssz-open]').forEach(b => b.addEventListener('click', () => dialog.showModal()));
+  dialog.querySelector('[data-ssz-close]').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });                    // backdrop click
+
+  /* 8. Marquee: duplicate the items once so the loop is seamless. */
+  document.querySelectorAll('[data-ssz-marquee] .ssz-marquee__track').forEach(track => {
+    [...track.children].forEach(item => { const c = item.cloneNode(true); c.setAttribute('aria-hidden', 'true'); track.append(c); });
+  });
+
+  document.querySelectorAll('[data-ssz-year]').forEach(el => el.textContent = new Date().getFullYear());
+})();
+</script>
+</body>
+</html>

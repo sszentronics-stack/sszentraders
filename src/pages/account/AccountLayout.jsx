@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSeo } from '../../hooks/useSeo'
+import { loadLocalProfile } from '../../lib/localAccount'
 
 const NAV = [
   { to: '/account', label: 'Profile', end: true },
@@ -13,38 +15,57 @@ const NAV = [
 ]
 
 export default function AccountLayout() {
-  const { profile, user, logout } = useAuth()
-  const displayName = profile?.firstName || user?.email
+  const { profile, user, logout, configured } = useAuth()
+  const [revision, setRevision] = useState(0)
+  useEffect(() => {
+    const refresh = () => setRevision((n) => n + 1)
+    window.addEventListener('sszentronics-account', refresh)
+    return () => window.removeEventListener('sszentronics-account', refresh)
+  }, [])
+  const local = configured ? null : loadLocalProfile()
+  void revision
+  const displayName = profile?.firstName || local?.firstName || user?.email
 
-  useSeo({ title: 'My Account | SS Zen Traders', noindex: true })
+  useSeo({ title: 'My Account | SSzentronics', noindex: true })
 
   return (
-    <div className="container-aura py-12 md:py-16">
-      <div className="mb-8">
-        <h1 className="text-3xl font-medium font-display">My Account</h1>
-        {displayName && <p className="text-ink-soft mt-1">Welcome back, {displayName}.</p>}
-      </div>
-
-      <div className="account-shell">
-        <nav className="account-nav">
-          {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => (isActive ? 'active' : '')}>
-              {item.label}
-            </NavLink>
-          ))}
-          <button
-            type="button"
-            onClick={logout}
-            className="text-left"
-            style={{ padding: '14px 18px', fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#c31818', border: 0, background: 'none', cursor: 'pointer' }}
-          >
-            Sign Out
-          </button>
-        </nav>
-
-        <div className="account-panel">
-          <Outlet />
-        </div>
+    <div className="container py-4 py-lg-5">
+      <div className="row g-4">
+        <aside className="col-lg-3">
+          <div className="card border-0 shadow-sm">
+            <div className="card-body">
+              <p className="text-uppercase small text-secondary mb-1">SSzentronics</p>
+              <h1 className="h3 mb-1">My account</h1>
+              <p className="text-secondary mb-4">{displayName ? `Welcome back, ${displayName}.` : 'Welcome back.'}</p>
+              <nav className="d-flex flex-column" aria-label="Account">
+                {NAV.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) => `account-pill${isActive ? ' active' : ''}`}
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+              {configured ? (
+                <button type="button" className="btn btn-outline-dark w-100 mt-3" onClick={logout}>
+                  Sign out
+                </button>
+              ) : (
+                <p className="small text-secondary mt-3 mb-0">Profile and addresses are saved on this device.</p>
+              )}
+            </div>
+          </div>
+        </aside>
+        <section className="col-lg-9">
+          <div className="card border-0 shadow-sm">
+            <div className="card-body p-4 p-lg-5">
+              <Outlet />
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   )

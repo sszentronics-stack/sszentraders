@@ -1,23 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, Search, ShoppingBag, User, X } from 'lucide-react'
-import Logo from './Logo'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useProducts } from '../hooks/useCatalog'
 import { suggestProducts } from '../lib/productSearch'
 import { formatPKR } from '../data/products'
+import Logo from './Logo'
 
-const NAV = [
-  { to: '/shop', label: 'Shop' },
-  { to: '/products/sadoer-collagen-anti-aging-facial-mask', label: 'SADOER Mask' },
-  { to: '/products/hero-mighty-patch-invisible-plus', label: 'Mighty Patch' },
-  { to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner', label: 'SOME BY MI' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+const BRANDS = [
+  { to: '/shop?brand=SADOER', label: 'SADOER' },
+  { to: '/shop?brand=Hero%20Cosmetics', label: 'Hero Cosmetics' },
+  { to: '/shop?brand=SOME%20BY%20MI', label: 'SOME BY MI' },
 ]
 
-export default function Header({ onSearch }) {
+export default function Header() {
   const { count, setIsOpen } = useCart()
   const { isAuthenticated, configured } = useAuth()
   const { products } = useProducts()
@@ -25,165 +21,113 @@ export default function Header({ onSearch }) {
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const navigate = useNavigate()
-
+  const accountTo = configured && !isAuthenticated ? '/login' : '/account'
   const suggestions = useMemo(() => suggestProducts(products, query, 5), [products, query])
 
-  const goToShop = (q) => {
+  useEffect(() => {
+    const header = document.querySelector('[data-ssz-header]')
+    if (!header) return undefined
+    let lastY = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      header.classList.toggle('is-hidden', y > lastY && y > header.offsetHeight + 40)
+      lastY = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  function goToShop(q) {
     setSearchOpen(false)
     setMenuOpen(false)
     setQuery('')
-    if (onSearch) onSearch()
     navigate(q ? `/shop?q=${encodeURIComponent(q)}` : '/shop')
   }
 
-  const submitSearch = (e) => {
-    e.preventDefault()
-    goToShop(query.trim())
-  }
-
   return (
-    <header className="header-bar">
-      <div className="container-aura flex items-center justify-between gap-4 h-[92px]">
-        <button
-          type="button"
-          className="lg:hidden text-ink"
-          aria-label="Open menu"
-          onClick={() => setMenuOpen(true)}
-        >
-          <Menu size={22} />
-        </button>
-
-        <Logo />
-
-        <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
-          {NAV.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-4 text-ink">
-          <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>
-            <Search size={20} />
+    <>
+      <header className="ssz-header" data-ssz-header>
+        <div className="ssz-container ssz-header__inner">
+          <button type="button" className="ssz-icon-btn ssz-menu-btn" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
           </button>
-          {configured && (
-            <Link to={isAuthenticated ? '/account' : '/login'} aria-label={isAuthenticated ? 'My account' : 'Sign in'}>
-              <User size={20} />
+          <Logo />
+          <nav className="ssz-nav" aria-label="Main">
+            <NavLink className={({ isActive }) => `ssz-nav__item${isActive ? ' is-active' : ''}`} to="/"><span>Home</span></NavLink>
+            <NavLink className={({ isActive }) => `ssz-nav__item${isActive ? ' is-active' : ''}`} to="/shop"><span>Shop</span></NavLink>
+            <details className="ssz-menu">
+              <summary className="ssz-nav__item"><span>Brands</span></summary>
+              <ul className="ssz-menu__panel">
+                {BRANDS.map((brand) => (
+                  <li key={brand.to}><Link to={brand.to}>{brand.label}</Link></li>
+                ))}
+              </ul>
+            </details>
+            <NavLink className={({ isActive }) => `ssz-nav__item${isActive ? ' is-active' : ''}`} to="/gallery"><span>Gallery</span></NavLink>
+            <NavLink className={({ isActive }) => `ssz-nav__item${isActive ? ' is-active' : ''}`} to="/about"><span>About us</span></NavLink>
+            <NavLink className={({ isActive }) => `ssz-nav__item${isActive ? ' is-active' : ''}`} to="/contact"><span>Contact</span></NavLink>
+          </nav>
+          <div className="ssz-header__icons">
+            <button type="button" className="ssz-icon-btn" aria-label="Search" aria-expanded={searchOpen} onClick={() => setSearchOpen((open) => !open)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+            </button>
+            <Link className="ssz-icon-btn" to={accountTo} aria-label={isAuthenticated ? 'My account' : 'Account'}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="3" /><path d="M5 19a7 7 0 0 1 14 0" /></svg>
             </Link>
-          )}
-          <button
-            type="button"
-            className="relative"
-            aria-label="Open cart"
-            onClick={() => setIsOpen(true)}
-          >
-            <ShoppingBag size={20} />
-            <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] rounded-full bg-rose text-white text-[11px] font-semibold grid place-items-center px-1">
-              {count}
-            </span>
-          </button>
+            <button type="button" className="ssz-icon-btn" aria-label="Cart" onClick={() => setIsOpen(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 8h14l-1 12H6L5 8Z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
+              {count > 0 && <span className="ssz-cart-count">{count}</span>}
+            </button>
+          </div>
         </div>
-      </div>
-
-      {searchOpen && (
-        <div className="drawer-overlay" onClick={() => setSearchOpen(false)}>
-          <div
-            className="absolute top-0 left-0 right-0 bg-white p-5 shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <form onSubmit={submitSearch} className="container-aura flex items-center gap-3">
-              <Search size={18} className="text-ink-soft" />
-              <input
-                autoFocus
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="What are you looking for?"
-                className="flex-1 border-0 outline-none text-lg py-2 text-ink"
-                role="combobox"
-                aria-expanded={suggestions.length > 0}
-                aria-controls="search-suggestions"
-              />
-              <button type="submit" className="text-sm font-medium">
-                Search
-              </button>
-              <button type="button" aria-label="Close search" onClick={() => setSearchOpen(false)}>
-                <X size={18} />
-              </button>
+        {searchOpen && (
+          <div className="ssz-search">
+            <form className="ssz-container" onSubmit={(event) => { event.preventDefault(); goToShop(query.trim()) }}>
+              <label className="visually-hidden" htmlFor="site-search">Search</label>
+              <input id="site-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search products" autoFocus />
+              <button type="submit" className="ssz-btn">Search</button>
             </form>
             {suggestions.length > 0 && (
-              <ul id="search-suggestions" className="container-aura mt-2 border-t border-[#eee] pt-2">
+              <ul className="ssz-container">
                 {suggestions.map((product) => (
                   <li key={product.id}>
-                    <button
-                      type="button"
-                      className="w-full flex items-center gap-3 py-2.5 text-left hover:bg-meta"
-                      onClick={() => {
-                        setSearchOpen(false)
-                        setMenuOpen(false)
-                        setQuery('')
-                        if (onSearch) onSearch()
-                        navigate(`/products/${product.slug}`)
-                      }}
-                    >
-                      <img src={product.images[0]} alt="" className="w-10 h-10 object-contain bg-meta shrink-0" />
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-sm truncate">{product.name}</span>
-                        <span className="block text-xs text-ink-soft">{product.brand}</span>
-                      </span>
-                      <span className="text-sm shrink-0">{formatPKR(product.price)}</span>
+                    <button type="button" onClick={() => { setSearchOpen(false); setQuery(''); navigate(`/products/${product.slug}`) }}>
+                      <img src={product.images[0]} alt="" width="40" height="40" />
+                      <span>{product.name}</span>
+                      <span>{formatPKR(product.price)}</span>
                     </button>
                   </li>
                 ))}
-                <li>
-                  <button type="button" className="w-full text-left py-2 text-sm underline text-ink-soft" onClick={() => goToShop(query.trim())}>
-                    See all results for "{query.trim()}"
-                  </button>
-                </li>
               </ul>
             )}
           </div>
-        </div>
-      )}
-
-      {menuOpen && (
-        <div className="drawer-overlay lg:hidden" onClick={() => setMenuOpen(false)}>
-          <div
-            className="absolute top-0 left-0 h-full w-[min(320px,88%)] bg-blush text-ink p-6 flex flex-col gap-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center">
-              <Logo compact />
-              <button type="button" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
-                <X />
-              </button>
-            </div>
-            {NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMenuOpen(false)}
-                className="nav-link text-base"
-              >
-                {item.label}
-              </Link>
-            ))}
-            {configured && (
-              <Link
-                to={isAuthenticated ? '/account' : '/login'}
-                onClick={() => setMenuOpen(false)}
-                className="nav-link text-base"
-              >
-                {isAuthenticated ? 'My Account' : 'Sign In'}
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
+        )}
+      </header>
+      <div className={`ssz-drawer${menuOpen ? ' is-open' : ''}`}>
+        <div className="ssz-drawer__backdrop" onClick={() => setMenuOpen(false)} />
+        <nav className="ssz-drawer__panel" aria-label="Mobile">
+          <button type="button" className="ssz-icon-btn" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 5l14 14M19 5 5 19" /></svg>
+          </button>
+          <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+          <Link to="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
+          {BRANDS.map((brand) => (
+            <Link key={brand.to} to={brand.to} onClick={() => setMenuOpen(false)}>{brand.label}</Link>
+          ))}
+          <Link to="/gallery" onClick={() => setMenuOpen(false)}>Gallery</Link>
+          <Link to="/about" onClick={() => setMenuOpen(false)}>About us</Link>
+          <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
+          <Link to={accountTo} onClick={() => setMenuOpen(false)}>{isAuthenticated ? 'My account' : 'Account'}</Link>
+        </nav>
+      </div>
+    </>
   )
 }

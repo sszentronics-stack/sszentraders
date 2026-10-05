@@ -8,6 +8,7 @@ import Layout from './components/Layout'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
+import Gallery from './pages/Gallery'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
@@ -62,11 +63,13 @@ const AdminErpSyncCenter = lazy(() => import('./pages/admin/erp/ErpSyncCenter'))
 const AdminInventoryCenter = lazy(() => import('./pages/admin/inventory/InventoryCenter'))
 const AdminReports = lazy(() => import('./pages/admin/reports/Reports'))
 const AdminSettings = lazy(() => import('./pages/admin/settings/Settings'))
+const AdminSiteContent = lazy(() => import('./pages/admin/content/SiteContent'))
 const AdminAuditLog = lazy(() => import('./pages/admin/audit/AuditLog'))
 const AdminPromotionsLayout = lazy(() => import('./pages/admin/promotions/AdminPromotionsLayout'))
 const AdminCampaigns = lazy(() => import('./pages/admin/promotions/Campaigns'))
 const AdminPromotions = lazy(() => import('./pages/admin/promotions/Promotions'))
 const AdminCoupons = lazy(() => import('./pages/admin/promotions/Coupons'))
+const AdminInfluencers = lazy(() => import('./pages/admin/promotions/Influencers'))
 const AdminAbandonedCarts = lazy(() => import('./pages/admin/promotions/AbandonedCarts'))
 
 function AdminFallback() {
@@ -93,6 +96,7 @@ export default function App() {
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/shop" element={<Shop />} />
+                <Route path="/gallery" element={<Gallery />} />
                 <Route path="/products/:slug" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
@@ -160,6 +164,7 @@ export default function App() {
                 <Route path="products/new" element={<AdminProductForm />} />
                 <Route path="products/:id" element={<AdminProductDetail />} />
                 <Route path="catalog" element={<AdminCatalogManager />} />
+                <Route path="content" element={<AdminSiteContent />} />
                 <Route path="orders" element={<AdminOrderList />} />
                 <Route path="orders/:id" element={<AdminOrderDetail />} />
                 <Route path="customers" element={<AdminCustomerList />} />
@@ -177,6 +182,7 @@ export default function App() {
                   <Route path="campaigns" element={<AdminCampaigns />} />
                   <Route path="promotions" element={<AdminPromotions />} />
                   <Route path="coupons" element={<AdminCoupons />} />
+                  <Route path="influencers" element={<AdminInfluencers />} />
                   <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
                 </Route>
                 <Route path="settings" element={<AdminSettings />} />

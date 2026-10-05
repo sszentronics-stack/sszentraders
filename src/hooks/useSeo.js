@@ -8,7 +8,7 @@
  *
  * Usage: useSeo({ title, description, image?, noindex? }) in a page
  * component. `title` is used as-is (callers should already include the
- * "SS Zen Traders" suffix where appropriate, matching index.html's
+ * "SSzentronics" suffix where appropriate, matching index.html's
  * default <title>).
  */
 import { useEffect } from 'react'

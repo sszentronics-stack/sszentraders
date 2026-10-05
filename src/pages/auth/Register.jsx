@@ -6,7 +6,7 @@ import { registerInputSchema } from '../../../backend/lib/validation/index'
 import { useSeo } from '../../hooks/useSeo'
 
 export default function Register() {
-  useSeo({ title: 'Create Account | SS Zen Traders', noindex: true })
+  useSeo({ title: 'Create Account | SSzentronics', noindex: true })
   const { register, configured } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -175,7 +175,7 @@ export default function Register() {
               onChange={(e) => setField('marketingOptIn')(e.target.checked)}
               disabled={!configured}
             />
-            <span>Send me offers and updates from SS Zen Traders.</span>
+            <span>Send me offers and updates from SSzentronics.</span>
           </label>
 
           <button type="submit" className="btn-lavender" disabled={submitting || !configured}>

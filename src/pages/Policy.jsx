@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 const PAGES = {
   privacy: {
     title: 'Privacy policy',
-    body: `SS Zen Traders collects only the information you share when you place an order — typically your name, WhatsApp number, city, and delivery address. We use this information to confirm and fulfill orders. We do not sell your personal information. Messages sent through WhatsApp are subject to WhatsApp’s own privacy terms. For questions, contact us on WhatsApp at +92 307 9594474.`,
+    body: `SSzentronics collects only the information you share when you place an order — typically your name, WhatsApp number, city, and delivery address. We use this information to confirm and fulfill orders. We do not sell your personal information. Messages sent through WhatsApp are subject to WhatsApp’s own privacy terms. For questions, contact us on WhatsApp at +92 307 9594474.`,
   },
   shipping: {
     title: 'Shipping policy',
@@ -15,7 +15,7 @@ const PAGES = {
   },
   terms: {
     title: 'Terms of service',
-    body: `By shopping at SS Zen Traders you agree that product listings are for reference, prices may change without notice until an order is confirmed, and we may refuse or cancel orders in case of pricing errors, stock issues, or suspected fraud. Skincare results vary. You are responsible for reading labels and following directions. These terms are governed by the laws of Pakistan.`,
+    body: `By shopping at SSzentronics you agree that product listings are for reference, prices may change without notice until an order is confirmed, and we may refuse or cancel orders in case of pricing errors, stock issues, or suspected fraud. Skincare results vary. You are responsible for reading labels and following directions. These terms are governed by the laws of Pakistan.`,
   },
 }
 

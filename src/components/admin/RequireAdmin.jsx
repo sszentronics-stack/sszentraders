@@ -57,13 +57,25 @@ export default function RequireAdmin({ children }) {
   }, [configured, initializing, isAuthenticated, authProfile, session?.user?.id])
 
   if (!configured) {
-    // Fail closed, not open: if Supabase env vars are ever missing/broken,
-    // /admin must not silently render unguarded (see git history — this
-    // briefly regressed to `return children` here, which would have made
-    // the entire admin console accessible with no gate at all).
+    // The rest of the console stays closed without a staff account.
+    // Influencer promo codes are stored on this device and are the one
+    // admin tool available before Supabase is connected.
+    if (location.pathname.startsWith('/admin/promotions/influencers') || location.pathname.startsWith('/admin/content')) {
+      return children
+    }
+    if (location.pathname === '/admin') {
+      return <Navigate to="/admin/promotions/influencers" replace />
+    }
     return (
       <div className="container-aura py-24 text-center">
-        <p className="text-ink-soft">The admin dashboard is not available yet.</p>
+        <h1 className="text-2xl font-medium font-display mb-3">Staff sign-in required</h1>
+        <p className="text-ink-soft mb-6">That part of the admin console needs a connected store account. Storefront copy and influencer codes can be edited before that.</p>
+        <a href="/admin/content" className="btn-lavender inline-block w-auto px-8 mr-3">
+          Edit storefront
+        </a>
+        <a href="/admin/promotions/influencers" className="btn-lavender inline-block w-auto px-8">
+          Influencer promo codes
+        </a>
       </div>
     )
   }
@@ -93,7 +105,7 @@ export default function RequireAdmin({ children }) {
     return (
       <div className="container-aura py-24 text-center">
         <h1 className="text-2xl font-medium font-display mb-3">Restricted</h1>
-        <p className="text-ink-soft mb-4">This area is limited to SS Zen Traders staff accounts.</p>
+        <p className="text-ink-soft mb-4">This area is limited to SSzentronics staff accounts.</p>
         <p className="text-ink-soft text-sm">
           Signed in as {session?.user?.email}. Run <code>supabase/ensure-admin.sql</code> in the SQL Editor, then refresh.
         </p>

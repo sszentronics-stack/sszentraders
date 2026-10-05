@@ -9,6 +9,8 @@ import {
   updateAddress,
 } from '../../repositories/customers.repository'
 import { customerAddressSchema } from '../../../backend/lib/validation/index'
+import { isSupabaseConfigured } from '../../lib/supabase/client'
+import { deleteLocalAddress, loadLocalAddresses, saveLocalAddress, setLocalDefaultAddress } from '../../lib/localAccount'
 
 const EMPTY_FORM = {
   label: '',
@@ -24,7 +26,7 @@ const EMPTY_FORM = {
   isDefaultBilling: false,
 }
 
-function AddressForm({ initial, onCancel, onSaved }) {
+function AddressForm({ initial, onCancel, onSaved, persist }) {
   const [form, setForm] = useState(initial ?? EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -46,11 +48,7 @@ function AddressForm({ initial, onCancel, onSaved }) {
 
     setSubmitting(true)
     try {
-      if (form.id) {
-        await updateAddress(form.id, result.data)
-      } else {
-        await createAddress(result.data)
-      }
+      await persist(form.id, result.data)
       onSaved()
     } catch (err) {
       setError(err?.message ?? 'Could not save this address.')
@@ -169,10 +167,21 @@ export default function Addresses() {
   const [editing, setEditing] = useState(null) // null | 'new' | address object
   const [busyId, setBusyId] = useState(null)
 
+  const local = !isSupabaseConfigured()
+
+  async function persist(id, data) {
+    if (local) {
+      saveLocalAddress(id, data)
+      return
+    }
+    if (id) await updateAddress(id, data)
+    else await createAddress(data)
+  }
+
   const load = async () => {
     try {
       setError('')
-      setAddresses(await listMyAddresses())
+      setAddresses(local ? loadLocalAddresses() : await listMyAddresses())
     } catch (err) {
       setError(err?.message ?? 'Could not load your addresses.')
     }
@@ -191,7 +200,8 @@ export default function Addresses() {
     if (!window.confirm('Delete this address?')) return
     setBusyId(id)
     try {
-      await deleteAddress(id)
+      if (local) deleteLocalAddress(id)
+      else await deleteAddress(id)
       await load()
     } catch (err) {
       setError(err?.message ?? 'Could not delete this address.')
@@ -203,7 +213,8 @@ export default function Addresses() {
   const handleSetDefault = async (id, kind) => {
     setBusyId(id)
     try {
-      if (kind === 'shipping') await setDefaultShippingAddress(id)
+      if (local) setLocalDefaultAddress(id, kind)
+      else if (kind === 'shipping') await setDefaultShippingAddress(id)
       else await setDefaultBillingAddress(id)
       await load()
     } catch (err) {
@@ -226,9 +237,9 @@ export default function Addresses() {
 
       {error && <div className="form-banner form-banner-error">{error}</div>}
 
-      {editing === 'new' && <AddressForm onCancel={() => setEditing(null)} onSaved={handleSaved} />}
+      {editing === 'new' && <AddressForm persist={persist} onCancel={() => setEditing(null)} onSaved={handleSaved} />}
       {editing && editing !== 'new' && (
-        <AddressForm initial={editing} onCancel={() => setEditing(null)} onSaved={handleSaved} />
+        <AddressForm persist={persist} initial={editing} onCancel={() => setEditing(null)} onSaved={handleSaved} />
       )}
 
       {editing === null && addresses === null && <p className="text-ink-soft">Loading addresses...</p>}

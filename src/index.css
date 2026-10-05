@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
-  --color-blush: #fceee9;
-  --color-rose: #c98a7d;
-  --color-rose-soft: #e5b6a8;
-  --color-rose-line: #c5998e;
-  --color-ink: #222222;
-  --color-ink-soft: #7a5b53;
-  --color-header: #fceee9;
-  --color-footer: #222222;
-  --color-btn: #c98a7d;
-  --color-btn-hover: #b3776b;
-  --color-sale: #c31818;
-  --color-sale-badge: #d21404;
-  --color-gold: #e5b6a8;
-  --color-meta: #fceee9;
-  --color-line: #e5b6a8;
-  --color-hero: #7a5b53;
-  --color-hero-deep: #222222;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --color-blush: #f6f3f0;
+  --color-rose: #1c1c1c;
+  --color-rose-soft: #d9cfc7;
+  --color-rose-line: #e4ddd6;
+  --color-ink: #1c1c1c;
+  --color-ink-soft: #6d6560;
+  --color-header: #ffffff;
+  --color-footer: #1c1c1c;
+  --color-btn: #1c1c1c;
+  --color-btn-hover: #333333;
+  --color-sale: #9a3b32;
+  --color-sale-badge: #9a3b32;
+  --color-gold: #c4a484;
+  --color-meta: #f6f3f0;
+  --color-line: #e4ddd6;
+  --color-hero: #1c1c1c;
+  --color-hero-deep: #111111;
 }
 
 * {
@@ -33,11 +33,11 @@ html {
 
 body {
   margin: 0;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 1.5;
-  color: #222222;
+  color: #1c1c1c;
   background: #ffffff;
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
@@ -48,7 +48,7 @@ h1,
 h2,
 h3,
 .font-display {
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
 }
 
 button,
@@ -80,9 +80,9 @@ img {
 }
 
 .announcement {
-  background: #222222;
-  color: #fceee9;
-  font-family: "Montserrat", sans-serif;
+  background: #1c1c1c;
+  color: #f7f4f1;
+  font-family: "Outfit", sans-serif;
   font-weight: 300;
   font-size: 11px;
   letter-spacing: 0.18em;
@@ -93,24 +93,24 @@ img {
 }
 
 .header-bar {
-  background: #fceee9;
-  color: #222222;
+  background: #ffffff;
+  color: #1c1c1c;
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid #e5b6a8;
+  border-bottom: 1px solid #ece7e2;
 }
 
 .nav-link {
-  font-family: "Montserrat", sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.18em;
+  font-family: "Outfit", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   white-space: nowrap;
   padding: 6px 2px;
   position: relative;
-  color: #7a5b53;
+  color: #1c1c1c;
 }
 
 .nav-link:hover,
@@ -127,13 +127,13 @@ img {
   right: 0;
   bottom: -2px;
   height: 1px;
-  background: #c5998e;
+  background: #1c1c1c;
 }
 
 .btn-gold {
-  background: #c98a7d;
-  color: #222222;
-  font-family: "Montserrat", sans-serif;
+  background: #1c1c1c;
+  color: #ffffff;
+  font-family: "Outfit", sans-serif;
   font-weight: 600;
   letter-spacing: 0.22em;
   border: 0;
@@ -145,13 +145,13 @@ img {
 }
 
 .btn-gold:hover {
-  background: #b3776b;
+  background: #333333;
 }
 
 .btn-lavender {
-  background: #c98a7d;
-  color: #222222;
-  font-family: "Montserrat", sans-serif;
+  background: #1c1c1c;
+  color: #ffffff;
+  font-family: "Outfit", sans-serif;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -170,8 +170,8 @@ img {
 
 .btn-outline {
   background: transparent;
-  color: #222222;
-  border: 1px solid #c5998e;
+  color: #1c1c1c;
+  border: 1px solid #1c1c1c;
   border-radius: 4px;
   padding: 13px 20px;
   cursor: pointer;
@@ -180,13 +180,13 @@ img {
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
 }
 
 .btn-outline:hover {
-  background: #222222;
-  color: #fceee9;
-  border-color: #222222;
+  background: #1c1c1c;
+  color: #ffffff;
+  border-color: #1c1c1c;
 }
 
 .badge {
@@ -200,22 +200,22 @@ img {
   padding: 4px 10px;
   border-radius: 999px;
   text-transform: uppercase;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
 }
 
 .badge-sale {
   background: #7a5b53;
-  color: #fceee9;
+  color: #f6f3f0;
 }
 
 .badge-new {
-  background: #c98a7d;
+  background: #1c1c1c;
   color: #fff;
 }
 
 .badge-best {
   background: #222222;
-  color: #fceee9;
+  color: #f6f3f0;
 }
 
 .product-card {
@@ -223,7 +223,7 @@ img {
 }
 
 .product-card .thumb {
-  background: #fceee9;
+  background: #f6f3f0;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -308,7 +308,7 @@ img {
 
 .hero-solid-title {
   margin: 0 0 12px;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: clamp(28px, 5vw, 44px);
   font-weight: 600;
   line-height: 1.15;
@@ -357,7 +357,7 @@ img {
 
 .home-trio-media {
   aspect-ratio: 1;
-  background: #fceee9;
+  background: #f6f3f0;
   overflow: hidden;
 }
 
@@ -380,7 +380,7 @@ img {
 
 .home-trio-copy h2 {
   margin: 0;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -410,8 +410,8 @@ img {
 }
 
 .footer-aura {
-  background: #222222;
-  color: #fceee9;
+  background: #1c1c1c;
+  color: #f7f4f1;
 }
 
 .footer-aura a:hover {
@@ -419,7 +419,7 @@ img {
 }
 
 .label-wide {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-weight: 300;
   font-size: 12px;
   letter-spacing: 0.34em;
@@ -467,7 +467,7 @@ img {
 
 .qty {
   display: inline-flex;
-  border: 1px solid #c5998e;
+  border: 1px solid #d9cfc7;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -502,11 +502,11 @@ img {
   font-weight: 500;
   cursor: pointer;
   color: #222222;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
 }
 
 .disclaimer {
-  background: #fceee9;
+  background: #f6f3f0;
   border: 1px solid #e5b6a8;
   padding: 18px 20px;
   font-size: 12.5px;
@@ -523,7 +523,7 @@ img {
 .section-tabs button {
   background: none;
   border: 0;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 28px;
   font-weight: 500;
   color: rgba(122, 91, 83, 0.4);
@@ -533,7 +533,7 @@ img {
 
 .section-tabs button.active {
   color: #222222;
-  box-shadow: inset 0 -2px 0 #c5998e;
+  box-shadow: inset 0 -2px 0 #d9cfc7;
 }
 
 @media (max-width: 640px) {
@@ -548,7 +548,7 @@ img {
 
 .auth-shell {
   min-height: calc(100vh - 92px);
-  background: #fceee9;
+  background: #f6f3f0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -571,7 +571,7 @@ img {
 }
 
 .auth-title {
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 28px;
   font-weight: 500;
   color: #222222;
@@ -602,7 +602,7 @@ img {
 .form-input,
 .form-select {
   width: 100%;
-  border: 1px solid #c5998e;
+  border: 1px solid #d9cfc7;
   border-radius: 4px;
   padding: 13px 14px;
   font-size: 15px;
@@ -687,7 +687,7 @@ img {
 
 .form-checkbox-row input {
   margin-top: 3px;
-  accent-color: #c98a7d;
+  accent-color: #1c1c1c;
 }
 
 .auth-footer-link {
@@ -750,7 +750,7 @@ img {
 
 .account-nav a.active,
 .account-nav a:hover {
-  background: #fceee9;
+  background: #f6f3f0;
   color: #222222;
 }
 
@@ -791,7 +791,7 @@ img {
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 999px;
-  background: #fceee9;
+  background: #f6f3f0;
   color: #7a5b53;
 }
 
@@ -845,7 +845,7 @@ img {
   grid-template-columns: 248px 1fr;
   min-height: 100vh;
   background: #faf6f4;
-  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.55;
   color: #2a2220;
@@ -879,7 +879,7 @@ img {
 }
 
 .admin-brand {
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 22px;
   color: #fff;
   padding: 0 20px 18px;
@@ -955,7 +955,7 @@ img {
 .admin-nav a.active {
   color: #fff;
   background: rgba(201, 138, 125, 0.2);
-  border-left-color: #c98a7d;
+  border-left-color: #1c1c1c;
 }
 
 .admin-sidebar-footer {
@@ -1016,7 +1016,7 @@ img {
 }
 
 .admin-page-header h1 {
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 30px;
   line-height: 1.2;
   color: #222;
@@ -1052,7 +1052,7 @@ img {
 }
 
 .admin-card-header h2 {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0;
@@ -1093,7 +1093,7 @@ img {
 }
 
 .admin-stat-value {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-size: 28px;
   font-weight: 600;
   color: #222;
@@ -1134,7 +1134,7 @@ img {
   padding: 16px 18px;
   border-radius: 10px;
   border: 1px solid #eddad3;
-  background: #fceee9;
+  background: #f6f3f0;
 }
 
 .admin-banner-icon {
@@ -1248,7 +1248,7 @@ img {
 .admin-hbar-fill {
   height: 100%;
   border-radius: inherit;
-  background: #c98a7d;
+  background: #1c1c1c;
 }
 
 .admin-hbar-value {
@@ -1312,7 +1312,7 @@ img {
 }
 
 .admin-table tr.is-selected {
-  background: #fceee9;
+  background: #f6f3f0;
 }
 
 .admin-table-actions {
@@ -1380,7 +1380,7 @@ img {
 }
 
 .admin-btn-primary {
-  background: #c98a7d;
+  background: #1c1c1c;
   color: #fff;
 }
 
@@ -1395,7 +1395,7 @@ img {
 }
 
 .admin-btn-ghost:hover:not(:disabled) {
-  background: #fceee9;
+  background: #f6f3f0;
 }
 
 .admin-btn-danger {
@@ -1492,8 +1492,8 @@ img {
 }
 
 .admin-date-filter-presets button.active {
-  background: #c98a7d;
-  border-color: #c98a7d;
+  background: #1c1c1c;
+  border-color: #1c1c1c;
   color: #fff;
 }
 
@@ -1561,7 +1561,7 @@ img {
 }
 
 .admin-modal h3 {
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 19px;
   margin-bottom: 8px;
 }
@@ -1788,7 +1788,7 @@ img {
 }
 
 .admin-breadcrumb-back:hover {
-  color: #c98a7d;
+  color: #1c1c1c;
 }
 
 .admin-image-gallery {
@@ -1806,7 +1806,7 @@ img {
 }
 
 .admin-image-tile.is-primary {
-  border-color: #c98a7d;
+  border-color: #1c1c1c;
 }
 
 .admin-image-tile-path {
@@ -1847,7 +1847,7 @@ img {
   gap: 6px;
   min-height: 200px;
   padding: 16px;
-  border: 1.5px dashed #c98a7d;
+  border: 1.5px dashed #1c1c1c;
   border-radius: 8px;
   background: #fff8f5;
   color: #7a5b53;
@@ -1859,7 +1859,7 @@ img {
 }
 
 .admin-image-add-tile:hover {
-  background: #fceee9;
+  background: #f6f3f0;
   border-color: #b3776b;
   color: #222;
 }
@@ -1868,4 +1868,94 @@ img {
   font-size: 12px;
   font-weight: 500;
   color: #9c8983;
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #1c1c1c;
+}
+
+.brand-lockup.is-light {
+  color: #ffffff;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-family: "Outfit", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.brand-wordmark {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.home-editorial {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 36px;
+}
+
+.home-editorial h2 {
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 500;
+  line-height: 1;
+  margin: 0 0 12px;
+}
+
+.home-editorial p {
+  color: #6d6560;
+  margin: 0;
+}
+
+.home-quotes {
+  background: #f6f3f0;
+}
+
+.home-quote-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.home-quote {
+  background: #ffffff;
+  padding: 24px 22px;
+  min-height: 180px;
+}
+
+.home-quote p {
+  margin: 0 0 16px;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.home-quote span {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6d6560;
+}
+
+@media (max-width: 767px) {
+  .home-quote-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-wordmark {
+    font-size: 22px;
+  }
 }

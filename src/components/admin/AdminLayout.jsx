@@ -20,6 +20,7 @@ const NAV_SECTIONS = [
     items: [
       { to: '/admin/products', label: 'Products' },
       { to: '/admin/catalog', label: 'Brands & Categories' },
+      { to: '/admin/content', label: 'Storefront' },
     ],
   },
   {
@@ -77,7 +78,7 @@ export default function AdminLayout() {
   const { pathname } = useLocation()
   const [openSections, setOpenSections] = useState(() => new Set([activeSectionId(pathname)]))
 
-  useSeo({ title: 'Admin | SS Zen Traders', noindex: true })
+  useSeo({ title: 'Admin | SSzentronics', noindex: true })
 
   useEffect(() => {
     const current = activeSectionId(pathname)
@@ -103,7 +104,7 @@ export default function AdminLayout() {
       <div className="admin-shell">
         <aside className="admin-sidebar">
           <Link to="/admin" className="admin-brand">
-            SS Zen <span>Ops</span>
+            SSzentronics
           </Link>
           {!configured ? (
             <p className="admin-sidebar-email" style={{ margin: '0 0 0.75rem', opacity: 0.75 }}>

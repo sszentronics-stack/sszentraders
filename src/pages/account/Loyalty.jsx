@@ -14,7 +14,7 @@ export default function Loyalty() {
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      setError('Loyalty points are not available right now.')
+      setSummary({ balance: 0, history: [] })
       return
     }
     loyaltyApi

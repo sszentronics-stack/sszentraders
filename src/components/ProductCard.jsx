@@ -1,54 +1,42 @@
 import { Link } from 'react-router-dom'
-import { Heart } from 'lucide-react'
-import { formatPKR, salePercent } from '../data/products'
+import { formatPKR } from '../data/products'
+import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { useWishlist } from '../context/WishlistContext'
 
-const BADGE_CLASS = {
-  sale: 'badge badge-sale',
-  new: 'badge badge-new',
-  bestseller: 'badge badge-best',
-}
-
 export default function ProductCard({ product }) {
-  const off = salePercent(product)
-  const badgeLabel = product.badge === 'bestseller' ? 'Bestseller' : product.badge === 'new' ? 'New' : 'Sale'
+  const applied = useAppliedInfluencerPromo()
+  const salePrice = priceAfterInfluencer(product.price, applied)
+  const compare = product.compareAt > product.price ? product.compareAt : product.price > salePrice ? product.price : 0
+  const onSale = compare > salePrice
   const { isWishlisted, toggle } = useWishlist()
   const wishlisted = isWishlisted(product.id)
-  const outOfStock = product.availability === 'out_of_stock'
-  const lowStock = product.availability === 'low_stock'
+  const hover = product.images?.[1]
+  const soldOut = product.availability === 'out_of_stock'
 
   return (
-    <article className="product-card relative">
+    <article className="ssz-card-wrap">
       <button
         type="button"
+        className="ssz-card__wish"
         aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         aria-pressed={wishlisted}
-        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 grid place-items-center shadow"
-        onClick={(e) => {
-          e.preventDefault()
-          toggle(product)
-        }}
+        onClick={() => toggle(product)}
       >
-        <Heart size={16} fill={wishlisted ? '#c31818' : 'none'} color={wishlisted ? '#c31818' : '#102b26'} />
+        <svg viewBox="0 0 24 24" width="16" height="16" fill={wishlisted ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9Z" /></svg>
       </button>
-      <Link to={`/products/${product.slug}`} className="block">
-        <div className="thumb">
-          {outOfStock ? (
-            <span className="badge" style={{ background: '#6b6b6b' }}>Sold out</span>
-          ) : (
-            product.badge && <span className={BADGE_CLASS[product.badge] || BADGE_CLASS.sale}>{badgeLabel}</span>
-          )}
-          <img src={product.images[0]} alt={product.name} style={outOfStock ? { opacity: 0.5 } : undefined} />
+      <Link to={`/products/${product.slug}`} className="ssz-card">
+        <div className="ssz-card__media">
+          <img className="ssz-card__img" src={product.images[0]} alt={product.name} width="600" height="600" style={soldOut ? { opacity: 0.5 } : undefined} />
+          {hover && <img className="ssz-card__img ssz-card__img--hover" src={hover} alt="" width="600" height="600" />}
+          {soldOut ? <span className="ssz-badge ssz-card__badge">Sold out</span> : onSale && <span className="ssz-badge ssz-card__badge">Sale</span>}
         </div>
-        <h3 className="mt-3 text-[15px] font-normal leading-snug px-2">{product.name}</h3>
-        <p className="mt-2 text-[15px]">
-          {product.compareAt > product.price && (
-            <span className="price-compare">{formatPKR(product.compareAt)}</span>
-          )}
-          <span className={off ? 'price-sale' : 'font-medium'}>{formatPKR(product.price)}</span>
-          {off > 0 && <span className="price-sale ml-1.5 text-sm">{off}% off</span>}
-        </p>
-        {lowStock && <p className="text-xs mt-1" style={{ color: '#c98a7d' }}>Only a few left</p>}
+        <div className="ssz-card__info">
+          <h3 className="ssz-card__title">{product.name}</h3>
+          <div className="ssz-price">
+            {onSale && <s>{formatPKR(compare)}</s>}
+            {formatPKR(salePrice)}
+          </div>
+        </div>
       </Link>
     </article>
   )

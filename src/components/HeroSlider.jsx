@@ -9,21 +9,21 @@ const SLIDES = [
     title: 'SADOER Collagen Mask',
     subtitle: 'Was Rs.199 · now Rs.129',
     to: '/products/sadoer-collagen-anti-aging-facial-mask',
-    image: '/banners/sadoer-collagen-banner.png',
+    image: '/banners/sadoer-collagen-banner.jpg',
   },
   {
     id: 2,
     title: 'SOME BY MI Miracle Toner',
     subtitle: 'Was Rs.11,999 · now Rs.7,900',
     to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner',
-    image: '/banners/some-by-mi-banner.png',
+    image: '/banners/some-by-mi-banner.jpg',
   },
   {
     id: 3,
     title: 'Hero Mighty Patch Invisible+',
     subtitle: 'Was Rs.5,500 · now Rs.4,400',
     to: '/products/hero-mighty-patch-invisible-plus',
-    image: '/banners/mighty-patch-banner.png',
+    image: '/banners/mighty-patch-banner.jpg',
   },
 ]
 
@@ -48,7 +48,7 @@ export default function HeroSlider() {
         <img src={slide.image} alt="" className="hero-photo-bg" />
         <div className="hero-photo-overlay" />
         <div className="hero-solid-copy">
-          <p className="hero-solid-eyebrow">SS Zen Traders</p>
+          <p className="hero-solid-eyebrow">SSzentronics</p>
           <h1 className="hero-solid-title">{slide.title}</h1>
           <p className="hero-solid-sub">{slide.subtitle}</p>
           <span className="hero-solid-cta">Shop now</span>

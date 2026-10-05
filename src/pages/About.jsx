@@ -2,29 +2,25 @@ import { useSeo } from '../hooks/useSeo'
 
 export default function About() {
   useSeo({
-    title: 'About Us | SS Zen Traders',
-    description: 'SS Zen Traders is an online skincare shop in Pakistan focused on a short, trusted list of authentic Korean and US products.',
+    title: 'About us | SS Zen Traders',
+    description: 'SS Zen Traders is a skincare shop in Islamabad with a short list of authentic SADOER, Hero Cosmetics, and SOME BY MI products.',
   })
 
   return (
-    <div className="container-aura py-12 md:py-16 max-w-3xl">
-      <p className="text-sm text-ink-soft mb-3">About us</p>
-      <h1 className="text-4xl font-medium mb-6">SS Zen Traders</h1>
-      <p className="text-lg leading-relaxed mb-4">
-        SS Zen Traders is an online skincare shop in Pakistan focused on a short, trusted list of
-        products that actually work. Shop Hero Mighty Patch Invisible+, SOME BY MI’s AHA BHA PHA 30
-        Days Miracle Toner, and SADOER Collagen Anti-Aging Facial Mask.
-      </p>
-      <p className="leading-relaxed text-ink-soft mb-4">
-        We built this store so you can order authentic Korean and US skincare without the noise of a
-        giant catalog. Every order is confirmed on WhatsApp at{' '}
-        <strong className="text-ink">+92 307 9594474</strong>. Cash on delivery is available, and we
-        ship nationwide. We deliver across Islamabad and Rawalpindi.
-      </p>
-      <p className="leading-relaxed text-ink-soft">
-        Always read the label on the product you receive. Packaging and ingredients can change, and
-        our listings are for reference — not medical advice.
-      </p>
-    </div>
+    <section className="ssz-section">
+      <div className="ssz-container ssz-narrow">
+        <h1>About us</h1>
+        <img src="/products/mighty-patch/1.jpg" alt="Hero Mighty Patch Invisible+" width="800" height="800" style={{ margin: '24px 0' }} />
+        <p>
+          SS Zen Traders keeps a short list of authentic skincare: the SADOER collagen mask, Hero Mighty Patch Invisible+, and SOME BY MI 30 Days Miracle Toner.
+        </p>
+        <p>
+          The office is at Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad. Call 03079594474 or email info@sszentraders.com. Every order is confirmed on WhatsApp, and cash on delivery is available.
+        </p>
+        <p>
+          Always read the label on the product you receive. Packaging and ingredients can change, and our listings are for reference.
+        </p>
+      </div>
+    </section>
   )
 }

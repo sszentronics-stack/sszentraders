@@ -44,7 +44,7 @@ export default function ResetPassword() {
     <div className="auth-shell">
       <div className="auth-card">
         <h1 className="auth-title">Set a new password</h1>
-        <p className="auth-subtitle">Choose a new password for your SS Zen Traders account.</p>
+        <p className="auth-subtitle">Choose a new password for your SSzentronics account.</p>
 
         {done ? (
           <div className="form-banner form-banner-success">Password updated. Redirecting to your account...</div>
