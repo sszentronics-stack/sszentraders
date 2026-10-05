@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useSiteContent } from '../lib/siteContent'
 
 export default function Footer() {
+  const { business } = useSiteContent()
   const [note, setNote] = useState('')
   const year = new Date().getFullYear()
 
   function subscribe(event) {
     event.preventDefault()
     const email = new FormData(event.currentTarget).get('email')
-    window.location.href = `mailto:info@sszentraders.com?subject=${encodeURIComponent('Subscribe')}&body=${encodeURIComponent(String(email || ''))}`
+    window.location.href = `mailto:${business.email}?subject=${encodeURIComponent('Subscribe')}&body=${encodeURIComponent(String(email || ''))}`
     setNote('Your email app will open so you can send the subscribe request.')
   }
 
@@ -38,11 +40,11 @@ export default function Footer() {
           <div className="ssz-reveal">
             <h2>Office</h2>
             <p>
-              Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad
+              {business.address}
               <br />
-              <a href="tel:03079594474">03079594474</a>
+              <a href={`tel:${business.phone}`}>{business.phone}</a>
               <br />
-              <a href="mailto:info@sszentraders.com">info@sszentraders.com</a>
+              <a href={`mailto:${business.email}`}>{business.email}</a>
             </p>
           </div>
           <div className="ssz-reveal">
@@ -54,7 +56,7 @@ export default function Footer() {
             {note && <p className="ssz-note">{note}</p>}
           </div>
         </div>
-        <div className="ssz-footer__bottom">© {year} SS Zen Traders</div>
+        <div className="ssz-footer__bottom">© {year} {business.name}</div>
       </div>
     </footer>
   )

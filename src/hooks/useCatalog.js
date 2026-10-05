@@ -22,16 +22,18 @@
  * (same loading/empty/error affordances) without a matrix of specialized
  * hooks per query.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 import { listPublishedProducts } from '../repositories/products.repository'
 import { adaptProduct } from '../data/catalogAdapter'
 import { products as fallbackProducts } from '../data/products'
+import { applyProductEdits, useSiteContent } from '../lib/siteContent'
 
 /**
  * @returns {{ products: object[], loading: boolean, error: string|null, source: 'supabase'|'fallback' }}
  */
 export function useProducts() {
+  const content = useSiteContent()
   const [state, setState] = useState({ products: [], loading: true, error: null, source: 'fallback' })
 
   useEffect(() => {
@@ -67,7 +69,8 @@ export function useProducts() {
     }
   }, [])
 
-  return state
+  const products = useMemo(() => applyProductEdits(state.products, content), [state.products, content])
+  return { ...state, products }
 }
 
 /**

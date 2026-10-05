@@ -1,9 +1,10 @@
-const ITEMS = ['Cash on delivery', 'WhatsApp confirmation', '7-day returns']
+import { useSiteContent } from '../lib/siteContent'
 
 export default function TrustBar() {
+  const items = useSiteContent().trust
   return (
     <ul className="ssz-trust">
-      {ITEMS.map((item) => (
+      {items.map((item) => (
         <li key={item}>{item}</li>
       ))}
     </ul>

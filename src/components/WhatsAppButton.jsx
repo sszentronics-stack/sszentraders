@@ -1,10 +1,11 @@
-import { WHATSAPP_LINK } from '../data/products'
+import { useSiteContent, whatsAppHref } from '../lib/siteContent'
 
 export default function WhatsAppButton() {
+  const content = useSiteContent()
   return (
     <a
       className="wa-float"
-      href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi SSzentronics! I have a question about your products.')}`}
+      href={whatsAppHref(content)}
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"

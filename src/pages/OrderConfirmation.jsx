@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import * as ordersApi from '../repositories/orders.repository'
 import { formatMoney } from '../../backend/lib/money/index'
-import { WHATSAPP_LINK } from '../data/products'
+import { useSiteContent, whatsAppHref } from '../lib/siteContent'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 
 const ORDER_STATUS_LABEL = {
@@ -27,6 +27,7 @@ const PAYMENT_METHOD_LABEL = { cod: 'Cash on Delivery', easypaisa: 'Easypaisa' }
  * read-only view; nothing about the presentation differs by entry point.
  */
 export default function OrderConfirmation() {
+  const content = useSiteContent()
   const { id } = useParams()
   const [order, setOrder] = useState(null)
   const [error, setError] = useState('')
@@ -151,7 +152,7 @@ export default function OrderConfirmation() {
       <div className="flex flex-wrap gap-3">
         <a
           className="btn-outline w-auto px-6 inline-block text-center"
-          href={`${WHATSAPP_LINK}?text=${encodeURIComponent(supportMessage)}`}
+          href={whatsAppHref(content, supportMessage)}
           target="_blank"
           rel="noreferrer"
         >

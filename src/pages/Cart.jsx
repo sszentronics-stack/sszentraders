@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { buildWhatsAppOrder, formatPKR, WHATSAPP_LINK } from '../data/products'
+import { buildWhatsAppOrder, formatPKR } from '../data/products'
+import { orderCustomer, useSiteContent, whatsAppHref } from '../lib/siteContent'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 import { getAppliedInfluencerPromo, normalizePhone, quoteInfluencerCode, recordInfluencerRedemption, setAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { useSeo } from '../hooks/useSeo'
 
 export default function Cart() {
   useSeo({ title: 'Your cart | SS Zen Traders', noindex: true })
+  const content = useSiteContent()
   const configured = isSupabaseConfigured()
   const navigate = useNavigate()
   const { items, total, updateQty, removeItem, clearCart, removedNotice, dismissRemovedNotice } = useCart()
@@ -147,7 +149,7 @@ export default function Cart() {
             </button>
             <a
               className="btn-outline block text-center mt-3"
-              href={`${WHATSAPP_LINK}?text=${encodeURIComponent('Hi SSzentronics! I have a question before placing my order.')}`}
+              href={whatsAppHref(content, 'Hi! I have a question before placing my order.')}
               target="_blank"
               rel="noreferrer"
             >
@@ -195,13 +197,13 @@ export default function Cart() {
             </div>
             <a
               className="ssz-btn"
-              href={buildWhatsAppOrder(items, {
+              href={buildWhatsAppOrder(items, orderCustomer(content, {
                 ...form,
                 promoCode: promo?.couponCode,
                 promoLabel: promo?.promotionName,
                 discount,
                 due,
-              })}
+              }))}
               onClick={(event) => {
                 if (!promo?.couponCode) return
                 const saved = recordInfluencerRedemption(promo.couponCode, form.phone)

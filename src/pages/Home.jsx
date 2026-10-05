@@ -14,21 +14,6 @@ function BannerLink({ action, className, children }) {
   return <Link className={className} to={action.to}>{children}</Link>
 }
 
-const STORIES = [
-  { label: 'SADOER', to: '/shop?brand=SADOER', image: '/products/sadoer-collagen/1.png' },
-  { label: 'Hero', to: '/shop?brand=Hero%20Cosmetics', image: '/products/mighty-patch/1.jpg' },
-  { label: 'SOME BY MI', to: '/shop?brand=SOME%20BY%20MI', image: '/products/some-by-mi/1.jpg' },
-  { label: 'Masks', to: '/shop?category=Masks', image: '/products/sadoer-collagen/2.png' },
-  { label: 'Toners', to: '/shop?category=Toners', image: '/products/some-by-mi/2.jpg' },
-  { label: 'Patches', to: '/shop?category=Acne%20Care', image: '/products/mighty-patch/2.jpg' },
-]
-
-const BRAND_CARDS = [
-  { label: 'SADOER', to: '/shop?brand=SADOER', image: '/products/sadoer-collagen/1.png' },
-  { label: 'Hero Cosmetics', to: '/shop?brand=Hero%20Cosmetics', image: '/products/mighty-patch/1.jpg' },
-  { label: 'SOME BY MI', to: '/shop?brand=SOME%20BY%20MI', image: '/products/some-by-mi/1.jpg' },
-]
-
 function Arrow() {
   return (
     <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">
@@ -39,18 +24,18 @@ function Arrow() {
 
 export default function Home() {
   const { products, loading, error } = useProducts()
-  const { slides, story } = useSiteContent()
+  const { slides, story, stories, brands, home, business } = useSiteContent()
   const [slide, setSlide] = useState(0)
   useSeo({
-    title: 'SS Zen Traders',
-    description: 'SS Zen Traders sells authentic SADOER, Hero Cosmetics, and SOME BY MI skincare. Orders are confirmed on WhatsApp. Cash on delivery is available.',
+    title: business.name,
+    description: `${business.name} sells authentic SADOER, Hero Cosmetics, and SOME BY MI skincare. Orders are confirmed on WhatsApp. Cash on delivery is available.`,
   })
   useJsonLd({
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'SS Zen Traders',
-    email: 'info@sszentraders.com',
-    telephone: '03079594474',
+    name: business.name,
+    email: business.email,
+    telephone: business.phone,
     url: typeof window !== 'undefined' ? window.location.origin : undefined,
   })
 
@@ -75,13 +60,13 @@ export default function Home() {
   return (
     <>
       <nav className="ssz-stories" aria-label="Shop by category">
-        {STORIES.map((story) => (
-          <Link key={story.label} className="ssz-story" to={story.to}>
+        {stories.map((item) => (
+          <Link key={item.label} className="ssz-story" to={item.to}>
             <div className="ssz-story__circle">
-              <img className="ssz-story__img" src={story.image} alt="" width="88" height="88" />
+              <img className="ssz-story__img" src={item.image} alt="" width="88" height="88" />
               <svg className="ssz-story__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" /></svg>
             </div>
-            {story.label}
+            {item.label}
           </Link>
         ))}
       </nav>
@@ -119,8 +104,8 @@ export default function Home() {
       <section className="ssz-section ssz-section--mist">
         <div className="ssz-container">
           <div className="ssz-section__head">
-            <h2 className="ssz-reveal">Featured products</h2>
-            <Link className="ssz-arrow-link ssz-reveal" to="/shop">View all <Arrow /></Link>
+            <h2 className="ssz-reveal">{home.featuredHeading}</h2>
+            <Link className="ssz-arrow-link ssz-reveal" to="/shop">{home.viewAllLabel} <Arrow /></Link>
           </div>
           {loading ? (
             <p>Loading products</p>
@@ -141,10 +126,10 @@ export default function Home() {
       <section className="ssz-section">
         <div className="ssz-container">
           <div className="ssz-section__head">
-            <h2 className="ssz-reveal">Shop by brand</h2>
+            <h2 className="ssz-reveal">{home.brandHeading}</h2>
           </div>
           <ul className="ssz-grid" style={{ '--cols': 3 }} data-ssz-cascade>
-            {BRAND_CARDS.map((brand) => (
+            {brands.map((brand) => (
               <li key={brand.label} className="ssz-reveal">
                 <Link className="ssz-card" to={brand.to}>
                   <div className="ssz-card__media">

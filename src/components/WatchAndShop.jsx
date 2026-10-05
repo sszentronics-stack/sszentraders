@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { formatPKR } from '../data/products'
 import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { useCart } from '../context/CartContext'
+import { useSiteContent } from '../lib/siteContent'
 
 const VIDEOS = {
   'sadoer-collagen-anti-aging-facial-mask': '/videos/sadoer.mp4',
@@ -29,12 +30,13 @@ export default function WatchAndShop({ products }) {
   const dialogRef = useRef(null)
   const { addItem } = useCart()
   const applied = useAppliedInfluencerPromo()
+  const watch = useSiteContent().watch
   const [active, setActive] = useState(null)
   const [canScroll, setCanScroll] = useState(false)
   const cards = products
     .map((product) => ({
       product,
-      video: VIDEOS[product.slug],
+      video: watch.clips[product.slug] || VIDEOS[product.slug],
       poster: product.images?.[0],
       caption: product.tagline || product.subtitle || product.name,
     }))
@@ -86,8 +88,8 @@ export default function WatchAndShop({ products }) {
       <div className="ssz-container">
         <div className="ssz-section__head">
           <div>
-            <h2 className="ssz-display ssz-reveal" style={{ fontSize: 28 }}>Watch and shop</h2>
-            <p className="ssz-reveal" style={{ margin: '8px 0 0' }}>Short clips of the products in stock.</p>
+            <h2 className="ssz-display ssz-reveal" style={{ fontSize: 28 }}>{watch.heading}</h2>
+            <p className="ssz-reveal" style={{ margin: '8px 0 0' }}>{watch.lead}</p>
           </div>
           {canScroll && (
             <div className="ssz-sv__nav">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { buildWhatsAppProduct, formatPKR, salePercent, WHATSAPP_LINK } from '../data/products'
+import { buildWhatsAppOrder, formatPKR, salePercent } from '../data/products'
+import { orderCustomer, useSiteContent, whatsAppHref } from '../lib/siteContent'
 import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 import { useProduct } from '../hooks/useCatalog'
@@ -34,9 +35,10 @@ export default function Product() {
   useRecordRecentlyViewed(product?.id)
   const { items: recentlyViewed } = useRecentlyViewed(product?.id)
   const appliedPromo = useAppliedInfluencerPromo()
+  const content = useSiteContent()
 
   useSeo({
-    title: product ? `${product.name} | SS Zen Traders` : 'Product | SS Zen Traders',
+    title: product ? `${product.name} | ${content.business.name}` : `Product | ${content.business.name}`,
     description: product ? (product.tagline || product.description)?.slice(0, 160) : undefined,
     image: product?.images?.[0],
   })
@@ -227,7 +229,7 @@ export default function Product() {
             {isSupabaseConfigured() ? (
               <a
                 className="ssz-btn"
-                href={`${WHATSAPP_LINK}?text=${encodeURIComponent(`Hi SSzentronics! I have a question about ${product.name}.`)}`}
+                href={whatsAppHref(content, `Hi ${content.business.name}! I have a question about ${product.name}.`)}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -236,7 +238,7 @@ export default function Product() {
             ) : (
               <a
                 className="ssz-btn"
-                href={buildWhatsAppProduct(product, qty)}
+                href={buildWhatsAppOrder([{ name: product.name, price: product.price, qty }], orderCustomer(content))}
                 target="_blank"
                 rel="noreferrer"
               >

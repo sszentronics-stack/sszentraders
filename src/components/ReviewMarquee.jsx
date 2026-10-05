@@ -1,16 +1,4 @@
-const REVIEWS = [
-  { image: '/products/sadoer-collagen/1.png', rating: 5, text: 'The collagen mask left my skin soft by morning.' },
-  { image: '/products/mighty-patch/1.jpg', rating: 5, text: 'Mighty Patch stays flat and is easy to wear out.' },
-  { image: '/products/some-by-mi/1.jpg', rating: 5, text: 'The SOME BY MI toner is gentle enough for every day.' },
-  { image: '/products/sadoer-collagen/2.png', rating: 4, text: 'The sheet sits close to the face and feels light.' },
-]
-
-const SECOND_ROW = [
-  { image: '/products/mighty-patch/2.jpg', rating: 5, text: 'The patch is thin enough to wear in the daytime.' },
-  { image: '/products/some-by-mi/2.jpg', rating: 4, text: 'A clear toner step I can use on a cotton pad.' },
-  { image: '/products/sadoer-collagen/3.png', rating: 5, text: 'I use the collagen mask two evenings a week.' },
-  { image: '/products/mighty-patch/3.jpg', rating: 5, text: 'Cash on delivery and a WhatsApp confirmation made ordering simple.' },
-]
+import { useSiteContent } from '../lib/siteContent'
 
 function Star() {
   return (
@@ -38,15 +26,17 @@ function Row({ items, reverse }) {
 }
 
 export default function ReviewMarquee() {
+  const { heading, items } = useSiteContent().reviews
+  const midpoint = Math.ceil(items.length / 2)
   return (
     <section className="ssz-section">
       <div className="ssz-container">
         <div className="ssz-section__head" style={{ justifyContent: 'center' }}>
-          <h2 className="ssz-reveal">What customers say</h2>
+          <h2 className="ssz-reveal">{heading}</h2>
         </div>
       </div>
-      <Row items={REVIEWS} />
-      <Row items={SECOND_ROW} reverse />
+      <Row items={items.slice(0, midpoint)} />
+      <Row items={items.slice(midpoint)} reverse />
     </section>
   )
 }

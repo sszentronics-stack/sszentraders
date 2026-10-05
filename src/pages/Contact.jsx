@@ -1,19 +1,20 @@
 import { useState } from 'react'
-import { WHATSAPP_LINK } from '../data/products'
+import { useSiteContent, whatsAppHref } from '../lib/siteContent'
 import { useSeo } from '../hooks/useSeo'
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
+  const { contact, business } = useSiteContent()
   useSeo({
-    title: 'Contact | SS Zen Traders',
-    description: 'Contact SS Zen Traders at the Islamabad office, by email, or on WhatsApp.',
+    title: `${contact.title} | ${business.name}`,
+    description: `Contact ${business.name} at the office, by email, or on WhatsApp.`,
   })
 
   function submit(event) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     const body = `Name: ${data.get('name')}\nEmail: ${data.get('email')}\nPhone: ${data.get('phone')}\n\n${data.get('message')}`
-    window.location.href = `mailto:info@sszentraders.com?subject=${encodeURIComponent('Website message')}&body=${encodeURIComponent(body)}`
+    window.location.href = `mailto:${business.email}?subject=${encodeURIComponent('Website message')}&body=${encodeURIComponent(body)}`
     setSent(true)
   }
 
@@ -21,11 +22,11 @@ export default function Contact() {
     <section className="ssz-section">
       <div className="ssz-container ssz-contact">
         <div>
-          <h1>Contact</h1>
-          <p>Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad</p>
-          <p><a href="tel:03079594474">03079594474</a></p>
-          <p><a href="mailto:info@sszentraders.com">info@sszentraders.com</a></p>
-          <p><a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">Chat on WhatsApp</a></p>
+          <h1>{contact.title}</h1>
+          <p>{business.address}</p>
+          <p><a href={`tel:${business.phone}`}>{business.phone}</a></p>
+          <p><a href={`mailto:${business.email}`}>{business.email}</a></p>
+          <p><a href={whatsAppHref({ business })} target="_blank" rel="noreferrer">{contact.whatsappLabel}</a></p>
         </div>
         <form className="ssz-form" onSubmit={submit}>
           <label>

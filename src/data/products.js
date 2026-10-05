@@ -212,7 +212,7 @@ export function buildWhatsAppOrder(items, customer = {}) {
   )
   const total = items.reduce((sum, item) => sum + item.price * item.qty, 0)
   const header = [
-    'Hello SS Zen Traders, I would like to place an order:',
+    customer.greeting || 'Hello SS Zen Traders, I would like to place an order:',
     '',
     ...lines,
     '',
@@ -231,7 +231,8 @@ export function buildWhatsAppOrder(items, customer = {}) {
     if (customer.address) header.push(`Address: ${customer.address}`)
   }
   header.push('', 'Please confirm availability. Thank you!')
-  return `${WHATSAPP_LINK}?text=${encodeURIComponent(header.join('\n'))}`
+  const link = customer.whatsappLink || WHATSAPP_LINK
+  return `${link}?text=${encodeURIComponent(header.join('\n'))}`
 }
 
 export function buildWhatsAppProduct(product, qty = 1) {

@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { buildWhatsAppOrder, formatPKR } from '../data/products'
+import { orderCustomer, useSiteContent } from '../lib/siteContent'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 
 export default function CartDrawer() {
+  const content = useSiteContent()
   const configured = isSupabaseConfigured()
   const { items, total, isOpen, setIsOpen, updateQty, removeItem, removedNotice, dismissRemovedNotice } = useCart()
 
@@ -88,7 +90,7 @@ export default function CartDrawer() {
                   <p className="text-xs text-ink-soft">Checkout continues on WhatsApp. Cash on delivery available.</p>
                   <a
                     className="btn-lavender block text-center"
-                    href={buildWhatsAppOrder(items)}
+                    href={buildWhatsAppOrder(items, orderCustomer(content))}
                     target="_blank"
                     rel="noreferrer"
                   >
