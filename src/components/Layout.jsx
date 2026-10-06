@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
@@ -8,10 +8,11 @@ import WhatsAppButton from './WhatsAppButton'
 
 export default function Layout() {
   const { pathname } = useLocation()
+  const shellRef = useRef(null)
 
   useEffect(() => {
     document.documentElement.classList.add('ssz-js')
-    const root = document.querySelector('main') ?? document.body
+    const root = shellRef.current ?? document.body
 
     const markCascade = (node) => {
       const groups = []
@@ -50,7 +51,7 @@ export default function Layout() {
   }, [pathname])
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" ref={shellRef}>
       <AnnouncementBar />
       <Header />
       <main className="flex-1">

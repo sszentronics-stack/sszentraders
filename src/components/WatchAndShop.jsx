@@ -124,7 +124,7 @@ export default function WatchAndShop({ products }) {
                   <p className="ssz-sv__caption">{card.caption}</p>
                 </button>
                 <div className="ssz-sv__product">
-                  <img className="ssz-sv__thumb" src={card.product.images[0]} alt="" width="48" height="48" />
+                  <img className="ssz-sv__thumb" src={card.product.images[0]} alt="" width="72" height="72" />
                   <div>
                     <div className="ssz-sv__name">{card.product.name}</div>
                     <div className="ssz-sv__price">{formatPKR(price)}</div>

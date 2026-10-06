@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { callEdgeFunction } from '../../lib/supabase/functions'
 import { isSupabaseConfigured } from '../../lib/supabase/client'
 import { loadLocalProfile, saveLocalProfile } from '../../lib/localAccount'
+import { knownCustomer } from '../../lib/customerDetails'
 import { updateProfileSchema } from '../../../backend/lib/validation/index'
 
 export default function Profile() {
@@ -23,13 +24,14 @@ export default function Profile() {
       })
       return
     }
+    const known = knownCustomer({ profile, customer, user })
     setForm({
-      firstName: profile?.firstName ?? '',
-      lastName: profile?.lastName ?? '',
-      phone: profile?.phone ?? customer?.phone ?? '',
-      marketingOptIn: Boolean(customer?.marketingOptIn),
+      firstName: known.firstName,
+      lastName: known.lastName,
+      phone: known.phone,
+      marketingOptIn: known.marketingOptIn,
     })
-  }, [profile, customer])
+  }, [profile, customer, user])
 
   const setField = (key) => (value) => setForm((f) => ({ ...f, [key]: value }))
 

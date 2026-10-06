@@ -32,7 +32,7 @@ const parts = [
   `-- Source: supabase/migrations/*.sql (${files.length} files)`,
   `--`,
   `-- HOW TO APPLY`,
-  `-- 1. Open https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new`,
+  `-- 1. Open https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new`,
   `-- 2. Paste this entire file into the SQL Editor`,
   `-- 3. Click Run`,
   `--`,
@@ -71,4 +71,4 @@ console.log('  2. Paste contents of supabase/all-tables.sql')
 console.log('  3. Click Run')
 console.log('')
 console.log('Dashboard SQL Editor:')
-console.log('  https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new')
+console.log('  https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new')

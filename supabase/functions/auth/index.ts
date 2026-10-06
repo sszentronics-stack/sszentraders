@@ -30,7 +30,7 @@ import { getSupabaseAdminClient, getSupabaseUserScopedClient } from '../_shared/
 import { AuthenticationError, NotFoundError } from '../../../backend/lib/errors/index.ts'
 import { writeAuditLog } from '../../../backend/lib/audit/index.ts'
 import { parseOrThrow, updateProfileSchema } from '../../../backend/lib/validation/index.ts'
-import { ensureCustomerForProfile } from '../../../backend/lib/auth/linking.ts'
+import { customerFillFromSignup, ensureCustomerForProfile, profilePatchFromSignup, type SignupMetadata } from '../../../backend/lib/auth/linking.ts'
 import { makeCustomerLinkDeps as makeLinkDeps } from '../../../backend/services/auth/auth.service.ts'
 
 interface ProfileRow {
@@ -126,14 +126,26 @@ Deno.serve(
     }
 
     if (req.method === 'POST' && !isProfileRoute) {
-      const { profile } = await requireCallerProfile(req, admin)
+      const { user, profile: loaded } = await requireCallerProfile(req, admin)
+      const meta = (user.user_metadata ?? {}) as SignupMetadata
+      const signupPatch = profilePatchFromSignup(loaded, meta)
+      let profile = loaded
+      if (Object.keys(signupPatch).length > 0) {
+        const { data, error } = await admin
+          .from('profiles')
+          .update(signupPatch)
+          .eq('id', loaded.id)
+          .select('id, auth_user_id, first_name, last_name, email, phone, avatar_url, status, is_admin')
+          .single()
+        if (error) throw error
+        profile = data as ProfileRow
+      }
       const deps = makeLinkDeps(admin)
+      const existing = await deps.findCustomerByProfileId(profile.id)
       const result = await ensureCustomerForProfile(deps, {
         profileId: profile.id,
-        firstName: profile.first_name,
-        lastName: profile.last_name,
         email: profile.email,
-        phone: profile.phone,
+        ...customerFillFromSignup(existing, profile, meta),
       })
 
       await writeAuditLog(admin, {

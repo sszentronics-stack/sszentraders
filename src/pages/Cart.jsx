@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { buildWhatsAppOrder, formatPKR } from '../data/products'
-import { orderCustomer, useSiteContent, whatsAppHref } from '../lib/siteContent'
+import { orderCustomer, useSiteContent } from '../lib/siteContent'
+import { knownCustomer, rememberLocalCheckout } from '../lib/customerDetails'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 import { getAppliedInfluencerPromo, normalizePhone, quoteInfluencerCode, recordInfluencerRedemption, setAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { useSeo } from '../hooks/useSeo'
@@ -10,10 +12,12 @@ import { useSeo } from '../hooks/useSeo'
 export default function Cart() {
   useSeo({ title: 'Your cart | SS Zen Traders', noindex: true })
   const content = useSiteContent()
+  const { profile, customer, user } = useAuth()
   const configured = isSupabaseConfigured()
   const navigate = useNavigate()
   const { items, total, updateQty, removeItem, clearCart, removedNotice, dismissRemovedNotice } = useCart()
   const [form, setForm] = useState({ name: '', phone: '', city: '', address: '' })
+  const [editingPhone, setEditingPhone] = useState(false)
   const [promoInput, setPromoInput] = useState('')
   const [promo, setPromo] = useState(null)
   const [promoError, setPromoError] = useState('')
@@ -41,12 +45,27 @@ export default function Cart() {
     })
   }
 
+  const known = knownCustomer({ profile, customer, user })
+
   useEffect(() => {
     const applied = getAppliedInfluencerPromo()
-    if (!applied?.code) return
-    setPromoInput(applied.code)
-    setForm((current) => (current.phone ? current : { ...current, phone: applied.phone || '' }))
-  }, [])
+    if (applied?.code) setPromoInput(applied.code)
+    setForm((current) => ({
+      name: current.name || known.name,
+      phone: current.phone || known.phone,
+      city: current.city || known.city,
+      address: current.address || known.addressLine1,
+    }))
+  }, [known.name, known.phone, known.city, known.addressLine1])
+
+  function rememberDetails() {
+    rememberLocalCheckout({
+      name: form.name,
+      phone: form.phone,
+      city: form.city,
+      address: form.address,
+    })
+  }
 
   useEffect(() => {
     const applied = getAppliedInfluencerPromo()
@@ -134,6 +153,8 @@ export default function Cart() {
             <PromoField
               phone={form.phone}
               setPhone={(value) => setForm((current) => ({ ...current, phone: value }))}
+              editingPhone={editingPhone || !form.phone}
+              onEditPhone={() => setEditingPhone(true)}
               promoInput={promoInput}
               setPromoInput={setPromoInput}
               applyPromo={applyPromo}
@@ -149,11 +170,21 @@ export default function Cart() {
             </button>
             <a
               className="btn-outline block text-center mt-3"
-              href={whatsAppHref(content, 'Hi! I have a question before placing my order.')}
+              href={buildWhatsAppOrder(items, orderCustomer(content, {
+                name: form.name,
+                phone: form.phone,
+                city: form.city,
+                address: form.address,
+                promoCode: promo?.couponCode,
+                promoLabel: promo?.promotionName,
+                discount,
+                due,
+              }))}
+              onClick={rememberDetails}
               target="_blank"
               rel="noreferrer"
             >
-              Ask a question on WhatsApp
+              Order on WhatsApp
             </a>
           </aside>
         ) : (
@@ -162,6 +193,8 @@ export default function Cart() {
             <PromoField
               phone={form.phone}
               setPhone={(value) => setForm((current) => ({ ...current, phone: value }))}
+              editingPhone={editingPhone || !form.phone}
+              onEditPhone={() => setEditingPhone(true)}
               promoInput={promoInput}
               setPromoInput={setPromoInput}
               applyPromo={applyPromo}
@@ -205,6 +238,7 @@ export default function Cart() {
                 due,
               }))}
               onClick={(event) => {
+                rememberDetails()
                 if (!promo?.couponCode) return
                 const saved = recordInfluencerRedemption(promo.couponCode, form.phone)
                 if (!saved.ok) {
@@ -229,17 +263,24 @@ export default function Cart() {
   )
 }
 
-function PromoField({ phone, setPhone, promoInput, setPromoInput, applyPromo, promo, promoError, discount, total, due }) {
+function PromoField({ phone, setPhone, editingPhone, onEditPhone, promoInput, setPromoInput, applyPromo, promo, promoError, discount, total, due }) {
   return (
     <div className="mb-4">
-      <label className="form-label" htmlFor="cart-phone">Mobile number</label>
-      <input
-        id="cart-phone"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="03XXXXXXXXX"
-        className="w-full border border-line px-3 py-2.5 bg-white mb-3"
-      />
+      {editingPhone ? (
+        <>
+          <label className="form-label" htmlFor="cart-phone">Mobile number</label>
+          <input
+            id="cart-phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="03XXXXXXXXX"
+            autoComplete="tel"
+            className="w-full border border-line px-3 py-2.5 bg-white mb-3"
+          />
+        </>
+      ) : (
+        <p className="text-sm mb-3">Using {phone}. <button type="button" className="underline" onClick={onEditPhone}>Change</button></p>
+      )}
       <label className="form-label" htmlFor="cart-promo">Influencer promo code</label>
       <div className="flex gap-2">
         <input

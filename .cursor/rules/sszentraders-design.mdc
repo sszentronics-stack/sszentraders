@@ -1,0 +1,52 @@
+---
+description: Design rules for the SS Zen Traders website (colours, type, shape, motion)
+alwaysApply: true
+---
+
+# SS Zen Traders design rules
+
+The full design is defined in two files at the project root. Read both before any UI work.
+
+- `SSZENTRADERS_DESIGN.md`: the design guide (tokens, page structure, animation table, checklist).
+- `ssz-design-reference.html`: working reference with the exact CSS, markup and JavaScript.
+
+When this file and those files disagree, the reference HTML wins for values and the design guide wins for scope.
+
+## Scope
+
+- This is a design task. Keep the project's framework, routing, data layer and build setup.
+- Convert the reference markup into this project's component style. Keep the `ssz-` class names and the `--ssz-*` CSS variables.
+- Do not add libraries for sliders, carousels, modals or animation. Use CSS and small vanilla JavaScript (or the framework's own hooks).
+- Never copy or hotlink images, videos, text, reviews or logos from any other store.
+- Never invent reviews, ratings, review counts, before/after results, awards or delivery promises. Leave those empty and hide the section.
+
+## Look
+
+- Colours: ink `#121212`, paper `#FFFFFF`, mist `#F3F3F3`, rose-gold `#B76E79`, rose-deep `#8C4A55`, blush `#F4E4E1`. Use the CSS variables, not raw hex. Do not add new colours without asking.
+- Rose-gold is an accent only: story rings, sale badge, stars. Not for large backgrounds or body text.
+- Fonts: Assistant for body and headings (400, bold 700). Josefin Sans for the hero heading and the buttons in the hero and video sections.
+- Sentence case for all text. No all-caps labels.
+- Square corners on buttons, inputs, cards and images. Rounded only for circles, pills and video cards (10px).
+- Borders are 1px. No box shadows.
+- Page width 1200px. Sections touch each other and alternate between paper and mist backgrounds.
+- Grid gap 4px on mobile and 8px on desktop. Product grid is 2 columns on mobile and up to 4 on desktop.
+
+## Motion
+
+- Use only the animations listed in section 5 of the design guide, with the timings given there.
+- Use the duration and easing variables (`--ssz-t-short` 0.1s, `--ssz-t-default` 0.2s, `--ssz-t-bar` 0.25s, `--ssz-t-medium` 0.3s, `--ssz-t-long` 0.5s, `--ssz-t-xlong` 0.6s, `--ssz-ease-out`, `--ssz-ease-pop`).
+- Animate only `opacity`, `transform`, `clip-path` and `stroke`.
+- All looping and automatic animation must stop under `prefers-reduced-motion: reduce`, and content must stay visible.
+- Scroll reveal hides content only when JavaScript is running.
+
+## Quality
+
+- Mobile first. Check 360, 390, 768, 1024 and 1440px. No horizontal page scroll.
+- Real `<a>`, `<button>`, `<input>` and `<dialog>` elements with labels and visible focus outlines.
+- Images have width and height; media below the fold is lazy-loaded; the hero is not.
+- Videos are `muted playsinline` with a poster and play only while visible.
+- A section with no content renders nothing.
+
+## When finishing a task
+
+State which part of the design guide you implemented, which files changed, and how to test it in the browser.

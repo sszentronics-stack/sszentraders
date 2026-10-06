@@ -1,6 +1,6 @@
 -- Aura Beauty Care — DUMMY / DEV DATA
 -- Run in SQL Editor (after migrations):
--- https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
+-- https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new
 --
 -- Safe to re-run (upserts / on conflict). No real customers.
 

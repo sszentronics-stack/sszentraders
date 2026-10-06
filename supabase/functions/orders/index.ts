@@ -36,6 +36,7 @@ import {
 } from '../../../backend/lib/validation/index.ts'
 import { writeAuditLog } from '../../../backend/lib/audit/index.ts'
 import * as orders from '../../../backend/services/orders/orders.service.ts'
+import { sendOrderConfirmationEmail } from '../../../backend/lib/orders/confirmationEmail.ts'
 
 const IDEMPOTENCY_SCOPE = 'order.create'
 
@@ -104,6 +105,14 @@ Deno.serve(
 
       try {
         const order = await orders.createOrder(admin, caller.id, input)
+        try {
+          await sendOrderConfirmationEmail(order, {
+            apiKey: Deno.env.get('RESEND_API_KEY'),
+            from: Deno.env.get('ORDER_FROM_EMAIL'),
+          })
+        } catch (mailError) {
+          console.error('Order confirmation email was not sent.', mailError)
+        }
         await saveIdempotencyRecord(admin, { ...pending, status: 'completed', responseReference: order.id })
         await writeAuditLog(admin, {
           actor: caller.id,

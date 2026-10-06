@@ -13,6 +13,10 @@
  *    brand-new project with nothing published yet), fall back to the
  *    static dataset as well, but keep the specific error message around in
  *    case a page wants to surface a subtle "showing sample products" note.
+ *  - A published list never replaces the local storefront products. Those
+ *    three keep their photos, copy, and video clips. A published row with
+ *    the same slug only adds its variant id. Any other published product
+ *    is listed after them.
  *  - Never throws into the component tree and never leaves the storefront
  *    on an infinite spinner — every path resolves `loading: false`.
  *
@@ -28,6 +32,17 @@ import { listPublishedProducts } from '../repositories/products.repository'
 import { adaptProduct } from '../data/catalogAdapter'
 import { products as fallbackProducts } from '../data/products'
 import { applyProductEdits, useSiteContent } from '../lib/siteContent'
+
+function mergeWithLocalCatalog(remote) {
+  const remoteBySlug = new Map(remote.map((product) => [product.slug, product]))
+  const local = fallbackProducts.map((product) => {
+    const match = remoteBySlug.get(product.slug)
+    if (!match?.variantId) return product
+    return { ...product, variantId: match.variantId, availability: match.availability ?? product.availability, inStock: match.inStock }
+  })
+  const extras = remote.filter((product) => !fallbackProducts.some((item) => item.slug === product.slug))
+  return [...local, ...extras]
+}
 
 /**
  * @returns {{ products: object[], loading: boolean, error: string|null, source: 'supabase'|'fallback' }}
@@ -51,7 +66,7 @@ export function useProducts() {
           setState({ products: fallbackProducts, loading: false, error: null, source: 'fallback' })
           return
         }
-        setState({ products: rows.map(adaptProduct), loading: false, error: null, source: 'supabase' })
+        setState({ products: mergeWithLocalCatalog(rows.map(adaptProduct)), loading: false, error: null, source: 'supabase' })
       } catch (err) {
         if (cancelled) return
         setState({

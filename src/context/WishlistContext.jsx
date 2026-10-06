@@ -8,6 +8,20 @@ import { useToast } from './ToastContext'
 
 const WishlistContext = createContext(null)
 const STORAGE_KEY = 'aura-beauty-wishlist'
+const SERVER_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+function isServerId(id) {
+  return SERVER_ID.test(String(id ?? ''))
+}
+
+function readLocalWishlist() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
 
 /**
  * Same dual-mode shape as CartContext: server-backed (backend/services/cart/
@@ -31,25 +45,16 @@ function mapItems(items) {
 
 export function WishlistProvider({ children }) {
   const configured = isSupabaseConfigured()
-  const { session, ensureGuestSession } = useAuth()
+  const { session } = useAuth()
   const toast = useToast()
 
-  const [productIds, setProductIds] = useState(() => {
-    if (configured) return []
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      return raw ? JSON.parse(raw) : []
-    } catch {
-      return []
-    }
-  })
+  const [productIds, setProductIds] = useState(readLocalWishlist)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(configured)
 
   useEffect(() => {
-    if (configured) return
     localStorage.setItem(STORAGE_KEY, JSON.stringify(productIds))
-  }, [configured, productIds])
+  }, [productIds])
 
   const reload = useCallback(async () => {
     if (!configured) return
@@ -69,10 +74,9 @@ export function WishlistProvider({ children }) {
     }
     let cancelled = false
     async function sync() {
-      try {
-        await ensureGuestSession()
-      } catch (err) {
-        console.error('Failed to establish a wishlist session.', err)
+      if (!session?.user || session.user.is_anonymous) {
+        if (!cancelled) setLoading(false)
+        return
       }
       if (!cancelled) await reload()
     }
@@ -80,24 +84,26 @@ export function WishlistProvider({ children }) {
     return () => {
       cancelled = true
     }
-  }, [configured, session?.user?.id, ensureGuestSession, reload])
+  }, [configured, session?.user?.id, reload])
 
   const isWishlisted = useCallback(
-    (productId) => (configured ? items.some((item) => item.productId === productId) : productIds.includes(productId)),
-    [configured, items, productIds],
+    (productId) => productIds.includes(productId) || items.some((item) => item.productId === productId),
+    [items, productIds],
   )
 
   const toggle = useCallback(
     async (product) => {
       const productId = product.id
-      if (!configured) {
+      const rememberLocal = () => {
         const wasWishlisted = productIds.includes(productId)
         setProductIds((prev) => (wasWishlisted ? prev.filter((id) => id !== productId) : [...prev, productId]))
         toast.success(wasWishlisted ? 'Removed from wishlist' : 'Added to wishlist')
+      }
+      if (!configured || !isServerId(productId)) {
+        rememberLocal()
         return
       }
       try {
-        await ensureGuestSession()
         if (isWishlisted(productId)) {
           setItems(mapItems(await wishlistApi.removeFromWishlist(productId)))
           toast.success('Removed from wishlist')
@@ -107,16 +113,16 @@ export function WishlistProvider({ children }) {
         }
       } catch (err) {
         console.error('Failed to update wishlist.', err)
-        toast.error(err?.message ?? 'Could not update your wishlist. Please try again.')
+        rememberLocal()
       }
     },
-    [configured, ensureGuestSession, isWishlisted, productIds, toast],
+    [configured, isWishlisted, productIds, toast],
   )
 
   const value = useMemo(
     () => ({
       items,
-      productIds: configured ? items.map((item) => item.productId) : productIds,
+      productIds: [...new Set([...productIds, ...items.map((item) => item.productId)])],
       isWishlisted,
       toggle,
       loading,

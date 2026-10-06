@@ -1,7 +1,7 @@
 # Aura Beauty Care — Supabase local/remote config
 # https://supabase.com/docs/guides/cli/config
 
-project_id = "kcwntiotjnunavektiwm"
+project_id = "tiwoqgagrclmbysgexbf"
 
 [api]
 enabled = true

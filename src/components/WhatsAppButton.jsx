@@ -1,11 +1,26 @@
-import { useSiteContent, whatsAppHref } from '../lib/siteContent'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
+import { buildWhatsAppOrder } from '../data/products'
+import { knownCustomer } from '../lib/customerDetails'
+import { orderCustomer, useSiteContent, whatsAppHref } from '../lib/siteContent'
 
 export default function WhatsAppButton() {
   const content = useSiteContent()
+  const { items } = useCart()
+  const { profile, customer, user } = useAuth()
+  const known = knownCustomer({ profile, customer, user })
+  const href = items.length > 0
+    ? buildWhatsAppOrder(items, orderCustomer(content, {
+      name: known.name,
+      phone: known.phone,
+      city: known.city,
+      address: [known.addressLine1, known.addressLine2].filter(Boolean).join(', '),
+    }))
+    : whatsAppHref(content)
   return (
     <a
       className="wa-float"
-      href={whatsAppHref(content)}
+      href={href}
       target="_blank"
       rel="noreferrer"
       aria-label="Chat on WhatsApp"

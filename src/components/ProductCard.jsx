@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { formatPKR } from '../data/products'
 import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influencerCodes'
+import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 
 export default function ProductCard({ product }) {
@@ -8,6 +9,7 @@ export default function ProductCard({ product }) {
   const salePrice = priceAfterInfluencer(product.price, applied)
   const compare = product.compareAt > product.price ? product.compareAt : product.price > salePrice ? product.price : 0
   const onSale = compare > salePrice
+  const { addItem } = useCart()
   const { isWishlisted, toggle } = useWishlist()
   const wishlisted = isWishlisted(product.id)
   const hover = product.images?.[1]
@@ -38,6 +40,14 @@ export default function ProductCard({ product }) {
           </div>
         </div>
       </Link>
+      <button
+        type="button"
+        className="ssz-btn ssz-btn--outline ssz-card__add"
+        disabled={soldOut}
+        onClick={() => addItem(product, 1)}
+      >
+        {soldOut ? 'Sold out' : 'Add to cart'}
+      </button>
     </article>
   )
 }

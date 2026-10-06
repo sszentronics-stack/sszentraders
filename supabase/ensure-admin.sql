@@ -1,5 +1,5 @@
 -- Ensure sszentronics@gmail.com can access /admin
--- Run in: https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
+-- Run in: https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new
 
 -- 1) Link / create profile for this auth user + set admin
 insert into public.profiles (auth_user_id, email, first_name, last_name, is_admin, status)

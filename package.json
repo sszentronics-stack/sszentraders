@@ -12,7 +12,7 @@
     "test": "vitest run",
     "db:tables": "node scripts/build-all-tables.mjs",
     "db:tables:seed": "node scripts/build-all-tables.mjs --with-seed",
-    "db:dummy": "node -e \"console.log('Open supabase/dummy-data.sql and paste into Supabase SQL Editor:\\nhttps://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new')\"",
+    "db:dummy": "node -e \"console.log('Open supabase/dummy-data.sql and paste into Supabase SQL Editor:\\nhttps://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new')\"",
     "db:deploy-functions": "node scripts/deploy-functions.mjs"
   },
   "dependencies": {

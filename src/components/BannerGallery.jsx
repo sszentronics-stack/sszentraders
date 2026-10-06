@@ -9,6 +9,8 @@ import {
   setAppliedInfluencerPromo,
   useAppliedInfluencerPromo,
 } from '../lib/influencerCodes'
+import { knownCustomer } from '../lib/customerDetails'
+import { useAuth } from '../context/AuthContext'
 
 function framesFor(product) {
   const banner = bannerForProduct(product)
@@ -23,7 +25,10 @@ export default function BannerGallery({ heading = 'Banner gallery', intro }) {
   const items = useMemo(() => products.filter((product) => bannerForProduct(product).image), [products])
   const [active, setActive] = useState(null)
   const [frame, setFrame] = useState(0)
+  const { profile, customer, user } = useAuth()
+  const known = knownCustomer({ profile, customer, user })
   const [phone, setPhone] = useState('')
+  const [editingPhone, setEditingPhone] = useState(false)
   const [code, setCode] = useState('')
   const [claimError, setClaimError] = useState('')
   const [claimNote, setClaimNote] = useState('')
@@ -56,6 +61,11 @@ export default function BannerGallery({ heading = 'Banner gallery', intro }) {
   const current = frames[frame]
 
   useEffect(() => {
+    if (phone || !known.phone) return
+    setPhone(known.phone)
+  }, [known.phone, phone])
+
+  useEffect(() => {
     if (active == null) return undefined
     const onKey = (event) => {
       if (event.key === 'Escape') setActive(null)
@@ -84,9 +94,13 @@ export default function BannerGallery({ heading = 'Banner gallery', intro }) {
           <h2>Influencer promo code</h2>
           <p>The discount applies to these banners. Each mobile number can use a code only once.</p>
           <div className="ssz-form">
-            <label htmlFor="gallery-phone">Mobile number
-              <input id="gallery-phone" placeholder="03XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-            </label>
+            {editingPhone || !phone ? (
+              <label htmlFor="gallery-phone">Mobile number
+                <input id="gallery-phone" placeholder="03XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" required />
+              </label>
+            ) : (
+              <p>Using {phone}. <button type="button" className="underline" onClick={() => setEditingPhone(true)}>Change</button></p>
+            )}
             <label htmlFor="gallery-code">Promo code
               <input id="gallery-code" placeholder="Code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} required />
             </label>

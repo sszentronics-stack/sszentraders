@@ -1,6 +1,6 @@
 -- Aura Beauty Care — bootstrap first admin
 -- Run once in Supabase SQL Editor:
--- https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
+-- https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new
 --
 -- What this does:
 -- 1) Auto-creates a profiles row when someone signs up (so /admin works

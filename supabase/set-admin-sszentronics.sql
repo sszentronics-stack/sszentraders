@@ -1,5 +1,5 @@
 -- Promote sszentronics@gmail.com to admin
--- Run in: https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
+-- Run in: https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new
 
 create or replace function public.handle_new_user()
 returns trigger

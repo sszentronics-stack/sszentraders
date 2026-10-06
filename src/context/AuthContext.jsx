@@ -4,6 +4,21 @@ import { callEdgeFunction } from '../lib/supabase/functions'
 
 const AuthContext = createContext(null)
 
+function mapProfile(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    authUserId: row.authUserId ?? row.auth_user_id ?? null,
+    firstName: row.firstName ?? row.first_name ?? null,
+    lastName: row.lastName ?? row.last_name ?? null,
+    email: row.email ?? null,
+    phone: row.phone ?? null,
+    avatarUrl: row.avatarUrl ?? row.avatar_url ?? null,
+    status: row.status ?? null,
+    isAdmin: Boolean(row.isAdmin ?? row.is_admin),
+  }
+}
+
 /**
  * Customer identity state for the whole storefront. Wraps Supabase Auth
  * directly for signup/login/logout/password-reset (the browser SPA calling
@@ -27,11 +42,12 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [customer, setCustomer] = useState(null)
   const [initializing, setInitializing] = useState(configured)
+  const [identityReady, setIdentityReady] = useState(!configured)
 
   const linkAndRefresh = useCallback(async () => {
     try {
       const result = await callEdgeFunction('auth', { method: 'POST' })
-      setProfile(result?.profile ?? null)
+      setProfile(mapProfile(result?.profile))
       setCustomer(result?.customer ?? null)
     } catch (err) {
       // Non-fatal: the visitor is still signed in even if the linking call
@@ -55,7 +71,11 @@ export function AuthProvider({ children }) {
       setSession(data.session)
       setInitializing(false)
       if (data.session && !data.session.user?.is_anonymous) {
-        linkAndRefresh()
+        linkAndRefresh().finally(() => {
+          if (!cancelled) setIdentityReady(true)
+        })
+      } else {
+        setIdentityReady(true)
       }
     })
 
@@ -66,9 +86,11 @@ export function AuthProvider({ children }) {
       if (event === 'SIGNED_OUT') {
         setProfile(null)
         setCustomer(null)
+        setIdentityReady(true)
       }
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && nextSession && !nextSession.user?.is_anonymous) {
-        linkAndRefresh()
+        setIdentityReady(false)
+        linkAndRefresh().finally(() => setIdentityReady(true))
       }
     })
 
@@ -149,6 +171,7 @@ export function AuthProvider({ children }) {
     () => ({
       configured,
       initializing,
+      identityReady,
       session,
       user: session?.user ?? null,
       isAuthenticated: Boolean(session?.user) && !session?.user?.is_anonymous,
@@ -166,6 +189,7 @@ export function AuthProvider({ children }) {
     [
       configured,
       initializing,
+      identityReady,
       session,
       profile,
       customer,

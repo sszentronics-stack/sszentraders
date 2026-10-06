@@ -139,7 +139,7 @@ export default function Shop() {
           ) : sorted.length === 0 ? (
             <NoResults error={error} hasActiveFilters={hasActiveFilters} categories={facets.categories} onClearFilters={clearFilters} />
           ) : (
-            <ul className="ssz-grid" style={{ '--cols': 3 }}>
+            <ul className="ssz-grid">
               {sorted.map((product) => (
                 <li key={product.id}>
                   <ProductCard product={product} />

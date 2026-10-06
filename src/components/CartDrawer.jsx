@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { buildWhatsAppOrder, formatPKR } from '../data/products'
 import { orderCustomer, useSiteContent } from '../lib/siteContent'
+import { knownCustomer } from '../lib/customerDetails'
 import { isSupabaseConfigured } from '../lib/supabase/client'
 
 export default function CartDrawer() {
   const content = useSiteContent()
+  const { profile, customer, user } = useAuth()
+  const known = knownCustomer({ profile, customer, user })
   const configured = isSupabaseConfigured()
   const { items, total, isOpen, setIsOpen, updateQty, removeItem, removedNotice, dismissRemovedNotice } = useCart()
 
@@ -77,30 +81,28 @@ export default function CartDrawer() {
                 <span>{formatPKR(total)}</span>
               </div>
               {configured ? (
-                <>
-                  <Link to="/checkout" className="btn-lavender block text-center" onClick={() => setIsOpen(false)}>
-                    Proceed to checkout
-                  </Link>
-                  <Link to="/cart" className="btn-outline block text-center" onClick={() => setIsOpen(false)}>
-                    View cart &amp; details
-                  </Link>
-                </>
+                <Link to="/checkout" className="btn-lavender block text-center" onClick={() => setIsOpen(false)}>
+                  Proceed to checkout
+                </Link>
               ) : (
-                <>
-                  <p className="text-xs text-ink-soft">Checkout continues on WhatsApp. Cash on delivery available.</p>
-                  <a
-                    className="btn-lavender block text-center"
-                    href={buildWhatsAppOrder(items, orderCustomer(content))}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Order on WhatsApp
-                  </a>
-                  <Link to="/cart" className="btn-outline block text-center" onClick={() => setIsOpen(false)}>
-                    View cart &amp; details
-                  </Link>
-                </>
+                <p className="text-xs text-ink-soft">Checkout continues on WhatsApp. Cash on delivery available.</p>
               )}
+              <a
+                className={configured ? 'btn-outline block text-center' : 'btn-lavender block text-center'}
+                    href={buildWhatsAppOrder(items, orderCustomer(content, {
+                      name: known.name,
+                      phone: known.phone,
+                      city: known.city,
+                      address: [known.addressLine1, known.addressLine2].filter(Boolean).join(', '),
+                    }))}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Order on WhatsApp
+              </a>
+              <Link to="/cart" className="btn-outline block text-center" onClick={() => setIsOpen(false)}>
+                View cart &amp; details
+              </Link>
             </div>
           </>
         )}

@@ -81,14 +81,14 @@ export const DEFAULT_SITE_CONTENT = {
   reviews: {
     heading: 'What customers say',
     items: [
-      { image: '/products/sadoer-collagen/1.png', rating: '5', text: 'The collagen mask left my skin soft by morning.' },
-      { image: '/products/mighty-patch/1.jpg', rating: '5', text: 'Mighty Patch stays flat and is easy to wear out.' },
-      { image: '/products/some-by-mi/1.jpg', rating: '5', text: 'The SOME BY MI toner is gentle enough for every day.' },
-      { image: '/products/sadoer-collagen/2.png', rating: '4', text: 'The sheet sits close to the face and feels light.' },
-      { image: '/products/mighty-patch/2.jpg', rating: '5', text: 'The patch is thin enough to wear in the daytime.' },
-      { image: '/products/some-by-mi/2.jpg', rating: '4', text: 'A clear toner step I can use on a cotton pad.' },
-      { image: '/products/sadoer-collagen/3.png', rating: '5', text: 'I use the collagen mask two evenings a week.' },
-      { image: '/products/mighty-patch/3.jpg', rating: '5', text: 'Cash on delivery and a WhatsApp confirmation made ordering simple.' },
+      { image: '/reviews/review-1.jpg', rating: '5', text: 'The collagen mask left my skin soft by morning.' },
+      { image: '/reviews/review-2.jpg', rating: '5', text: 'Mighty Patch stays flat and is easy to wear out.' },
+      { image: '/reviews/review-3.jpg', rating: '5', text: 'The SOME BY MI toner is gentle enough for every day.' },
+      { image: '/reviews/review-4.jpg', rating: '4', text: 'The sheet sits close to the face and feels light.' },
+      { image: '/reviews/review-5.jpg', rating: '5', text: 'The patch is thin enough to wear in the daytime.' },
+      { image: '/reviews/review-6.jpg', rating: '4', text: 'A clear toner step I can use on a cotton pad.' },
+      { image: '/reviews/review-7.jpg', rating: '5', text: 'I use the collagen mask two evenings a week.' },
+      { image: '/reviews/review-8.jpg', rating: '5', text: 'Cash on delivery and a WhatsApp confirmation made ordering simple.' },
     ],
   },
   trust: ['Cash on delivery', 'WhatsApp confirmation', '7-day returns'],
@@ -224,7 +224,7 @@ export function normalizeSiteContent(input) {
         const incoming = source.reviews?.items?.[index] ?? {}
         const rating = Number(incoming.rating)
         return {
-          image: path(incoming.image, item.image),
+          image: String(incoming.image || '').startsWith('/products/') ? item.image : path(incoming.image, item.image),
           rating: Number.isFinite(rating) && rating >= 1 && rating <= 5 ? String(Math.round(rating)) : item.rating,
           text: text(incoming.text, item.text, 180),
         }

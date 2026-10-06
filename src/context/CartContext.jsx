@@ -7,6 +7,20 @@ import { useAuth } from './AuthContext'
 
 const CartContext = createContext(null)
 const STORAGE_KEY = 'aura-beauty-cart'
+const SERVER_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+function isServerId(id) {
+  return SERVER_ID.test(String(id ?? ''))
+}
+
+function readLocalCart() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
 
 /**
  * Phase 5: when Supabase is configured, the cart is server-backed
@@ -34,17 +48,9 @@ function mapSummaryToItems(summary) {
 
 export function CartProvider({ children }) {
   const configured = isSupabaseConfigured()
-  const { session, ensureGuestSession } = useAuth()
+  const { session } = useAuth()
 
-  const [items, setItems] = useState(() => {
-    if (configured) return []
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      return raw ? JSON.parse(raw) : []
-    } catch {
-      return []
-    }
-  })
+  const [items, setItems] = useState(readLocalCart)
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(configured)
   const [removedNotice, setRemovedNotice] = useState(null)
@@ -56,12 +62,11 @@ export function CartProvider({ children }) {
   const prevUserRef = useRef(null)
 
   useEffect(() => {
-    if (configured) return
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  }, [configured, items])
+  }, [items])
 
   const applySummary = useCallback((summary) => {
-    setItems(mapSummaryToItems(summary))
+    setItems((prev) => [...prev.filter((item) => !isServerId(item.id)), ...mapSummaryToItems(summary)])
     const removedCount = summary.removedItems?.length ?? 0
     const adjustedCount = summary.items?.filter((item) => item.quantityAdjusted).length ?? 0
     const notices = []
@@ -102,17 +107,12 @@ export function CartProvider({ children }) {
     let cancelled = false
 
     async function sync() {
-      try {
-        await ensureGuestSession()
-      } catch (err) {
-        console.error('Failed to establish a cart session.', err)
+      const user = session?.user
+      if (!user || user.is_anonymous) {
         if (!cancelled) setLoading(false)
         return
       }
       if (cancelled) return
-
-      const user = session?.user
-      if (!user) return // AuthContext's session state will update from the sign-in above and re-run this effect
 
       const prev = prevUserRef.current
       if (prev && prev.id !== user.id && prev.isAnon && !user.is_anonymous) {
@@ -136,36 +136,40 @@ export function CartProvider({ children }) {
     return () => {
       cancelled = true
     }
-  }, [configured, session?.user?.id, session?.user?.is_anonymous, ensureGuestSession, reload])
+  }, [configured, session?.user?.id, session?.user?.is_anonymous, reload])
+
+  const rememberLocalItem = useCallback((product, qty) => {
+    setItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id)
+      if (existing) {
+        return prev.map((item) => (item.id === product.id ? { ...item, qty: item.qty + qty } : item))
+      }
+      return [...prev, { id: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images?.[0], qty }]
+    })
+    setIsOpen(true)
+  }, [])
 
   const addItem = useCallback(
     async (product, qty = 1) => {
-      if (!configured) {
-        setItems((prev) => {
-          const existing = prev.find((item) => item.id === product.id)
-          if (existing) {
-            return prev.map((item) => (item.id === product.id ? { ...item, qty: item.qty + qty } : item))
-          }
-          return [...prev, { id: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images[0], qty }]
-        })
-        setIsOpen(true)
+      const variantId = product.variantId ?? product.id
+      if (!configured || !isServerId(variantId)) {
+        rememberLocalItem(product, qty)
         return
       }
       try {
-        await ensureGuestSession()
-        const variantId = product.variantId ?? product.id
         applySummary(await cartApi.addCartItem(variantId, qty))
         setIsOpen(true)
       } catch (err) {
         console.error('Failed to add item to cart.', err)
+        rememberLocalItem(product, qty)
       }
     },
-    [configured, ensureGuestSession, applySummary],
+    [configured, applySummary, rememberLocalItem],
   )
 
   const updateQty = useCallback(
     async (id, qty) => {
-      if (!configured) {
+      if (!configured || !isServerId(id)) {
         setItems((prev) =>
           qty < 1 ? prev.filter((item) => item.id !== id) : prev.map((item) => (item.id === id ? { ...item, qty } : item)),
         )
@@ -182,7 +186,7 @@ export function CartProvider({ children }) {
 
   const removeItem = useCallback(
     async (id) => {
-      if (!configured) {
+      if (!configured || !isServerId(id)) {
         setItems((prev) => prev.filter((item) => item.id !== id))
         return
       }
@@ -196,12 +200,10 @@ export function CartProvider({ children }) {
   )
 
   const clearCart = useCallback(async () => {
-    if (!configured) {
-      setItems([])
-      return
-    }
+    setItems((prev) => prev.filter((item) => isServerId(item.id)))
+    if (!configured) return
     try {
-      applySummary(await cartApi.clearCart())
+      setItems(mapSummaryToItems(await cartApi.clearCart()))
     } catch (err) {
       console.error('Failed to clear cart.', err)
     }

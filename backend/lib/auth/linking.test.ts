@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ensureCustomerForProfile, type CustomerRow, type LinkCustomerDeps } from './linking.ts'
+import { customerFillFromSignup, ensureCustomerForProfile, profilePatchFromSignup, type CustomerRow, type LinkCustomerDeps } from './linking.ts'
 
 function makeFakeDeps(initialCustomers: CustomerRow[] = []): LinkCustomerDeps & { customers: CustomerRow[] } {
   const customers = [...initialCustomers]
@@ -127,5 +127,39 @@ describe('ensureCustomerForProfile', () => {
     expect(result.claimedGuestCustomer).toBe(true)
     expect(result.customer.id).toBe('guest-2')
     expect(deps.customers).toHaveLength(1)
+  })
+})
+
+describe('signup details fill empty profile fields only', () => {
+  it('copies name and phone when the profile is blank', () => {
+    expect(profilePatchFromSignup(
+      { first_name: null, last_name: null, phone: null },
+      { first_name: 'Ayesha', last_name: 'Khan', phone: '03079594474', marketing_opt_in: true },
+    )).toEqual({ first_name: 'Ayesha', last_name: 'Khan', phone: '03079594474' })
+  })
+
+  it('leaves a name or phone the customer already saved', () => {
+    expect(profilePatchFromSignup(
+      { first_name: 'Sara', last_name: 'Ali', phone: '03001112233' },
+      { first_name: 'Ayesha', last_name: 'Khan', phone: '03079594474' },
+    )).toEqual({})
+  })
+
+  it('fills an empty customer and keeps a later phone', () => {
+    const existing: CustomerRow = {
+      id: 'c1',
+      profileId: 'p1',
+      customerNumber: 'AURA-1',
+      firstName: null,
+      lastName: 'Ali',
+      email: 'sara@example.com',
+      phone: '03001112233',
+      marketingOptIn: false,
+      status: 'active',
+    }
+    expect(customerFillFromSignup(existing, { first_name: 'Sara', last_name: 'Khan', phone: '03079594474' }, { marketing_opt_in: true }))
+      .toEqual({ firstName: 'Sara' })
+    expect(customerFillFromSignup(null, { first_name: 'Sara', last_name: 'Ali', phone: '03079594474' }, { marketing_opt_in: true }))
+      .toEqual({ firstName: 'Sara', lastName: 'Ali', phone: '03079594474', marketingOptIn: true })
   })
 })

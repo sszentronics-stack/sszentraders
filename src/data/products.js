@@ -206,11 +206,18 @@ export function salePercent(product) {
 }
 
 export function buildWhatsAppOrder(items, customer = {}) {
-  const lines = items.map(
-    (item) =>
-      `• ${item.qty}x ${item.name} — ${formatPKR(item.price * item.qty)}`,
-  )
-  const total = items.reduce((sum, item) => sum + item.price * item.qty, 0)
+  const lines = items.map((item, index) => {
+    const qty = Number(item.qty) || 1
+    const unit = Number(item.price) || 0
+    const name = item.name || 'Item'
+    return [
+      `${index + 1}. ${name}`,
+      `Quantity: ${qty}`,
+      `Price: ${formatPKR(unit)}`,
+      `Amount: ${formatPKR(unit * qty)}`,
+    ].join('\n')
+  })
+  const total = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0)
   const header = [
     customer.greeting || 'Hello SS Zen Traders, I would like to place an order:',
     '',

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
@@ -9,6 +9,8 @@ import * as ordersApi from '../repositories/orders.repository'
 import * as customersApi from '../repositories/customers.repository'
 import * as promotionsApi from '../repositories/promotions.repository'
 import { isSupabaseConfigured } from '../lib/supabase/client'
+import { callEdgeFunction } from '../lib/supabase/functions'
+import { addressIsComplete, knownCustomer, rememberLocalCheckout } from '../lib/customerDetails'
 import { findInfluencerCode, quoteInfluencerCode, recordInfluencerRedemption, setAppliedInfluencerPromo } from '../lib/influencerCodes'
 import { useSeo } from '../hooks/useSeo'
 
@@ -29,7 +31,7 @@ const EMPTY_ADDRESS = {
 export default function Checkout() {
   useSeo({ title: 'Checkout | SSzentronics', noindex: true })
   const navigate = useNavigate()
-  const { isAuthenticated, user, ensureGuestSession } = useAuth()
+  const { isAuthenticated, user, profile, customer, initializing, identityReady, ensureGuestSession, refreshProfile } = useAuth()
   const { items, total, loading: cartLoading, clearCart } = useCart()
 
   const [step, setStep] = useState('contact')
@@ -37,6 +39,9 @@ export default function Checkout() {
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState(EMPTY_ADDRESS)
   const [savedAddresses, setSavedAddresses] = useState(null)
+  const [hydrated, setHydrated] = useState(false)
+  const userEdited = useRef(false)
+  const stepped = useRef(false)
   const [selectedSavedId, setSelectedSavedId] = useState('')
   const [deliveryMethod, setDeliveryMethod] = useState('standard')
   const [paymentMethod, setPaymentMethod] = useState('cod')
@@ -121,28 +126,59 @@ export default function Checkout() {
   }, [ensureGuestSession])
 
   useEffect(() => {
-    if (!isSupabaseConfigured() || !isAuthenticated) return
+    if (initializing || (isAuthenticated && !identityReady)) return undefined
+    if (!isSupabaseConfigured() || !isAuthenticated) {
+      setSavedAddresses((current) => current ?? [])
+      return undefined
+    }
+    let cancelled = false
     customersApi
       .listMyAddresses()
       .then((list) => {
-        setSavedAddresses(list)
-        const def = list.find((a) => a.isDefaultShipping) ?? list[0]
-        if (def) {
-          setSelectedSavedId(def.id)
-          setAddress({
-            recipientName: def.recipientName,
-            phone: def.phone,
-            addressLine1: def.addressLine1,
-            addressLine2: def.addressLine2 ?? '',
-            city: def.city,
-            province: def.province ?? '',
-            postalCode: def.postalCode ?? '',
-            country: def.country,
-          })
-        }
+        if (!cancelled) setSavedAddresses(list)
       })
-      .catch((err) => console.error('Failed to load saved addresses.', err))
-  }, [isAuthenticated])
+      .catch((err) => {
+        console.error('Failed to load saved addresses.', err)
+        if (!cancelled) setSavedAddresses([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [initializing, identityReady, isAuthenticated])
+
+  useEffect(() => {
+    if (initializing || (isAuthenticated && (!identityReady || savedAddresses === null))) return
+    const known = knownCustomer({ profile, customer, user })
+    const def = (savedAddresses ?? []).find((row) => row.isDefaultShipping) ?? (savedAddresses ?? [])[0]
+    if (!userEdited.current) {
+      setEmail((current) => current || known.email)
+      setPhone((current) => current || def?.phone || known.phone)
+      if (def) setSelectedSavedId((current) => current || def.id)
+      setAddress((current) => ({
+        recipientName: current.recipientName || def?.recipientName || known.name,
+        phone: current.phone || def?.phone || known.phone,
+        addressLine1: current.addressLine1 || def?.addressLine1 || known.addressLine1,
+        addressLine2: current.addressLine2 || def?.addressLine2 || known.addressLine2,
+        city: current.city || def?.city || known.city,
+        province: current.province || def?.province || known.province,
+        postalCode: current.postalCode || def?.postalCode || known.postalCode,
+        country: current.country || def?.country || 'PK',
+      }))
+    }
+    if (!stepped.current && !userEdited.current) {
+      const nextAddress = {
+        recipientName: def?.recipientName || known.name,
+        phone: def?.phone || known.phone,
+        addressLine1: def?.addressLine1 || known.addressLine1,
+        city: def?.city || known.city,
+      }
+      const contactReady = Boolean(known.email && nextAddress.phone)
+      if (addressIsComplete(nextAddress)) setStep('delivery')
+      else if (contactReady) setStep('address')
+      stepped.current = true
+    }
+    setHydrated(true)
+  }, [initializing, identityReady, isAuthenticated, savedAddresses, profile, customer, user])
 
   const baseShippingTotal = deliveryCost(deliveryMethod)
   const shippingTotal = appliedFreeShipping ? 0 : baseShippingTotal
@@ -154,9 +190,11 @@ export default function Checkout() {
   }
 
   function selectSavedAddress(id) {
+    userEdited.current = true
     setSelectedSavedId(id)
     const found = savedAddresses?.find((a) => a.id === id)
     if (found) {
+      setPhone(found.phone)
       setAddress({
         recipientName: found.recipientName,
         phone: found.phone,
@@ -167,6 +205,19 @@ export default function Checkout() {
         postalCode: found.postalCode ?? '',
         country: found.country,
       })
+    }
+  }
+
+  function editPhone(value) {
+    userEdited.current = true
+    setPhone(value)
+    setAddress((current) => ({ ...current, phone: value }))
+  }
+
+  function editAddress(key) {
+    return (value) => {
+      userEdited.current = true
+      setAddress((current) => ({ ...current, [key]: value }))
     }
   }
 
@@ -184,18 +235,23 @@ export default function Checkout() {
   }
 
   function validateAddress() {
+    const phoneValue = phone.trim() || address.phone.trim()
+    const next = { ...address, phone: phoneValue }
+    if (phoneValue !== address.phone) setAddress(next)
     const required = ['recipientName', 'phone', 'addressLine1', 'city']
     const fieldErrors = {}
     for (const key of required) {
-      if (!address[key]?.trim()) fieldErrors[key] = 'Required'
+      if (!next[key]?.trim()) fieldErrors[key] = 'Required'
     }
     setErrors(fieldErrors)
     return Object.keys(fieldErrors).length === 0
   }
 
   function handleContinue() {
-    if (step === 'contact' && validateContact()) goTo('address')
-    else if (step === 'address' && validateAddress()) goTo('delivery')
+    if (step === 'contact' && validateContact()) {
+      setAddress((current) => ({ ...current, phone: phone.trim() || current.phone }))
+      goTo('address')
+    } else if (step === 'address' && validateAddress()) goTo('delivery')
     else if (step === 'delivery') goTo('payment')
     else if (step === 'payment') goTo('review')
   }
@@ -241,6 +297,39 @@ export default function Checkout() {
       if (findInfluencerCode(couponPreview?.couponCode)) {
         recordInfluencerRedemption(couponPreview.couponCode, customerPhone)
       }
+      rememberLocalCheckout({
+        name: address.recipientName,
+        phone: customerPhone,
+        city: address.city,
+        address: address.addressLine1,
+        addressLine2: address.addressLine2,
+        province: address.province,
+        postalCode: address.postalCode,
+      })
+      if (isAuthenticated) {
+        try {
+          if (!selectedSavedId && address.recipientName && address.addressLine1 && address.city && customerPhone) {
+            await customersApi.createAddress({
+              label: 'Home',
+              recipientName: address.recipientName,
+              phone: customerPhone,
+              addressLine1: address.addressLine1,
+              addressLine2: address.addressLine2 || undefined,
+              city: address.city,
+              province: address.province || undefined,
+              postalCode: address.postalCode || undefined,
+              country: address.country || 'PK',
+              isDefaultShipping: true,
+            })
+          }
+          if (!(profile?.phone || customer?.phone) && customerPhone) {
+            await callEdgeFunction('auth/profile', { method: 'PATCH', body: { phone: customerPhone } })
+            await refreshProfile()
+          }
+        } catch (err) {
+          console.error('Could not save details for next time.', err)
+        }
+      }
       await clearCart().catch(() => undefined) // server cart is already converted server-side; this just clears local state if needed
       navigate(`/order-confirmation/${order.id}`, { replace: true })
     } catch (err) {
@@ -272,24 +361,38 @@ export default function Checkout() {
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-10">
         <div className="max-w-xl">
-          {step === 'contact' && (
+          {!hydrated ? (
+            <p className="text-ink-soft">Loading your details...</p>
+          ) : null}
+          {hydrated && (step === 'delivery' || step === 'payment') && (email || phone || address.addressLine1) && (
+            <div className="border border-[#e8e8e8] p-4 mb-6 text-sm">
+              {address.recipientName && <p>{address.recipientName}</p>}
+              <p>{[email, phone || address.phone].filter(Boolean).join(' · ')}</p>
+              {address.addressLine1 && <p>{address.addressLine1}{address.city ? `, ${address.city}` : ''}</p>}
+              <div className="flex gap-4 mt-2">
+                <button type="button" className="underline" onClick={() => goTo('contact')}>Edit contact</button>
+                <button type="button" className="underline" onClick={() => goTo('address')}>Edit address</button>
+              </div>
+            </div>
+          )}
+          {hydrated && step === 'contact' && (
             <section>
               <h2 className="text-xl font-medium mb-4">Contact information</h2>
               {isAuthenticated && <p className="text-sm text-ink-soft mb-4">Signed in as {user?.email}</p>}
               <div className="form-field">
                 <label className="form-label" htmlFor="email">Email</label>
-                <input id="email" type="email" className="form-input" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={Boolean(errors.email)} />
+                <input id="email" type="email" className="form-input" value={email} onChange={(e) => { userEdited.current = true; setEmail(e.target.value) }} aria-invalid={Boolean(errors.email)} autoComplete="email" />
                 {errors.email && <p className="form-error">{errors.email}</p>}
               </div>
               <div className="form-field">
                 <label className="form-label" htmlFor="phone">Phone</label>
-                <input id="phone" className="form-input" placeholder="03XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <input id="phone" className="form-input" placeholder="03XXXXXXXXX" value={phone} onChange={(e) => editPhone(e.target.value)} autoComplete="tel" />
               </div>
               <button type="button" className="btn-lavender w-auto px-8" onClick={handleContinue}>Continue to address</button>
             </section>
           )}
 
-          {step === 'address' && (
+          {hydrated && step === 'address' && (
             <section>
               <h2 className="text-xl font-medium mb-4">Shipping address</h2>
               {isAuthenticated && savedAddresses?.length > 0 && (
@@ -308,37 +411,41 @@ export default function Checkout() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="form-field">
                   <label className="form-label" htmlFor="recipientName">Recipient name</label>
-                  <input id="recipientName" className="form-input" aria-invalid={Boolean(errors.recipientName)} value={address.recipientName} onChange={(e) => setAddress((a) => ({ ...a, recipientName: e.target.value }))} />
+                  <input id="recipientName" className="form-input" aria-invalid={Boolean(errors.recipientName)} value={address.recipientName} onChange={(e) => editAddress('recipientName')(e.target.value)} autoComplete="name" />
                   {errors.recipientName && <p className="form-error">Required</p>}
                 </div>
                 <div className="form-field">
-                  <label className="form-label" htmlFor="addressPhone">Phone</label>
-                  <input id="addressPhone" className="form-input" placeholder="03XXXXXXXXX" aria-invalid={Boolean(errors.phone)} value={address.phone} onChange={(e) => setAddress((a) => ({ ...a, phone: e.target.value }))} />
+                  <p className="form-label">Phone</p>
+                  {phone || address.phone ? (
+                    <p className="text-sm">{phone || address.phone} <button type="button" className="underline" onClick={() => goTo('contact')}>Change</button></p>
+                  ) : (
+                    <input id="addressPhone" className="form-input" placeholder="03XXXXXXXXX" aria-invalid={Boolean(errors.phone)} value={phone} onChange={(e) => editPhone(e.target.value)} autoComplete="tel" />
+                  )}
                   {errors.phone && <p className="form-error">Required</p>}
                 </div>
               </div>
               <div className="form-field">
                 <label className="form-label" htmlFor="addressLine1">Address line 1</label>
-                <input id="addressLine1" className="form-input" aria-invalid={Boolean(errors.addressLine1)} value={address.addressLine1} onChange={(e) => setAddress((a) => ({ ...a, addressLine1: e.target.value }))} />
+                <input id="addressLine1" className="form-input" aria-invalid={Boolean(errors.addressLine1)} value={address.addressLine1} onChange={(e) => editAddress('addressLine1')(e.target.value)} autoComplete="address-line1" />
                 {errors.addressLine1 && <p className="form-error">Required</p>}
               </div>
               <div className="form-field">
                 <label className="form-label" htmlFor="addressLine2">Address line 2 (optional)</label>
-                <input id="addressLine2" className="form-input" value={address.addressLine2} onChange={(e) => setAddress((a) => ({ ...a, addressLine2: e.target.value }))} />
+                <input id="addressLine2" className="form-input" value={address.addressLine2} onChange={(e) => editAddress('addressLine2')(e.target.value)} autoComplete="address-line2" />
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="form-field">
                   <label className="form-label" htmlFor="city">City</label>
-                  <input id="city" className="form-input" aria-invalid={Boolean(errors.city)} value={address.city} onChange={(e) => setAddress((a) => ({ ...a, city: e.target.value }))} />
+                  <input id="city" className="form-input" aria-invalid={Boolean(errors.city)} value={address.city} onChange={(e) => editAddress('city')(e.target.value)} autoComplete="address-level2" />
                   {errors.city && <p className="form-error">Required</p>}
                 </div>
                 <div className="form-field">
                   <label className="form-label" htmlFor="province">Province</label>
-                  <input id="province" className="form-input" value={address.province} onChange={(e) => setAddress((a) => ({ ...a, province: e.target.value }))} />
+                  <input id="province" className="form-input" value={address.province} onChange={(e) => editAddress('province')(e.target.value)} autoComplete="address-level1" />
                 </div>
                 <div className="form-field">
                   <label className="form-label" htmlFor="postalCode">Postal code</label>
-                  <input id="postalCode" className="form-input" value={address.postalCode} onChange={(e) => setAddress((a) => ({ ...a, postalCode: e.target.value }))} />
+                  <input id="postalCode" className="form-input" value={address.postalCode} onChange={(e) => editAddress('postalCode')(e.target.value)} autoComplete="postal-code" />
                 </div>
               </div>
               <div className="flex gap-3">
@@ -348,7 +455,7 @@ export default function Checkout() {
             </section>
           )}
 
-          {step === 'delivery' && (
+          {hydrated && step === 'delivery' && (
             <section>
               <h2 className="text-xl font-medium mb-4">Delivery method</h2>
               <div className="space-y-3 mb-6">
@@ -362,7 +469,7 @@ export default function Checkout() {
             </section>
           )}
 
-          {step === 'payment' && (
+          {hydrated && step === 'payment' && (
             <section>
               <h2 className="text-xl font-medium mb-4">Payment method</h2>
               <div className="space-y-3 mb-6">
@@ -380,7 +487,7 @@ export default function Checkout() {
             </section>
           )}
 
-          {step === 'review' && (
+          {hydrated && step === 'review' && (
             <section>
               <h2 className="text-xl font-medium mb-4">Review your order</h2>
               {submitError && <div className="form-banner form-banner-error mb-4">{submitError}</div>}

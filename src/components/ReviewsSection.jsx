@@ -111,28 +111,35 @@ function WriteReviewForm({ target, onDone }) {
   )
 }
 
+const PRODUCT_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 export default function ReviewsSection({ productId }) {
   const { isAuthenticated } = useAuth()
   const [reviews, setReviews] = useState(null)
   const [error, setError] = useState('')
   const [reviewableTarget, setReviewableTarget] = useState(null)
   const [justSubmitted, setJustSubmitted] = useState(false)
+  const canQuery = PRODUCT_UUID.test(String(productId || ''))
 
   useEffect(() => {
-    if (!isSupabaseConfigured() || !productId) return
+    if (!isSupabaseConfigured() || !canQuery) {
+      setReviews([])
+      return
+    }
     listPublishedReviews(productId)
       .then(setReviews)
       .catch((err) => setError(err?.message ?? 'Could not load reviews.'))
-  }, [productId])
+  }, [productId, canQuery])
 
   useEffect(() => {
-    if (!isSupabaseConfigured() || !isAuthenticated || !productId || justSubmitted) return
+    if (!isSupabaseConfigured() || !isAuthenticated || !canQuery || justSubmitted) return
     listReviewableOrderItems()
       .then((items) => setReviewableTarget(items.find((item) => item.productId === productId) ?? null))
       .catch(() => setReviewableTarget(null))
-  }, [isAuthenticated, productId, justSubmitted])
+  }, [isAuthenticated, productId, justSubmitted, canQuery])
 
   if (!isSupabaseConfigured()) return null
+  if (!error && !justSubmitted && !reviewableTarget && (!reviews || reviews.length === 0)) return null
 
   const aggregate = computeAggregateRating(reviews ?? [])
 

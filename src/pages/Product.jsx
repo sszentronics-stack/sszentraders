@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { buildWhatsAppOrder, formatPKR, salePercent } from '../data/products'
-import { orderCustomer, useSiteContent, whatsAppHref } from '../lib/siteContent'
+import { orderCustomer, useSiteContent } from '../lib/siteContent'
 import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influencerCodes'
-import { isSupabaseConfigured } from '../lib/supabase/client'
 import { useProduct } from '../hooks/useCatalog'
 import { useRecentlyViewed, useRecordRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useSeo, useJsonLd } from '../hooks/useSeo'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
+import { knownCustomer } from '../lib/customerDetails'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
 import Disclaimer from '../components/Disclaimer'
@@ -19,7 +20,9 @@ import { ChevronLeft, ChevronRight, Heart, Share2 } from 'lucide-react'
 export default function Product() {
   const { slug } = useParams()
   const { product, others, loading, notFound } = useProduct(slug)
-  const { addItem } = useCart()
+  const { addItem, items } = useCart()
+  const { profile, customer, user } = useAuth()
+  const known = knownCustomer({ profile, customer, user })
   const { isWishlisted, toggle: toggleWishlist } = useWishlist()
   const toast = useToast()
   const [active, setActive] = useState(0)
@@ -27,10 +30,17 @@ export default function Product() {
   const [open, setOpen] = useState('description')
 
   const [touchX, setTouchX] = useState(null)
+  const [zoom, setZoom] = useState(false)
+  const zoomRef = useRef(null)
 
   useEffect(() => {
     setActive(0)
+    setZoom(false)
   }, [slug])
+
+  useEffect(() => {
+    if (zoom) zoomRef.current?.showModal()
+  }, [zoom])
 
   useRecordRecentlyViewed(product?.id)
   const { items: recentlyViewed } = useRecentlyViewed(product?.id)
@@ -113,13 +123,13 @@ export default function Product() {
       </nav>
 
       <div className="ssz-product">
-        <div className="min-w-0 w-full">
-          <div className="flex gap-3 min-w-0 w-full items-start">
-            <div className="hidden sm:flex flex-col gap-2 w-16 shrink-0 max-h-[min(70vw,520px)] overflow-y-auto">
+        <div className="ssz-product__media">
+          <div className="ssz-product__frame">
+            <div className="ssz-product__thumbs">
               {thumbs}
             </div>
             <div
-              className="relative flex-1 min-w-0 w-full overflow-hidden bg-meta aspect-square"
+              className="ssz-product__stage"
               onTouchStart={(e) => setTouchX(e.touches[0].clientX)}
               onTouchEnd={(e) => {
                 if (touchX == null) return
@@ -134,9 +144,12 @@ export default function Product() {
               {product.badge === 'new' && <span className="badge badge-new">New</span>}
               <img
                 src={product.images[active]}
-                alt={product.name}
-                className="absolute inset-0 h-full w-full object-contain p-6 pointer-events-none"
+                alt=""
+                className="ssz-product__photo"
+                width="800"
+                height="800"
               />
+              <button type="button" className="ssz-product__zoom" aria-label={`Zoom ${product.name}`} onClick={() => setZoom(true)} />
               {product.images.length > 1 && (
                 <>
                   <button
@@ -167,7 +180,7 @@ export default function Product() {
           </div>
         </div>
 
-        <div className="ssz-product__details min-w-0">
+        <div className="ssz-product__details">
           <p>{product.brand}</p>
           <h1>{product.name}</h1>
           <p>{product.tagline}</p>
@@ -226,25 +239,22 @@ export default function Product() {
             </button>
           </div>
           <div className="mt-3">
-            {isSupabaseConfigured() ? (
-              <a
-                className="ssz-btn"
-                href={whatsAppHref(content, `Hi ${content.business.name}! I have a question about ${product.name}.`)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Ask a question on WhatsApp
-              </a>
-            ) : (
-              <a
-                className="ssz-btn"
-                href={buildWhatsAppOrder([{ name: product.name, price: product.price, qty }], orderCustomer(content))}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Buy now
-              </a>
-            )}
+            <a
+              className="ssz-btn"
+              href={buildWhatsAppOrder(
+                items.length ? items : [{ name: product.name, price: salePrice, qty }],
+                orderCustomer(content, {
+                  name: known.name,
+                  phone: known.phone,
+                  city: known.city,
+                  address: [known.addressLine1, known.addressLine2].filter(Boolean).join(', '),
+                }),
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {items.length ? 'Order on WhatsApp' : 'Buy now'}
+            </a>
           </div>
 
           <div className="mt-6">
@@ -279,6 +289,24 @@ export default function Product() {
           </button>
         </div>
       </div>
+
+      <dialog
+        className="ssz-dialog ssz-zoom"
+        ref={zoomRef}
+        aria-label={product.name}
+        onClick={(event) => {
+          const rect = zoomRef.current?.getBoundingClientRect()
+          if (!rect) return
+          const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom
+          if (!inside) zoomRef.current.close()
+        }}
+        onClose={() => setZoom(false)}
+      >
+        <button type="button" className="ssz-icon-btn ssz-dialog__close" aria-label="Close" onClick={() => zoomRef.current?.close()}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 5l14 14M19 5 5 19" /></svg>
+        </button>
+        <img className="ssz-zoom__img" src={product.images[active]} alt={product.name} width="1200" height="1200" />
+      </dialog>
 
       <div className="mt-12 max-w-3xl">
         <Accordion id="description" title="Description" open={open} setOpen={setOpen}>

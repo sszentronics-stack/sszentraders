@@ -3,7 +3,7 @@
 -- RLS still applies; these grants only allow the roles to reach the policies.
 --
 -- Run in SQL Editor:
--- https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
+-- https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new
 
 -- Schema usage
 grant usage on schema public to postgres, anon, authenticated, service_role;

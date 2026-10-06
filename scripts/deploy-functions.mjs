@@ -3,7 +3,7 @@
  *
  * Prerequisites (one-time):
  *   1. npx supabase login
- *   2. npx supabase link --project-ref kcwntiotjnunavektiwm
+ *   2. npx supabase link --project-ref tiwoqgagrclmbysgexbf
  *   3. In Dashboard → Project Settings → API Keys, copy the legacy
  *      service_role JWT (or a secret key) if you need extra secrets.
  *      Hosted functions usually already receive SUPABASE_URL /
@@ -32,7 +32,7 @@ const FUNCTIONS = [
   'integrations-leopards',
 ]
 
-console.log(`Deploying ${FUNCTIONS.length} Edge Functions to project kcwntiotjnunavektiwm…`)
+console.log(`Deploying ${FUNCTIONS.length} Edge Functions to project tiwoqgagrclmbysgexbf…`)
 console.log('JWT verify is disabled in config.toml (required for publishable API keys).\n')
 
 for (const name of FUNCTIONS) {
@@ -45,7 +45,7 @@ for (const name of FUNCTIONS) {
       'deploy',
       name,
       '--project-ref',
-      'kcwntiotjnunavektiwm',
+      'tiwoqgagrclmbysgexbf',
       '--no-verify-jwt',
       '--import-map',
       'supabase/functions/import_map.json',
@@ -56,10 +56,10 @@ for (const name of FUNCTIONS) {
     console.error(`\nFailed deploying "${name}".`)
     console.error('If you see a login/link error, run:')
     console.error('  npx supabase login')
-    console.error('  npx supabase link --project-ref kcwntiotjnunavektiwm')
+    console.error('  npx supabase link --project-ref tiwoqgagrclmbysgexbf')
     process.exit(result.status ?? 1)
   }
 }
 
 console.log('\nAll Edge Functions deployed.')
-console.log('Dashboard: https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/functions')
+console.log('Dashboard: https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/functions')

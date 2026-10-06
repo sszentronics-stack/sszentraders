@@ -33,9 +33,11 @@ export function makeCustomerLinkDeps(admin: SupabaseClient): LinkCustomerDeps {
         .from('customers')
         .select(CUSTOMER_COLUMNS)
         .eq('profile_id', profileId)
-        .maybeSingle()
+        .order('created_at', { ascending: true })
+        .limit(1)
       if (error) throw error
-      return data ? mapCustomerRow(data) : null
+      const row = Array.isArray(data) ? data[0] : data
+      return row ? mapCustomerRow(row) : null
     },
     async findGuestCustomerByEmail(email) {
       const { data, error } = await admin
@@ -43,10 +45,11 @@ export function makeCustomerLinkDeps(admin: SupabaseClient): LinkCustomerDeps {
         .select(CUSTOMER_COLUMNS)
         .is('profile_id', null)
         .eq('email', email)
+        .order('created_at', { ascending: true })
         .limit(1)
-        .maybeSingle()
       if (error) throw error
-      return data ? mapCustomerRow(data) : null
+      const row = Array.isArray(data) ? data[0] : data
+      return row ? mapCustomerRow(row) : null
     },
     async findGuestCustomerByPhone(phone) {
       const { data, error } = await admin
@@ -54,10 +57,11 @@ export function makeCustomerLinkDeps(admin: SupabaseClient): LinkCustomerDeps {
         .select(CUSTOMER_COLUMNS)
         .is('profile_id', null)
         .eq('phone', phone)
+        .order('created_at', { ascending: true })
         .limit(1)
-        .maybeSingle()
       if (error) throw error
-      return data ? mapCustomerRow(data) : null
+      const row = Array.isArray(data) ? data[0] : data
+      return row ? mapCustomerRow(row) : null
     },
     async updateCustomer(id, patch) {
       const row: Record<string, unknown> = {}

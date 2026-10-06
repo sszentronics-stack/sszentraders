@@ -88,7 +88,18 @@ export default function OrderConfirmation() {
 
   const canCancel = order.orderStatus === 'pending' || order.orderStatus === 'confirmed'
   const canRequestReturn = order.orderStatus === 'delivered'
-  const supportMessage = `Hi SSzentronics! I have a question about my order ${order.orderNumber}.`
+  const itemLines = order.items.map((item, index) => {
+    const name = `${item.productName}${item.variantName ? ` — ${item.variantName}` : ''}`
+    return `${index + 1}. ${name}\nQuantity: ${item.quantity}\nAmount: ${formatMoney(item.lineTotal, { currency: order.currency })}`
+  })
+  const supportMessage = [
+    `Hi ${content.business?.name || 'SS Zen Traders'}! I have a question about my order ${order.orderNumber}.`,
+    '',
+    'Items:',
+    ...itemLines,
+    '',
+    `Total: ${formatMoney(order.grandTotal, { currency: order.currency })}`,
+  ].join('\n')
 
   return (
     <div className="container-aura py-10 md:py-14 max-w-2xl">
@@ -98,6 +109,9 @@ export default function OrderConfirmation() {
         <p className="text-ink-soft">
           Order <span className="font-medium text-ink">{order.orderNumber}</span> — {ORDER_STATUS_LABEL[order.orderStatus] ?? order.orderStatus}
         </p>
+        {order.email && (
+          <p className="text-sm text-ink-soft mt-3">A confirmation email with this order was sent to {order.email}.</p>
+        )}
       </div>
 
       <div className="bg-meta p-6 mb-6">

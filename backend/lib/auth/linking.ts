@@ -83,6 +83,58 @@ function defaultCustomerNumber(): string {
   return `AURA-${timePart}-${randomPart}`
 }
 
+function blankText(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed || null
+}
+
+export interface SignupMetadata {
+  first_name?: unknown
+  last_name?: unknown
+  phone?: unknown
+  marketing_opt_in?: unknown
+}
+
+/** Fields copied from signup metadata only where the profile is still empty. */
+export function profilePatchFromSignup(
+  profile: { first_name: string | null; last_name: string | null; phone: string | null },
+  meta: SignupMetadata,
+): { first_name?: string; last_name?: string; phone?: string } {
+  const patch: { first_name?: string; last_name?: string; phone?: string } = {}
+  if (!profile.first_name) {
+    const firstName = blankText(meta.first_name)
+    if (firstName) patch.first_name = firstName
+  }
+  if (!profile.last_name) {
+    const lastName = blankText(meta.last_name)
+    if (lastName) patch.last_name = lastName
+  }
+  if (!profile.phone) {
+    const phone = blankText(meta.phone)
+    if (phone) patch.phone = phone
+  }
+  return patch
+}
+
+/**
+ * Values to pass into ensureCustomerForProfile. Existing name, phone, and
+ * marketing choice are left alone. Marketing opt-in is sent only when a new
+ * customer is being created and signup actually recorded a choice.
+ */
+export function customerFillFromSignup(
+  existing: CustomerRow | null,
+  profile: { first_name: string | null; last_name: string | null; phone: string | null },
+  meta: SignupMetadata,
+): Pick<LinkCustomerInput, 'firstName' | 'lastName' | 'phone' | 'marketingOptIn'> {
+  const fill: Pick<LinkCustomerInput, 'firstName' | 'lastName' | 'phone' | 'marketingOptIn'> = {}
+  if (!existing?.firstName && profile.first_name) fill.firstName = profile.first_name
+  if (!existing?.lastName && profile.last_name) fill.lastName = profile.last_name
+  if (!existing?.phone && profile.phone) fill.phone = profile.phone
+  if (!existing && typeof meta.marketing_opt_in === 'boolean') fill.marketingOptIn = meta.marketing_opt_in
+  return fill
+}
+
 /** Only overwrite an existing field when the caller explicitly supplied a new, non-empty value. */
 function mergePatch(existing: CustomerRow, input: LinkCustomerInput): CustomerPatch {
   const patch: CustomerPatch = {}

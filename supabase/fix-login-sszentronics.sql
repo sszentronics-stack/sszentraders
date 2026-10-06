@@ -1,7 +1,7 @@
 -- Fix login for sszentronics@gmail.com
 -- Password will be set to: CHANGE_ME_ADMIN_PASSWORD
 -- Run in SQL Editor:
--- https://supabase.com/dashboard/project/kcwntiotjnunavektiwm/sql/new
+-- https://supabase.com/dashboard/project/tiwoqgagrclmbysgexbf/sql/new
 --
 -- IMPORTANT: This only works if the Auth user already exists.
 -- If the SELECT at the bottom returns 0 rows, create the user first:
