@@ -158,7 +158,17 @@ export function AuthProvider({ children }) {
     const { data } = await client.auth.getSession()
     if (data.session) return data.session
     const { data: anon, error } = await client.auth.signInAnonymously()
-    if (error) throw error
+    if (error) {
+      const raw = error.message || 'Could not start a guest session.'
+      throw new Error(
+        /anonymous|not enabled|disabled/i.test(raw)
+          ? 'Guest checkout is turned off. Sign in to place this order, or turn on anonymous sign-ins in Supabase Authentication.'
+          : raw,
+      )
+    }
+    if (!anon.session) throw new Error('Could not start a guest session.')
+    setSession(anon.session)
+    setIdentityReady(true)
     return anon.session
   }, [])
 

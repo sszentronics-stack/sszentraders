@@ -20,6 +20,7 @@ export const PRODUCT_DISCLAIMER = `While we work to ensure that product informat
 export const products = [
   {
     id: 'sadoer-collagen-anti-aging-mask',
+    variantId: '00000000-0000-0000-0000-000000000301',
     slug: 'sadoer-collagen-anti-aging-facial-mask',
     brand: 'SADOER',
     name: 'SADOER Collagen Anti-Aging Facial Mask',
@@ -76,6 +77,7 @@ Part of the SADOER Collagen Firming Series. Each 25g sachet is packed with hydro
   },
   {
     id: 'mighty-patch-invisible',
+    variantId: '00000000-0000-0000-0000-000000000302',
     slug: 'hero-mighty-patch-invisible-plus',
     brand: 'Hero Cosmetics',
     name: 'Hero Mighty Patch Invisible+',
@@ -133,6 +135,7 @@ Each pack includes 39 hydrocolloid patches in two sizes so you can cover differe
   },
   {
     id: 'some-by-mi-miracle-toner',
+    variantId: '00000000-0000-0000-0000-000000000303',
     slug: 'some-by-mi-aha-bha-pha-30-days-miracle-toner',
     brand: 'SOME BY MI',
     name: 'SOME BY MI AHA BHA PHA 30 Days Miracle Toner',

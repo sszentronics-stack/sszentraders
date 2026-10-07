@@ -75,7 +75,7 @@ export function buildOrderConfirmationMessage(order: ConfirmationOrder) {
     'SS Zen Traders',
     'Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad',
     '03079594474',
-    'info@sszentraders.com',
+    'sales@idermacare.com',
   ]
 
   return {
@@ -107,7 +107,7 @@ export async function sendOrderConfirmationEmail(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: env.from || 'SS Zen Traders <info@sszentraders.com>',
+      from: env.from || 'SS Zen Traders <sales@idermacare.com>',
       to: [to],
       subject: message.subject,
       text: message.text,

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Hero Cosmetics">
+  <circle cx="300" cy="300" r="292" fill="#ffffff" stroke="#3d624e" stroke-width="8"/>
+  <text x="300" y="286" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="84" letter-spacing="2" fill="#121212">Hero</text>
+  <text x="300" y="348" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" letter-spacing="6" fill="#3d624e">COSMETICS</text>
+</svg>

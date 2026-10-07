@@ -6,7 +6,26 @@ const STORAGE_KEY = 'sszentraders.site-content'
 const EVENT = 'sszentraders-content'
 const ROW_ID = 'storefront'
 
+export const SITE_CONTENT_LIMITS = { stories: 12, slides: 8, brands: 12 }
+
+const SITE_ASSET_TYPES = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/svg+xml': 'svg',
+}
+
+const SITE_VIDEO_TYPES = {
+  'video/mp4': 'mp4',
+  'video/webm': 'webm',
+}
+
+const IMAGE_LIMIT = 5 * 1024 * 1024
+const VIDEO_LIMIT = 40 * 1024 * 1024
+
 export const DEFAULT_SITE_CONTENT = {
+  logo: '/logo.png',
   announcements: [
     'Cash on delivery available',
     'Every order confirmed on WhatsApp',
@@ -18,21 +37,20 @@ export const DEFAULT_SITE_CONTENT = {
       heading: 'Authentic skincare, without the guesswork',
       text: 'Genuine products, confirmed with you on WhatsApp before they ship.',
       actions: [
-        { to: '/shop', label: 'Shop all products' },
-        { to: '/about', label: 'See our brands', ghost: true },
+        { to: '/products/sadoer-collagen-anti-aging-facial-mask', label: 'Get this product' },
       ],
     },
     {
       image: '/banners/some-by-mi-banner.jpg',
       heading: 'SOME BY MI 30 Days Miracle Toner',
       text: 'AHA, BHA and PHA in one daily toner.',
-      actions: [{ to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner', label: 'Shop the toner' }],
+      actions: [{ to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner', label: 'Get this product' }],
     },
     {
       image: '/banners/mighty-patch-banner.jpg',
       heading: 'Hero Mighty Patch Invisible+',
       text: 'A thin patch for daytime wear.',
-      actions: [{ to: '/products/hero-mighty-patch-invisible-plus', label: 'Shop Mighty Patch' }],
+      actions: [{ to: '/products/hero-mighty-patch-invisible-plus', label: 'Get this product' }],
     },
   ],
   story: {
@@ -57,17 +75,17 @@ export const DEFAULT_SITE_CONTENT = {
     brandHeading: 'Shop by brand',
   },
   stories: [
-    { label: 'SADOER', to: '/shop?brand=SADOER', image: '/products/sadoer-collagen/1.png' },
-    { label: 'Hero', to: '/shop?brand=Hero%20Cosmetics', image: '/products/mighty-patch/1.jpg' },
-    { label: 'SOME BY MI', to: '/shop?brand=SOME%20BY%20MI', image: '/products/some-by-mi/1.jpg' },
-    { label: 'Masks', to: '/shop?category=Masks', image: '/products/sadoer-collagen/2.png' },
-    { label: 'Toners', to: '/shop?category=Toners', image: '/products/some-by-mi/2.jpg' },
-    { label: 'Patches', to: '/shop?category=Acne%20Care', image: '/products/mighty-patch/2.jpg' },
+    { label: 'SADOER', to: '/products/sadoer-collagen-anti-aging-facial-mask', image: '/products/sadoer-collagen/1.png', storyImage: '/products/sadoer-collagen/1.png' },
+    { label: 'Hero', to: '/products/hero-mighty-patch-invisible-plus', image: '/products/mighty-patch/1.jpg', storyImage: '/products/mighty-patch/1.jpg' },
+    { label: 'SOME BY MI', to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner', image: '/products/some-by-mi/1.jpg', storyImage: '/products/some-by-mi/1.jpg' },
+    { label: 'Masks', to: '/products/sadoer-collagen-anti-aging-facial-mask', image: '/products/sadoer-collagen/2.png', storyImage: '/products/sadoer-collagen/2.png' },
+    { label: 'Toners', to: '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner', image: '/products/some-by-mi/2.jpg', storyImage: '/products/some-by-mi/2.jpg' },
+    { label: 'Patches', to: '/products/hero-mighty-patch-invisible-plus', image: '/products/mighty-patch/2.jpg', storyImage: '/products/mighty-patch/2.jpg' },
   ],
   brands: [
-    { label: 'SADOER', to: '/shop?brand=SADOER', image: '/products/sadoer-collagen/1.png' },
-    { label: 'Hero Cosmetics', to: '/shop?brand=Hero%20Cosmetics', image: '/products/mighty-patch/1.jpg' },
-    { label: 'SOME BY MI', to: '/shop?brand=SOME%20BY%20MI', image: '/products/some-by-mi/1.jpg' },
+    { label: 'SADOER', to: '/shop?brand=SADOER', image: '/brands/sadoer.svg' },
+    { label: 'Hero Cosmetics', to: '/shop?brand=Hero%20Cosmetics', image: '/brands/hero.svg' },
+    { label: 'SOME BY MI', to: '/shop?brand=SOME%20BY%20MI', image: '/brands/some-by-mi.svg' },
   ],
   watch: {
     heading: 'Watch and shop',
@@ -94,8 +112,8 @@ export const DEFAULT_SITE_CONTENT = {
   trust: ['Cash on delivery', 'WhatsApp confirmation', '7-day returns'],
   about: {
     title: 'About us',
-    image: '/products/mighty-patch/1.jpg',
-    alt: 'Hero Mighty Patch Invisible+',
+    image: '/about/iderma-care.png',
+    alt: 'iDermaCare clinical skincare',
     paragraphs: [
       'SS Zen Traders keeps a short list of authentic skincare: the SADOER collagen mask, Hero Mighty Patch Invisible+, and SOME BY MI 30 Days Miracle Toner.',
       'The office is at Office#14, First Floor, Farooq 2D Plaza, G-13/3, Islamabad. Call 03079594474 or email info@sszentraders.com. Every order is confirmed on WhatsApp, and cash on delivery is available.',
@@ -144,8 +162,8 @@ function text(value, fallback, max) {
 function path(value, fallback) {
   const next = String(value ?? '').trim()
   if (next.startsWith('/') && !next.startsWith('//')) return next.slice(0, 300)
-  if (/^https:\/\/\S+$/i.test(next)) return next.slice(0, 500)
-  return fallback
+  if (/^https:\/\/\S+$/i.test(next)) return next.slice(0, 800)
+  return fallback || ''
 }
 
 function plain(value, fallback, max) {
@@ -153,15 +171,79 @@ function plain(value, fallback, max) {
   return next || fallback
 }
 
-function cards(source, fallback) {
-  return fallback.map((item, index) => {
-    const incoming = source?.[index] ?? {}
-    return {
-      label: text(incoming.label, item.label, 40),
-      to: path(incoming.to, item.to),
-      image: path(incoming.image, item.image),
-    }
-  })
+function takeList(source, fallback, limit) {
+  const list = Array.isArray(source) ? source : fallback
+  return list.slice(0, limit)
+}
+
+const LEGACY_STORY_LINKS = {
+  '/shop?brand=SADOER': '/products/sadoer-collagen-anti-aging-facial-mask',
+  '/shop?brand=Hero%20Cosmetics': '/products/hero-mighty-patch-invisible-plus',
+  '/shop?brand=SOME%20BY%20MI': '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner',
+  '/shop?category=Masks': '/products/sadoer-collagen-anti-aging-facial-mask',
+  '/shop?category=Toners': '/products/some-by-mi-aha-bha-pha-30-days-miracle-toner',
+  '/shop?category=Acne%20Care': '/products/hero-mighty-patch-invisible-plus',
+}
+
+function storyItem(incoming, index) {
+  const fallback = DEFAULT_SITE_CONTENT.stories[index] || { label: 'Story', to: '/shop', image: '', storyImage: '' }
+  const image = incoming?.image === '' ? '' : path(incoming?.image, fallback.image)
+  const savedLink = LEGACY_STORY_LINKS[String(incoming?.to ?? '').trim()] || incoming?.to
+  const mediaType = incoming?.mediaType === 'video' ? 'video' : 'image'
+  const storyImage = incoming?.storyImage === '' ? '' : (path(incoming?.storyImage, fallback.storyImage || image) || image)
+  return {
+    label: text(incoming?.label, fallback.label, 40),
+    to: path(savedLink, fallback.to),
+    image,
+    storyImage,
+    mediaType,
+    storyVideo: mediaType === 'video' ? path(incoming?.storyVideo, '') : '',
+  }
+}
+
+function watchClips(source) {
+  const incoming = source?.watch?.clips
+  if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) {
+    return { ...DEFAULT_SITE_CONTENT.watch.clips }
+  }
+  return Object.fromEntries(
+    Object.entries(incoming)
+      .map(([slug, value]) => [String(slug).slice(0, 80), path(value, '')])
+      .filter(([slug, value]) => /^[a-z0-9-]+$/i.test(slug) && value),
+  )
+}
+
+function brandItem(incoming, index) {
+  const fallback = DEFAULT_SITE_CONTENT.brands[index] || { label: 'Brand', to: '/shop', image: '' }
+  return {
+    label: text(incoming?.label, fallback.label, 40),
+    to: path(incoming?.to, fallback.to),
+    image: path(incoming?.image, fallback.image),
+  }
+}
+
+function slideItem(incoming, index) {
+  const fallback = DEFAULT_SITE_CONTENT.slides[index] || {
+    image: '',
+    heading: 'Banner',
+    text: '',
+    actions: [{ to: '/shop', label: 'Get this product' }],
+  }
+  const incomingActions = Array.isArray(incoming?.actions) ? incoming.actions.slice(0, 2) : []
+  const actionSource = incomingActions.length ? incomingActions : fallback.actions
+  return {
+    image: path(incoming?.image, fallback.image),
+    heading: text(incoming?.heading, fallback.heading, 120),
+    text: text(incoming?.text, fallback.text, 240),
+    actions: actionSource.map((action, actionIndex) => {
+      const fallbackAction = fallback.actions[actionIndex] || { label: 'Get this product', to: '/shop' }
+      return {
+        label: text(action?.label, fallbackAction.label, 40),
+        to: path(action?.to, fallbackAction.to),
+        ...(fallbackAction.ghost || action?.ghost ? { ghost: true } : {}),
+      }
+    }),
+  }
 }
 
 export function normalizeSiteContent(input) {
@@ -170,23 +252,8 @@ export function normalizeSiteContent(input) {
     announcements: DEFAULT_SITE_CONTENT.announcements.map((fallback, index) =>
       text(source.announcements?.[index], fallback, 120),
     ),
-    slides: DEFAULT_SITE_CONTENT.slides.map((fallback, index) => {
-      const slide = source.slides?.[index] ?? {}
-      const actions = fallback.actions.map((action, actionIndex) => {
-        const incoming = Array.isArray(slide.actions) ? slide.actions[actionIndex] : null
-        return {
-          label: text(incoming?.label, action.label, 40),
-          to: path(incoming?.to, action.to),
-          ...(action.ghost ? { ghost: true } : {}),
-        }
-      })
-      return {
-        image: path(slide.image, fallback.image),
-        heading: text(slide.heading, fallback.heading, 120),
-        text: text(slide.text, fallback.text, 240),
-        actions,
-      }
-    }),
+    logo: path(source.logo, DEFAULT_SITE_CONTENT.logo),
+    slides: takeList(source.slides, DEFAULT_SITE_CONTENT.slides, SITE_CONTENT_LIMITS.slides).map(slideItem),
     story: {
       image: path(source.story?.image, DEFAULT_SITE_CONTENT.story.image),
       alt: text(source.story?.alt, DEFAULT_SITE_CONTENT.story.alt, 160),
@@ -208,15 +275,12 @@ export function normalizeSiteContent(input) {
       viewAllLabel: text(source.home?.viewAllLabel, DEFAULT_SITE_CONTENT.home.viewAllLabel, 40),
       brandHeading: text(source.home?.brandHeading, DEFAULT_SITE_CONTENT.home.brandHeading, 80),
     },
-    stories: cards(source.stories, DEFAULT_SITE_CONTENT.stories),
-    brands: cards(source.brands, DEFAULT_SITE_CONTENT.brands),
+    stories: takeList(source.stories, DEFAULT_SITE_CONTENT.stories, SITE_CONTENT_LIMITS.stories).map(storyItem),
+    brands: takeList(source.brands, DEFAULT_SITE_CONTENT.brands, SITE_CONTENT_LIMITS.brands).map(brandItem),
     watch: {
       heading: text(source.watch?.heading, DEFAULT_SITE_CONTENT.watch.heading, 80),
       lead: text(source.watch?.lead, DEFAULT_SITE_CONTENT.watch.lead, 160),
-      clips: Object.fromEntries(Object.entries(DEFAULT_SITE_CONTENT.watch.clips).map(([slug, fallback]) => [
-        slug,
-        path(source.watch?.clips?.[slug], fallback),
-      ])),
+      clips: watchClips(source),
     },
     reviews: {
       heading: text(source.reviews?.heading, DEFAULT_SITE_CONTENT.reviews.heading, 80),
@@ -233,8 +297,12 @@ export function normalizeSiteContent(input) {
     trust: DEFAULT_SITE_CONTENT.trust.map((item, index) => text(source.trust?.[index], item, 80)),
     about: {
       title: text(source.about?.title, DEFAULT_SITE_CONTENT.about.title, 80),
-      image: path(source.about?.image, DEFAULT_SITE_CONTENT.about.image),
-      alt: text(source.about?.alt, DEFAULT_SITE_CONTENT.about.alt, 160),
+      image: path(source.about?.image, DEFAULT_SITE_CONTENT.about.image) === '/products/mighty-patch/1.jpg'
+        ? DEFAULT_SITE_CONTENT.about.image
+        : path(source.about?.image, DEFAULT_SITE_CONTENT.about.image),
+      alt: text(source.about?.alt, DEFAULT_SITE_CONTENT.about.alt, 160) === 'Hero Mighty Patch Invisible+'
+        ? DEFAULT_SITE_CONTENT.about.alt
+        : text(source.about?.alt, DEFAULT_SITE_CONTENT.about.alt, 160),
       paragraphs: DEFAULT_SITE_CONTENT.about.paragraphs.map((item, index) => text(source.about?.paragraphs?.[index], item, 600)),
     },
     contact: {
@@ -257,7 +325,7 @@ export function normalizeSiteContent(input) {
         compareAt: Number.isFinite(compareAt) && compareAt > 0 ? String(compareAt) : product.compareAt,
         tagline: text(incoming.tagline, product.tagline, 120),
         description: text(incoming.description, product.description, 2500),
-        image: path(incoming.image, product.image),
+        image: incoming.image === '' ? '' : path(incoming.image, product.image),
       }
     }),
   }
@@ -315,6 +383,31 @@ function writeLocal(content) {
   } catch {
     window.dispatchEvent(new Event(EVENT))
   }
+}
+
+export async function uploadSiteAsset(file, folder = 'images') {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Connect Supabase to upload files. You can still paste an address.')
+  }
+  const imageExt = SITE_ASSET_TYPES[file?.type]
+  const videoExt = SITE_VIDEO_TYPES[file?.type]
+  const ext = imageExt || videoExt
+  if (!ext) throw new Error('Use a JPG, PNG, WebP, GIF, SVG, MP4, or WebM file.')
+  const limit = videoExt ? VIDEO_LIMIT : IMAGE_LIMIT
+  if (file.size > limit) {
+    throw new Error(videoExt ? 'Videos must be 40 MB or smaller.' : 'Images must be 5 MB or smaller.')
+  }
+  const safeFolder = String(folder).replace(/[^a-z0-9-]/gi, '') || 'images'
+  const storagePath = `${safeFolder}/${crypto.randomUUID()}.${ext}`
+  const client = getSupabaseBrowserClient()
+  const { error } = await client.storage.from('site-assets').upload(storagePath, file, {
+    contentType: file.type,
+    upsert: false,
+  })
+  if (error) throw new Error(error.message || 'Could not upload the image.')
+  const { data } = client.storage.from('site-assets').getPublicUrl(storagePath)
+  if (!data?.publicUrl) throw new Error('Could not read the uploaded image address.')
+  return data.publicUrl
 }
 
 export async function loadSiteContent() {

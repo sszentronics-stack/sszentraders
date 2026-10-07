@@ -15,8 +15,8 @@
  *    case a page wants to surface a subtle "showing sample products" note.
  *  - A published list never replaces the local storefront products. Those
  *    three keep their photos, copy, and video clips. A published row with
- *    the same slug only adds its variant id. Any other published product
- *    is listed after them.
+ *    the same slug updates the variant id when it differs. Any other
+ *    published product is listed after them.
  *  - Never throws into the component tree and never leaves the storefront
  *    on an infinite spinner — every path resolves `loading: false`.
  *

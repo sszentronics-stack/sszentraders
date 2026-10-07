@@ -12,7 +12,7 @@ export default function CartDrawer() {
   const { profile, customer, user } = useAuth()
   const known = knownCustomer({ profile, customer, user })
   const configured = isSupabaseConfigured()
-  const { items, total, isOpen, setIsOpen, updateQty, removeItem, removedNotice, dismissRemovedNotice } = useCart()
+  const { items, total, loading, isOpen, setIsOpen, updateQty, removeItem, removedNotice, dismissRemovedNotice } = useCart()
 
   if (!isOpen) return null
 
@@ -35,10 +35,15 @@ export default function CartDrawer() {
           </div>
         )}
 
-        {items.length === 0 ? (
+        {loading && items.length === 0 ? (
+          <div className="flex-1 grid place-items-center p-8 text-center text-ink-soft">
+            <p>Loading cart</p>
+          </div>
+        ) : items.length === 0 ? (
           <div className="flex-1 grid place-items-center p-8 text-center text-ink-soft">
             <div>
               <p className="mb-4">Your cart is empty</p>
+              {removedNotice && <p className="mb-4">{removedNotice}</p>}
               <Link to="/shop" className="btn-lavender inline-block w-auto px-6" onClick={() => setIsOpen(false)}>
                 Continue shopping
               </Link>

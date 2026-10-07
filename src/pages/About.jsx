@@ -12,7 +12,7 @@ export default function About() {
     <section className="ssz-section">
       <div className="ssz-container ssz-narrow">
         <h1>{about.title}</h1>
-        <img src={about.image} alt={about.alt} width="800" height="800" style={{ margin: '24px 0' }} />
+        <img className="ssz-about__photo" src={about.image} alt={about.alt} width="1024" height="1024" />
         {about.paragraphs.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}

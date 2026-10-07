@@ -16,7 +16,7 @@ import type { ProductWithRelations } from '../repositories/products.repository'
 
 export interface StorefrontProduct {
   id: string
-  /** The sellable variant/SKU id this card/page currently represents — what Phase 5's server-backed cart/wishlist reference. Absent on the offline fallback dataset (no live variant exists to reference), which is fine: that dataset only ever powers the localStorage cart fallback path. */
+  /** The sellable variant/SKU id this card/page currently represents — what Phase 5's server-backed cart/wishlist reference. The offline fallback dataset uses the seeded variant ids from supabase/dummy-data.sql so guest add-to-cart can still reach the server cart. */
   variantId?: string
   slug: string
   brand: string

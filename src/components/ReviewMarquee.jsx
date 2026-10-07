@@ -29,7 +29,7 @@ export default function ReviewMarquee() {
   const { heading, items } = useSiteContent().reviews
   const midpoint = Math.ceil(items.length / 2)
   return (
-    <section className="ssz-section">
+    <section className="ssz-section ssz-section--reviews">
       <div className="ssz-container">
         <div className="ssz-section__head" style={{ justifyContent: 'center' }}>
           <h2 className="ssz-reveal">{heading}</h2>

@@ -32,7 +32,7 @@ export default function Checkout() {
   useSeo({ title: 'Checkout | SSzentronics', noindex: true })
   const navigate = useNavigate()
   const { isAuthenticated, user, profile, customer, initializing, identityReady, ensureGuestSession, refreshProfile } = useAuth()
-  const { items, total, loading: cartLoading, clearCart } = useCart()
+  const { items, total, loading: cartLoading, clearCart, syncToServer } = useCart()
 
   const [step, setStep] = useState('contact')
   const [email, setEmail] = useState(user?.email ?? '')
@@ -293,6 +293,10 @@ export default function Checkout() {
 
     setSubmitting(true)
     try {
+      if (isSupabaseConfigured()) {
+        await ensureGuestSession()
+        await syncToServer()
+      }
       const order = await ordersApi.createOrder(parsed.data, idempotencyKey)
       if (findInfluencerCode(couponPreview?.couponCode)) {
         recordInfluencerRedemption(couponPreview.couponCode, customerPhone)
@@ -408,7 +412,7 @@ export default function Checkout() {
                   </select>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="form-field">
                   <label className="form-label" htmlFor="recipientName">Recipient name</label>
                   <input id="recipientName" className="form-input" aria-invalid={Boolean(errors.recipientName)} value={address.recipientName} onChange={(e) => editAddress('recipientName')(e.target.value)} autoComplete="name" />
@@ -433,7 +437,7 @@ export default function Checkout() {
                 <label className="form-label" htmlFor="addressLine2">Address line 2 (optional)</label>
                 <input id="addressLine2" className="form-input" value={address.addressLine2} onChange={(e) => editAddress('addressLine2')(e.target.value)} autoComplete="address-line2" />
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="form-field">
                   <label className="form-label" htmlFor="city">City</label>
                   <input id="city" className="form-input" aria-invalid={Boolean(errors.city)} value={address.city} onChange={(e) => editAddress('city')(e.target.value)} autoComplete="address-level2" />
@@ -448,7 +452,7 @@ export default function Checkout() {
                   <input id="postalCode" className="form-input" value={address.postalCode} onChange={(e) => editAddress('postalCode')(e.target.value)} autoComplete="postal-code" />
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button type="button" className="btn-outline w-auto px-6" onClick={() => goTo('contact')}>Back</button>
                 <button type="button" className="btn-lavender w-auto px-8" onClick={handleContinue}>Continue to delivery</button>
               </div>
@@ -462,7 +466,7 @@ export default function Checkout() {
                 <DeliveryOption value="standard" selected={deliveryMethod} onSelect={setDeliveryMethod} label="Standard delivery" eta="3–5 business days" cost={deliveryCost('standard')} />
                 <DeliveryOption value="express" selected={deliveryMethod} onSelect={setDeliveryMethod} label="Express delivery" eta="1–2 business days" cost={deliveryCost('express')} />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button type="button" className="btn-outline w-auto px-6" onClick={() => goTo('address')}>Back</button>
                 <button type="button" className="btn-lavender w-auto px-8" onClick={handleContinue}>Continue to payment</button>
               </div>
@@ -480,7 +484,7 @@ export default function Checkout() {
                 <label className="form-label" htmlFor="notes">Order notes (optional)</label>
                 <textarea id="notes" className="form-input" rows={3} value={customerNotes} onChange={(e) => setCustomerNotes(e.target.value)} />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button type="button" className="btn-outline w-auto px-6" onClick={() => goTo('delivery')}>Back</button>
                 <button type="button" className="btn-lavender w-auto px-8" onClick={handleContinue}>Review order</button>
               </div>

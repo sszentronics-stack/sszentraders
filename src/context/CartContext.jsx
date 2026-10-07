@@ -48,7 +48,7 @@ function mapSummaryToItems(summary) {
 
 export function CartProvider({ children }) {
   const configured = isSupabaseConfigured()
-  const { session } = useAuth()
+  const { session, ensureGuestSession } = useAuth()
 
   const [items, setItems] = useState(readLocalCart)
   const [isOpen, setIsOpen] = useState(false)
@@ -66,7 +66,14 @@ export function CartProvider({ children }) {
   }, [items])
 
   const applySummary = useCallback((summary) => {
-    setItems((prev) => [...prev.filter((item) => !isServerId(item.id)), ...mapSummaryToItems(summary)])
+    const incoming = Array.isArray(summary?.items) ? mapSummaryToItems(summary) : null
+    if (!incoming) return
+    setItems((prev) => {
+      const covered = new Set(incoming.map((item) => item.variantId).filter(Boolean))
+      const localItems = prev.filter((item) => item.local || !isServerId(item.id))
+      const kept = localItems.filter((item) => !item.variantId || !covered.has(item.variantId))
+      return [...kept, ...incoming]
+    })
     const removedCount = summary.removedItems?.length ?? 0
     const adjustedCount = summary.items?.filter((item) => item.quantityAdjusted).length ?? 0
     const notices = []
@@ -108,7 +115,7 @@ export function CartProvider({ children }) {
 
     async function sync() {
       const user = session?.user
-      if (!user || user.is_anonymous) {
+      if (!user) {
         if (!cancelled) setLoading(false)
         return
       }
@@ -139,32 +146,55 @@ export function CartProvider({ children }) {
   }, [configured, session?.user?.id, session?.user?.is_anonymous, reload])
 
   const rememberLocalItem = useCallback((product, qty) => {
+    const variantId = product.variantId ?? (isServerId(product.id) ? product.id : undefined)
+    const id = variantId ? `local:${variantId}` : product.id
     setItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id)
+      const existing = prev.find((item) => item.id === id || item.id === product.id || (variantId && item.variantId === variantId))
       if (existing) {
-        return prev.map((item) => (item.id === product.id ? { ...item, qty: item.qty + qty } : item))
+        return prev.map((item) => (item.id === existing.id ? { ...item, qty: item.qty + qty } : item))
       }
-      return [...prev, { id: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images?.[0], qty }]
+      return [...prev, {
+        id,
+        variantId,
+        local: true,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: product.images?.[0],
+        qty,
+      }]
     })
     setIsOpen(true)
   }, [])
 
+  const syncToServer = useCallback(async () => {
+    if (!configured) return
+    await ensureGuestSession()
+    const lines = itemsRef.current
+      .map((item) => ({
+        variantId: item.variantId ?? (isServerId(item.id) ? item.id : null),
+        quantity: item.qty,
+      }))
+      .filter((line) => isServerId(line.variantId) && line.quantity > 0)
+    if (lines.length === 0) {
+      throw new Error('Your cart could not be saved. Refresh the page and add the product again.')
+    }
+    applySummary(await cartApi.mergeCart(lines))
+  }, [configured, ensureGuestSession, applySummary])
+
   const addItem = useCallback(
     async (product, qty = 1) => {
-      const variantId = product.variantId ?? product.id
-      if (!configured || !isServerId(variantId)) {
-        rememberLocalItem(product, qty)
-        return
-      }
+      rememberLocalItem(product, qty)
+      const variantId = product.variantId ?? (isServerId(product.id) ? product.id : undefined)
+      if (!configured || !isServerId(variantId)) return
       try {
+        await ensureGuestSession()
         applySummary(await cartApi.addCartItem(variantId, qty))
-        setIsOpen(true)
       } catch (err) {
         console.error('Failed to add item to cart.', err)
-        rememberLocalItem(product, qty)
       }
     },
-    [configured, applySummary, rememberLocalItem],
+    [configured, applySummary, rememberLocalItem, ensureGuestSession],
   )
 
   const updateQty = useCallback(
@@ -237,12 +267,13 @@ export function CartProvider({ children }) {
       updateQty,
       removeItem,
       clearCart,
+      syncToServer,
       reorder,
       loading,
       removedNotice,
       dismissRemovedNotice,
     }),
-    [items, count, total, isOpen, addItem, updateQty, removeItem, clearCart, reorder, loading, removedNotice, dismissRemovedNotice],
+    [items, count, total, isOpen, addItem, updateQty, removeItem, clearCart, syncToServer, reorder, loading, removedNotice, dismissRemovedNotice],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

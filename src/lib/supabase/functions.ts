@@ -28,6 +28,18 @@ function isSuccessEnvelope<T>(value: unknown): value is SuccessEnvelope<T> {
   return Boolean(value && typeof value === 'object' && (value as { ok?: unknown }).ok === true && 'data' in (value as object))
 }
 
+/** Publishable API keys are not JWTs. Cart/orders require the user (or guest) access token. */
+export function authHeadersFromSession(
+  session: { access_token?: string } | null | undefined,
+  extra: Record<string, string> = {},
+): Record<string, string> {
+  const headers = { ...extra }
+  if (session?.access_token) {
+    headers.Authorization = `Bearer ${session.access_token}`
+  }
+  return headers
+}
+
 /**
  * `name` may include a sub-path, e.g. "auth/profile" invokes the `auth`
  * Edge Function's `/profile` route (see supabase/functions/auth/index.ts).
@@ -37,10 +49,13 @@ export async function callEdgeFunction<T>(
   options: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown; headers?: Record<string, string> } = {},
 ): Promise<T> {
   const client = getSupabaseBrowserClient()
+  const {
+    data: { session },
+  } = await client.auth.getSession()
   const { data, error } = await client.functions.invoke(name, {
     method: options.method ?? 'POST',
     body: options.body as Record<string, unknown> | undefined,
-    headers: options.headers,
+    headers: authHeadersFromSession(session, options.headers),
   })
 
   if (error) {

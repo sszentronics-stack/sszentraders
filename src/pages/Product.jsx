@@ -17,6 +17,13 @@ import TrustBar from '../components/TrustBar'
 import ReviewsSection from '../components/ReviewsSection'
 import { ChevronLeft, ChevronRight, Heart, Share2 } from 'lucide-react'
 
+const OFFICIAL_ADS = {
+  'hero-mighty-patch-invisible-plus': {
+    id: 'gaeYz1m7OGk',
+    title: 'Mighty Patch Original or Invisible+, from Hero Cosmetics',
+  },
+}
+
 export default function Product() {
   const { slug } = useParams()
   const { product, others, loading, notFound } = useProduct(slug)
@@ -152,30 +159,18 @@ export default function Product() {
               <button type="button" className="ssz-product__zoom" aria-label={`Zoom ${product.name}`} onClick={() => setZoom(true)} />
               {product.images.length > 1 && (
                 <>
-                  <button
-                    type="button"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/90 text-ink grid place-items-center shadow sm:hidden"
-                    aria-label="Previous image"
-                    onClick={showPrev}
-                  >
-                    <ChevronLeft size={20} />
+                  <button type="button" className="ssz-product__arrow ssz-product__arrow--prev" aria-label="Previous image" onClick={showPrev}>
+                    <ChevronLeft size={18} />
                   </button>
-                  <button
-                    type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/90 text-ink grid place-items-center shadow sm:hidden"
-                    aria-label="Next image"
-                    onClick={showNext}
-                  >
-                    <ChevronRight size={20} />
+                  <button type="button" className="ssz-product__arrow ssz-product__arrow--next" aria-label="Next image" onClick={showNext}>
+                    <ChevronRight size={18} />
                   </button>
-                  <p className="absolute bottom-2 right-3 z-10 text-xs bg-white/90 px-2 py-0.5 rounded sm:hidden">
-                    {active + 1} / {product.images.length}
-                  </p>
+                  <p className="ssz-product__count">{active + 1} / {product.images.length}</p>
                 </>
               )}
             </div>
           </div>
-          <div className="flex sm:hidden gap-2 overflow-x-auto mt-3 pb-1 -mx-1 px-1">
+          <div className="ssz-product__thumbs-row">
             {thumbs}
           </div>
         </div>
@@ -287,6 +282,21 @@ export default function Product() {
           >
             <Share2 size={15} /> Share
           </button>
+
+          {OFFICIAL_ADS[product.slug] && (
+            <div className="ssz-product__ad">
+              <h2>Official ad</h2>
+              <div className="ssz-product__player">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${OFFICIAL_ADS[product.slug].id}`}
+                  title={OFFICIAL_ADS[product.slug].title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

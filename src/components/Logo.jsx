@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom'
 import { useSiteContent } from '../lib/siteContent'
 
 export default function Logo() {
-  const name = useSiteContent().business.name
+  const { business, logo } = useSiteContent()
   return (
-    <Link to="/" className="ssz-logo" aria-label={`${name} home`}>
-      <img src="/logo.png" alt="" width="52" height="52" />
+    <Link to="/" className="ssz-logo" aria-label={`${business.name} home`}>
+      <img src={logo || '/logo.png'} alt="" width="1024" height="223" />
     </Link>
   )
 }

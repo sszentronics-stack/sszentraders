@@ -42,7 +42,7 @@ export default function ProductCard({ product }) {
       </Link>
       <button
         type="button"
-        className="ssz-btn ssz-btn--outline ssz-card__add"
+        className="ssz-btn ssz-card__add"
         disabled={soldOut}
         onClick={() => addItem(product, 1)}
       >

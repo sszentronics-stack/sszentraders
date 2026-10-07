@@ -3,6 +3,9 @@
 
 project_id = "tiwoqgagrclmbysgexbf"
 
+[auth]
+enable_anonymous_sign_ins = true
+
 [api]
 enabled = true
 

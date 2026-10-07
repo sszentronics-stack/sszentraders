@@ -5,12 +5,6 @@ import { priceAfterInfluencer, useAppliedInfluencerPromo } from '../lib/influenc
 import { useCart } from '../context/CartContext'
 import { useSiteContent } from '../lib/siteContent'
 
-const VIDEOS = {
-  'sadoer-collagen-anti-aging-facial-mask': '/videos/sadoer.mp4',
-  'hero-mighty-patch-invisible-plus': '/videos/mighty-patch.mp4',
-  'some-by-mi-aha-bha-pha-30-days-miracle-toner': '/videos/some-by-mi.mp4',
-}
-
 const CARD_ORDER = [
   'hero-mighty-patch-invisible-plus',
   'sadoer-collagen-anti-aging-facial-mask',
@@ -36,12 +30,16 @@ export default function WatchAndShop({ products }) {
   const cards = products
     .map((product) => ({
       product,
-      video: watch.clips[product.slug] || VIDEOS[product.slug],
+      video: watch.clips[product.slug],
       poster: product.images?.[0],
       caption: product.tagline || product.subtitle || product.name,
     }))
     .filter((card) => card.video)
-    .sort((a, b) => CARD_ORDER.indexOf(a.product.slug) - CARD_ORDER.indexOf(b.product.slug))
+    .sort((a, b) => {
+      const aIndex = CARD_ORDER.indexOf(a.product.slug)
+      const bIndex = CARD_ORDER.indexOf(b.product.slug)
+      return (aIndex === -1 ? CARD_ORDER.length : aIndex) - (bIndex === -1 ? CARD_ORDER.length : bIndex)
+    })
 
   useEffect(() => {
     const track = trackRef.current
